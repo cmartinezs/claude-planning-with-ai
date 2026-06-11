@@ -1,0 +1,10 @@
+{
+  "name": "claude-planning-with-ai",
+  "description": "Structured planning system for software projects. Lifecycle management (plan-new, plan-expand, plan-scope, plan-done, plan-archive), backlog enrichment (us-enrich, us-new, epic-enrich), and epic-to-planning bridge (plan-from-epic). Works with any markdown-based story/epic structure.",
+  "version": "1.0.0",
+  "author": {
+    "name": "cmartinezs",
+    "email": "carlos.f.martinez.s@gmail.com",
+    "url": "https://cmartinezs.github.io"
+  }
+}
