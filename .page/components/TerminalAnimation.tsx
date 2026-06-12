@@ -11,7 +11,7 @@ interface Props {
   onComplete?: () => void
 }
 
-function Prompt() {
+export function Prompt() {
   const [time, setTime] = useState('00:00')
 
   useEffect(() => {
@@ -94,7 +94,13 @@ export default function TerminalAnimation({ script, embedded = false, onComplete
         </div>
       )}
 
-      <div ref={scrollAreaRef} className={`${embedded ? 'min-h-0' : 'min-h-[320px] max-h-[400px]'} p-4 sm:p-5 flex-1 overflow-y-auto bg-surface-950/50`}>
+      <div ref={scrollAreaRef} className={`${embedded ? 'min-h-0' : 'min-h-[320px] max-h-[400px]'} p-4 sm:p-5 flex-1 overflow-y-auto scrollbar-dark bg-surface-950/50`}>
+        <div className="mb-1">
+          <Prompt />
+          <span className="text-brand-300 font-mono text-sm">{typed}</span>
+          {phase === 'typing' && <Blinker />}
+        </div>
+
         {outputLines.map((line, i) => {
           const display = line ?? ''
 
@@ -146,11 +152,12 @@ export default function TerminalAnimation({ script, embedded = false, onComplete
           )
         })}
 
-        <div className="mt-1">
-          <Prompt />
-          <span className="text-brand-300 font-mono text-sm">{typed}</span>
-          {phase !== 'done' && <Blinker />}
-        </div>
+        {phase === 'done' && (
+          <div className="mt-1">
+            <Prompt />
+            <Blinker />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from '../locales'
 
 const icons: ReactNode[] = [
@@ -25,6 +25,27 @@ const icons: ReactNode[] = [
 export default function WhatItDoes() {
   const t = useTranslation()
   const features = t.whatItDoes.features.map((f, i) => ({ ...f, icon: icons[i] }))
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [activeSlide, setActiveSlide] = useState(0)
+
+  const handleScroll = () => {
+    const track = trackRef.current
+    if (!track) return
+    const cards = Array.from(track.children) as HTMLElement[]
+    const center = track.scrollLeft + track.clientWidth / 2
+    const closest = cards.reduce((best, card, i) => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2
+      return Math.abs(cardCenter - center) < Math.abs(best.distance) ? { index: i, distance: cardCenter - center } : best
+    }, { index: 0, distance: Infinity })
+    setActiveSlide(closest.index)
+  }
+
+  const scrollToSlide = (i: number) => {
+    const track = trackRef.current
+    const card = track?.children[i] as HTMLElement | undefined
+    if (!track || !card) return
+    track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' })
+  }
 
   return (
     <section id="que-hace" className="relative py-24 md:py-32 scroll-mt-24">
@@ -42,11 +63,15 @@ export default function WhatItDoes() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          ref={trackRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-6 -mx-4 px-4 sm:-mx-6 sm:px-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible md:mx-0 md:px-0"
+        >
           {features.map((feature, i) => (
             <div
               key={i}
-              className="glass-card-hover p-6 md:p-8 group"
+              className="glass-card-hover p-6 md:p-8 group shrink-0 snap-center w-full md:w-auto md:shrink"
               style={{ animationDelay: `${i * 0.1}s` }}
             >
               <div className="w-12 h-12 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center mb-5 group-hover:bg-brand-500/20 transition-colors">
@@ -59,6 +84,20 @@ export default function WhatItDoes() {
                 {feature.description}
               </p>
             </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex justify-center gap-2 md:hidden">
+          {features.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => scrollToSlide(i)}
+              aria-label={`${i + 1} / ${features.length}`}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                activeSlide === i ? 'w-6 bg-brand-400' : 'w-2 bg-surface-600'
+              }`}
+            />
           ))}
         </div>
       </div>

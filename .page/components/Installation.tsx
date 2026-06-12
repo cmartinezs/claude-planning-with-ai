@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import TerminalAnimation, { type TerminalScript } from './TerminalAnimation'
+import TerminalAnimation, { Prompt, type TerminalScript } from './TerminalAnimation'
 import { useTranslation } from '../locales'
 
 const workspaceFiles = [
@@ -77,7 +77,7 @@ function WorkspaceMock({
     <div className="relative">
       <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-brand-500/15 via-cyan-500/10 to-transparent blur-2xl" />
       <div className="relative overflow-hidden rounded-2xl border border-surface-600/70 bg-surface-950 shadow-2xl shadow-brand-500/10">
-        <div className="grid min-h-[560px] grid-cols-[44px_minmax(128px,180px)_1fr] bg-surface-900/70">
+        <div className="grid min-h-[560px] grid-cols-[44px_1fr] md:grid-cols-[44px_minmax(128px,180px)_1fr] bg-surface-900/70">
           <div className="flex flex-col items-center gap-4 border-r border-surface-800 bg-surface-950 py-4 text-surface-500">
             <span className="text-lg text-surface-200">▣</span>
             <span className="text-lg">⌕</span>
@@ -85,7 +85,7 @@ function WorkspaceMock({
             <span className="mt-auto text-lg text-brand-400">⚙</span>
           </div>
 
-          <aside className="border-r border-surface-800 bg-surface-900/80">
+          <aside className="hidden md:block border-r border-surface-800 bg-surface-900/80">
             <div className="border-b border-surface-800 px-3 py-3 text-[11px] font-semibold uppercase tracking-wider text-surface-500">
               Explorer
             </div>
@@ -138,10 +138,9 @@ function WorkspaceMock({
                   <span className="text-brand-400">Terminal</span>
                 </div>
                 {activeStep === null ? (
-                  <div className="p-5 font-mono text-sm text-surface-500">
-                    <span className="text-cyan-400">└─</span>
-                    <span className="text-yellow-400">▪</span>{' '}
-                    <span className="text-surface-600">{waitingLabel}</span>
+                  <div className="p-5">
+                    <Prompt />
+                    <span className="font-mono text-sm text-surface-600">{waitingLabel}</span>
                   </div>
                 ) : (
                   <TerminalAnimation
@@ -270,7 +269,7 @@ export default function Installation() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <InstallCard
               title={t.installation.marketplace.title}
               description={t.installation.marketplace.description}
@@ -292,7 +291,7 @@ export default function Installation() {
             {t.installation.firstSteps}
           </h3>
 
-          <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-8 items-start">
             <div className="space-y-3">
               {steps.map((step, i) => {
                 const isActive = activeStep === i
@@ -328,8 +327,8 @@ export default function Installation() {
                       {isDone ? '✓' : i + 1}
                     </div>
                     <div className="min-w-0">
-                      <div className={`code-block inline-block mb-1 ${!isEnabled ? 'border-surface-800 bg-surface-900/40' : ''}`}>
-                        <code className={`text-sm font-mono px-3 py-1.5 block whitespace-nowrap ${!isEnabled ? 'text-surface-600' : ''}`}>
+                      <div className={`code-block inline-block max-w-full mb-1 ${!isEnabled ? 'border-surface-800 bg-surface-900/40' : ''}`}>
+                        <code className={`text-sm font-mono px-3 py-1.5 block break-words ${!isEnabled ? 'text-surface-600' : ''}`}>
                           {step.label}
                         </code>
                       </div>
