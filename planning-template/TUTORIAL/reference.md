@@ -61,6 +61,10 @@ Todos los comandos disponibles con su sintaxis exacta.
 # Ver estado de todos los plannings
 /plan-status
 
+# Validar integridad estructural (solo lectura: ubicación, scopes, workflows, dependencias)
+/plan-validate                         # todos los plannings
+/plan-validate NNN-slug                # solo uno
+
 # Ejecutar todas las tareas de un scope
 /plan-scope NNN-slug scope-NN
 
@@ -112,6 +116,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Convertir un epic en planning ejecutable | `/plan-from-epic NNN epic-NN-slug` |
 | Planificar trabajo técnico sin epic | `/plan-template` → `/plan-new` → `/plan-expand` |
 | Ver todos los plannings activos | `/plan-status` |
+| Verificar que un planning está bien formado | `/plan-validate NNN-slug` |
 | Ejecutar un scope | `/plan-scope NNN-slug scope-NN` |
 | Trabajo nuevo apareció durante ejecución | `/plan-enrich-epic NNN-slug` |
 | Scope del planning está mal especificado | `/plan-enrich-story NNN-slug scope-NN` |
@@ -132,6 +137,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-template` | `slug [--interactive\|--blank]` |
 | `/plan-new` | `NNN-slug -- intent` ó `NNN-slug @path.md` |
 | `/plan-expand` | `NNN-slug` |
+| `/plan-validate` | `[NNN-slug]` (vacío = todos) |
 | `/plan-scope` | `NNN-slug scope-NN` |
 | `/plan-done` | `NNN-slug scope-NN` ó `NNN-slug scope-NN task-N` |
 | `/plan-archive` | `NNN-slug` |

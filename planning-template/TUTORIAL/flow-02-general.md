@@ -160,7 +160,10 @@ Si ejecutas algún scope a mano, márcalo después:
 
 ## Paso 5 — Archivar
 
+Valida la integridad estructural y, si no hay FAIL, archiva:
+
 ```
+/plan-validate 001-jwt-auth-api
 /plan-archive 001-jwt-auth-api
 ```
 

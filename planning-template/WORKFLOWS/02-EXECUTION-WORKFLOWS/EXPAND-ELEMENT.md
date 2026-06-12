@@ -23,8 +23,8 @@
 Deepens the **indicated document** — adding content, examples, sub-sections, or additional context to it. Does not create a new document.
 
 > **The target is the document named in the invocation, not the artefact that document describes.**
-> Example: `scope-01-archon-cli-readme.md EXPAND-ELEMENT` → expand `scope-01-archon-cli-readme.md` itself
-> (add proposed content, sharper criteria, etc.), not `packages/archon-cli/README.md`.
+> Example: `scope-01-api-readme.md EXPAND-ELEMENT` → expand `scope-01-api-readme.md` itself
+> (add proposed content, sharper criteria, etc.), not `api/README.md`.
 
 ---
 

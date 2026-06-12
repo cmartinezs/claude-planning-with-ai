@@ -36,6 +36,7 @@ Full command listing with flags, arguments, and the structure installed by `/pla
 | `/plan-new NNN-slug -- intent` | Create a planning in INITIAL state |
 | `/plan-new NNN-slug @path.md` | Create a planning from an idea document |
 | `/plan-status` | Show all active plannings and their scopes |
+| `/plan-validate [NNN-slug]` | Check structural integrity (file locations, scope consistency, workflow IDs, dependencies) |
 | `/plan-expand NNN-slug` | Advance INITIAL → EXPANSION |
 | `/plan-scope NNN-slug scope-NN` | Execute all tasks in a scope |
 | `/plan-done NNN-slug scope-NN` | Mark a scope complete and advance |
@@ -102,7 +103,6 @@ Areas are the columns of the traceability matrix — every planning scope tracks
 ├── finished/               ← completed plannings (read-only)
 ├── GUIDE.md                ← area table filled in by plan-init
 ├── GLOSSARY.md
-├── METALANGUAGE.md
 ├── PROMPTING.md
 ├── TRACEABILITY-GLOBAL.md  ← columns filled in by plan-init
 └── README.md

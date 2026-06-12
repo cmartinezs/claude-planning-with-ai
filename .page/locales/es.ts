@@ -24,7 +24,7 @@ const es = {
     demoBtn: 'Ver demo',
     stats: [
       { value: '5', label: 'Estados del ciclo' },
-      { value: '10+', label: 'Comandos' },
+      { value: '16', label: 'Comandos' },
       { value: 'Markdown', label: 'Formato nativo' },
       { value: '0', label: 'Dependencias' },
     ],
@@ -94,7 +94,7 @@ const es = {
   commands: {
     titlePrefix: 'Comandos',
     titleHighlight: 'esenciales',
-    subtitle: 'Una docena de comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
+    subtitle: '16 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
     categories: [
       {
         title: 'Inicialización',
@@ -128,6 +128,7 @@ const es = {
           { cmd: '/plan-scope NNN-slug scope-NN', desc: 'Ejecuta todas las tareas de un scope' },
           { cmd: '/plan-done NNN-slug scope-NN', desc: 'Marca un scope como completado' },
           { cmd: '/plan-status', desc: 'Muestra todos los planes activos y sus scopes' },
+          { cmd: '/plan-validate', desc: 'Verifica la integridad estructural de los plannings' },
           { cmd: '/plan-archive NNN-slug', desc: 'Audita y archiva en finished/' },
         ],
       },

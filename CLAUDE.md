@@ -39,7 +39,6 @@ Each directory under `skills/` maps to one slash command. The `SKILL.md` in each
 | `WORKFLOWS/` | Workflow definitions referenced by task steps (5 groups: Planning, Execution, Maintenance, Sub-workflows, SDLC Guidance) |
 | `TUTORIAL/` | Flow guides for new users |
 | `GLOSSARY.md` | Operational vocabulary — the authoritative definition of all system terms |
-| `METALANGUAGE.md` | YAML authoring spec (`*.plan.yaml`) that compiles to the same markdown the system uses |
 | `GUIDE.md` | Lifecycle reference and naming conventions |
 
 ### Planning lifecycle
@@ -64,11 +63,9 @@ Every task in every scope must reference a workflow ID from `WORKFLOWS/`. The fo
 - `03-MAINTENANCE-WORKFLOWS/` — UPDATE-TRACEABILITY, RECORD-INCONSISTENCY, CASCADE-CHANGE, AUDIT-PLANNING, etc.
 - `04-SUB-WORKFLOWS/` — Reusable step sequences embedded via `[SUB-WORKFLOW-NAME]`
 
-`WORKFLOWS/API.md` documents the programmatic API workflows (QUERY-PLANNING, ADVANCE-SCOPE, VALIDATE-OUTPUT, GET-GRAPH) consumed by the `archon planning` CLI.
+### Validation
 
-### YAML metalanguage
-
-`METALANGUAGE.md` defines `*.plan.yaml`, a structured authoring format that compiles to the same markdown files used by the system. The compiler is at `planning/_compiler/yaml-to-markdown.ts` and is invoked via `archon planning compile`. The source of truth for version control is always the compiled markdown, not the YAML.
+There is no compiler or schema engine — the markdown files are the only representation. Structural integrity is checked by the `/plan-validate` skill, which verifies planning structure (file locations per state, scope table ↔ scope file consistency, workflow IDs against the `WORKFLOWS/` catalog, dependency references) directly from the markdown.
 
 ## Coding conventions
 

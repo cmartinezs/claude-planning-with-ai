@@ -73,6 +73,7 @@ Or generate a planning directly from existing stories:
 - **Auto-configured for your project** — `/plan-init` discovers your structure; you confirm.
 - **Backlog bridge** — convert existing epics/stories into executable plannings in one command.
 - **Mid-execution adjustments** — enrich, split, or deepen scopes without losing history.
+- **Self-checking** — `/plan-validate` audits structure, dependencies, and workflow references at any time.
 - **Pure markdown** — no lock-in, readable in any editor, version-controlled with your code.
 
 ---
@@ -83,7 +84,7 @@ Or generate a planning directly from existing stories:
 |-------|----------|
 | Init | `/plan-init` · `--blank` · `--force` |
 | Lifecycle | `/plan-new` · `/plan-expand` · `/plan-scope` · `/plan-done` · `/plan-archive` |
-| Status / ideas | `/plan-status` · `/plan-template` |
+| Status / ideas | `/plan-status` · `/plan-validate` · `/plan-template` |
 | Backlog | `/us-new` · `/us-enrich` · `/epic-enrich` · `/plan-from-epic` |
 | Adjust | `/plan-enrich-epic` · `/plan-enrich-story` · `/plan-split-story` |
 

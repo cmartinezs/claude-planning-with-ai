@@ -169,6 +169,7 @@ Use these when a planning is already active and reality has changed.
 | `/plan-template` | `[slug] [--interactive\|--blank]` | Generate an idea document |
 | `/plan-new` | `NNN-slug -- intent` or `NNN-slug @path.md` | Create a planning in INITIAL |
 | `/plan-status` | — | Show all plannings and scope statuses |
+| `/plan-validate` | `[NNN-slug]` | Check structural integrity of one or all plannings (read-only) |
 | `/plan-expand` | `NNN-slug` | Advance INITIAL → EXPANSION |
 | `/plan-scope` | `NNN-slug scope-NN` | Execute all tasks in a scope |
 | `/plan-done` | `NNN-slug scope-NN [task-N]` | Mark a scope (or single task) done |
@@ -210,6 +211,14 @@ Useful when you want to record partial progress without closing the scope.
 
 Shows all plannings (INITIAL, active, completed) and the status of each scope.
 
+### Validate structure before archiving
+
+```
+/plan-validate 001-checkout
+```
+
+Read-only structural audit: file locations per state, scope table ↔ scope file consistency, workflow IDs against the catalog, dependency references, and done criteria. Run it without arguments to validate every planning. Fix any FAIL it reports before `/plan-archive`.
+
 ---
 
 ## Working with areas
@@ -229,5 +238,6 @@ If you add a new directory to your project and want it tracked:
 - **One planning per initiative.** Don't create a planning for a task that takes 30 minutes. Use plannings for work that spans multiple sessions or areas.
 - **Enrich before generating.** Running `/us-enrich` on stories before `/plan-from-epic` produces richer scopes with better done criteria.
 - **`/plan-status` is your dashboard.** Check it at the start of every session to orient yourself.
+- **`/plan-validate` before `/plan-archive`.** A clean validation report means the audit will pass without surprises. It's read-only, so run it as often as you like.
 - **Residuals are not failures.** If something can't be resolved in the current scope, record it as a residual (it moves to the next planning). The system is designed for this.
 - **`finished/` is read-only.** Never edit archived plannings. If you need to continue the work, create a new planning that references the archived one.

@@ -47,7 +47,7 @@ planning-system/
 │   ├── TUTORIAL/            ← end-user flow guides
 │   ├── active/              ← stub for active plannings
 │   ├── finished/            ← stub for finished plannings
-│   └── *.md                 ← GUIDE, GLOSSARY, METALANGUAGE, PROMPTING, etc.
+│   └── *.md                 ← GUIDE, GLOSSARY, PROMPTING, etc.
 ├── scripts/
 │   └── migrate-commands.sh  ← one-off migration from legacy .claude/commands/ format
 ├── .page/                   ← Next.js/Tailwind static landing page
@@ -236,17 +236,9 @@ Claude resolves `[CHECK-AGNOSTIC-BOUNDARY]` by reading `04-SUB-WORKFLOWS/CHECK-A
 
 ---
 
-## YAML metalanguage
+## Structural validation
 
-`planning-template/METALANGUAGE.md` defines `*.plan.yaml`, a structured authoring format for plannings. Key facts:
-
-- YAML compiles to the same markdown files the system uses (`00-initial.md`, `01-expansion.md`, scope files, `TRACEABILITY.md`)
-- The compiler lives at `planning/_compiler/yaml-to-markdown.ts` (user-side, not in this repo)
-- Invoked via `archon planning compile --input <file.yaml> --output planning/active/`
-- The source of truth is always the compiled markdown — YAML is an authoring convenience
-- Machines can emit YAML; humans may author in YAML for complex plannings
-
-See `METALANGUAGE.md` for the full field reference and a complete example.
+There is no compiler, schema engine, or alternative authoring format — the markdown files in `.planning/` are the only representation of a planning. The `/plan-validate` skill provides structural integrity checking: it reads the planning markdown directly and verifies file locations per lifecycle state, scope table ↔ scope file consistency, workflow IDs against the `WORKFLOWS/` catalog, and dependency references. It is read-only and reports findings without modifying files.
 
 ---
 
@@ -269,7 +261,7 @@ npm run lint     # ESLint
 |-----------|---------|---------|
 | `SplashScreen.tsx` | Intro overlay | Animated intro dismissed on click |
 | `Header.tsx` | Fixed nav | Logo + nav links + GitHub CTA |
-| `Hero.tsx` | Above fold | Headline, stats (5 lifecycle states, 15+ commands…) |
+| `Hero.tsx` | Above fold | Headline, stats (5 lifecycle states, 16 commands…) |
 | `Installation.tsx` | `#instalacion` | Two install methods + interactive 4-step demo |
 | `WhatItDoes.tsx` | `#que-hace` | 6-feature grid |
 | `Lifecycle.tsx` | `#ciclo` | 5-state visual pipeline (INITIAL → ARCHIVE) |

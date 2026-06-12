@@ -170,7 +170,13 @@ Si prefieres ejecutar las tareas a mano y solo marcar el scope como hecho:
 
 ## Paso 5 — Archivar
 
-Cuando todos los scopes están en `DONE`:
+Cuando todos los scopes están en `DONE`, valida la integridad estructural antes de cerrar:
+
+```
+/plan-validate 005-grading-assistance
+```
+
+Si el reporte sale limpio (sin FAIL), archiva:
 
 ```
 /plan-archive 005-grading-assistance
