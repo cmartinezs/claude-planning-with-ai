@@ -162,67 +162,36 @@ function WorkspaceMock({
 function InstallCard({
   title,
   description,
-  code,
-  note,
-  cloneInstructions,
+  lines,
+  windowLabel,
 }: {
   title: string
   description: string
-  code?: string
-  note?: string
-  cloneInstructions?: boolean
+  lines: string[]
+  windowLabel: string
 }) {
   return (
     <div className="glass-card p-6 md:p-8">
       <h3 className="text-lg font-semibold text-surface-50 mb-2">{title}</h3>
       <p className="text-sm text-surface-400 mb-5">{description}</p>
 
-      {cloneInstructions ? (
-        <div className="space-y-4">
-          <div className="code-block">
-            <div className="flex items-center gap-2 px-4 py-2 bg-surface-900/50 border-b border-surface-700">
-              <div className="flex gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-red-500/50" />
-                <span className="w-3 h-3 rounded-full bg-yellow-500/50" />
-                <span className="w-3 h-3 rounded-full bg-green-500/50" />
-              </div>
-              <span className="text-xs text-surface-600 font-mono">terminal</span>
-            </div>
-            <div className="p-4 space-y-2">
-              <code className="text-sm text-brand-400 font-mono block">
-                git clone git@github.com:cmartinezs/claude-planning-with-ai.git
-              </code>
-              <code className="text-sm text-green-400 font-mono block">
-                ln -s $(pwd)/claude-planning-with-ai ~/.claude/plugins/claude-planning-with-ai
-              </code>
-            </div>
+      <div className="code-block">
+        <div className="flex items-center gap-2 px-4 py-2 bg-surface-900/50 border-b border-surface-700">
+          <div className="flex gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-red-500/50" />
+            <span className="w-3 h-3 rounded-full bg-yellow-500/50" />
+            <span className="w-3 h-3 rounded-full bg-green-500/50" />
           </div>
-          {note && (
-            <div className="flex items-center gap-2 text-xs text-surface-500 bg-surface-800/50 rounded-xl px-4 py-3 border border-surface-700/50">
-              <svg className="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{note}</span>
-            </div>
-          )}
+          <span className="text-xs text-surface-600 font-mono">{windowLabel}</span>
         </div>
-      ) : (
-        <div className="code-block">
-          <div className="flex items-center gap-2 px-4 py-2 bg-surface-900/50 border-b border-surface-700">
-            <div className="flex gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500/50" />
-              <span className="w-3 h-3 rounded-full bg-yellow-500/50" />
-              <span className="w-3 h-3 rounded-full bg-green-500/50" />
-            </div>
-            <span className="text-xs text-surface-600 font-mono">terminal</span>
-          </div>
-          <div className="p-4">
-            <code className="text-sm text-brand-400 font-mono leading-relaxed block">
-              {code}
+        <div className="p-4 space-y-2">
+          {lines.map((line) => (
+            <code key={line} className="text-sm text-brand-400 font-mono block break-words">
+              {line}
             </code>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -273,14 +242,28 @@ export default function Installation() {
             <InstallCard
               title={t.installation.marketplace.title}
               description={t.installation.marketplace.description}
-              code="/plugin install claude-planning-with-ai"
+              windowLabel="claude"
+              lines={[
+                '/plugin marketplace add cmartinezs/claude-planning-with-ai',
+                '/plugin install claude-planning-with-ai@cmartinezs',
+              ]}
             />
             <InstallCard
-              title={t.installation.symlink.title}
-              description={t.installation.symlink.description}
-              cloneInstructions
-              note={t.installation.symlink.note}
+              title={t.installation.terminal.title}
+              description={t.installation.terminal.description}
+              windowLabel="terminal"
+              lines={[
+                'claude plugin marketplace add cmartinezs/claude-planning-with-ai',
+                'claude plugin install claude-planning-with-ai@cmartinezs',
+              ]}
             />
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm text-surface-400">
+            <span>{t.installation.updateNote}</span>
+            <code className="code-block px-3 py-1.5 text-sm font-mono text-brand-400">
+              claude plugin update claude-planning-with-ai
+            </code>
           </div>
         </div>
       </section>

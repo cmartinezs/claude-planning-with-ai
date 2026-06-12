@@ -23,18 +23,25 @@
 
 ## Install
 
-**From the marketplace** *(coming soon)*:
-```bash
-/plugin install claude-planning-with-ai
+From within Claude Code, add the marketplace and install the plugin:
+
+```
+/plugin marketplace add cmartinezs/claude-planning-with-ai
+/plugin install claude-planning-with-ai@cmartinezs
 ```
 
-**Now — symlink your local clone:**
+Or from your terminal:
+
 ```bash
-git clone git@github.com:cmartinezs/claude-planning-with-ai.git
-ln -s $(pwd)/claude-planning-with-ai ~/.claude/plugins/claude-planning-with-ai
+claude plugin marketplace add cmartinezs/claude-planning-with-ai
+claude plugin install claude-planning-with-ai@cmartinezs
 ```
 
-The symlink points Claude Code directly at your clone — changes take effect immediately, no reinstall.
+To update to the latest version later:
+
+```bash
+claude plugin update claude-planning-with-ai
+```
 
 ---
 

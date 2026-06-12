@@ -148,14 +148,14 @@ const en = {
     titleHighlight: '2 steps',
     subtitle: 'The plugin works with any markdown-based project. No external dependencies. No prior configuration.',
     marketplace: {
-      title: 'From marketplace',
-      description: 'Plugin published on the Claude Code marketplace:',
+      title: 'From within Claude Code',
+      description: 'Add the marketplace and install the plugin:',
     },
-    symlink: {
-      title: 'From local (symlink)',
-      description: 'Clone the repo and link it where Claude looks for plugins:',
-      note: 'The symlink points the plugin directly at your local clone. Any changes to the repo are available immediately, no reinstall needed.',
+    terminal: {
+      title: 'From your terminal',
+      description: 'The same two steps using the Claude Code CLI:',
     },
+    updateNote: 'To update to the latest version later:',
     firstSteps: 'First steps',
     interactive: 'interactive — run the steps in order',
     waiting: 'waiting for command...',

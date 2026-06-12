@@ -149,14 +149,14 @@ const es = {
     titleHighlight: '2 pasos',
     subtitle: 'El plugin funciona con cualquier proyecto que use markdown. Sin dependencias externas. Sin configuración previa.',
     marketplace: {
-      title: 'Desde marketplace',
-      description: 'Plugin publicado en el marketplace de Claude Code:',
+      title: 'Desde Claude Code',
+      description: 'Agrega el marketplace e instala el plugin:',
     },
-    symlink: {
-      title: 'Desde local (symlink)',
-      description: 'Clona el repo y enlázalo donde Claude busca plugins:',
-      note: 'El symlink apunta el plugin directamente a tu clon local. Cualquier cambio en el repo queda disponible de inmediato, sin reinstalar.',
+    terminal: {
+      title: 'Desde tu terminal',
+      description: 'Los mismos dos pasos usando la CLI de Claude Code:',
     },
+    updateNote: 'Para actualizar a la última versión más adelante:',
     firstSteps: 'Primeros pasos',
     interactive: 'interactivo — ejecuta los pasos en orden',
     waiting: 'esperando comando...',
