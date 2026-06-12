@@ -1,7 +1,7 @@
 ---
 name: epic-enrich
 description: Add new stories to an existing story container. Reads the current content, identifies gaps in coverage, and guides the addition of new stories. Works with any directory of story files or single docume
-argument-hint: path to the story container:
+argument-hint: <path/to/epic-dir/> | <path/to/stories.md>
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

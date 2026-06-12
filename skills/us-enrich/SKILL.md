@@ -1,7 +1,7 @@
 ---
 name: us-enrich
 description: Enrich a user story (or any story-shaped document) by adding execution-relevant sections it is missing: a testable Definition of Done, Technical Notes / affected areas, Dependencies, and a Complexity 
-argument-hint: any of:
+argument-hint: <path/to/story.md> | <story-id> | <partial-filename>
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

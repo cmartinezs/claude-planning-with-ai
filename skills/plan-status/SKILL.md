@@ -1,6 +1,7 @@
 ---
 name: plan-status
 description: Show the current state of all plannings in the `.planning/` system.
+argument-hint: (no arguments)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 
