@@ -1,99 +1,8 @@
 import { useState } from 'react'
 import TerminalAnimation, { type TerminalScript } from './TerminalAnimation'
+import { useTranslation } from '../locales'
 
-const installMethods = [
-  {
-    title: 'Desde marketplace',
-    description: 'Plugin publicado en el marketplace de Claude Code:',
-    code: '/plugin install claude-planning-with-ai',
-  },
-  {
-    title: 'Desde local (symlink)',
-    description: 'Clona el repo y enlázalo donde Claude busca plugins:',
-    code: '',
-    cloneInstructions: true,
-  },
-]
-
-const steps = [
-  {
-    id: 0,
-    label: '/plan-init',
-    desc: 'Crea .planning/ y detecta las áreas del proyecto',
-    script: {
-      command: '/plan-init',
-      output: [
-        '  ⟳ Detectando estructura del proyecto...',
-        '',
-        '    api/    → AP  (Java/Spring Boot)',
-        '    web/    → WB  (Next.js)',
-        '    docs/   → DO  (Markdown)',
-        '    infra/  → IN  (Terraform)',
-        '',
-        '  ¿Es correcta esta configuración? (Enter) ✓',
-        '',
-        '  ✓ Áreas configuradas: AP · WB · DO · IN',
-        '  ✓ Estructura .planning/ creada',
-        '',
-      ],
-    },
-  },
-  {
-    id: 1,
-    label: '/plan-new 001-mi-feature -- Mi feature',
-    desc: 'Crea el plan en estado INITIAL',
-    script: {
-      command: '/plan-new 001-mi-feature -- Mi feature',
-      output: [
-        '  ✓ Plan 001-mi-feature creado en estado INITIAL',
-        '',
-        '    📁 .planning/active/001-mi-feature/',
-        '    ├── 📄 plan.md',
-        '    └── 📄 scope-01.md',
-        '',
-      ],
-    },
-  },
-  {
-    id: 2,
-    label: '/plan-expand 001-mi-feature',
-    desc: 'Expande la idea en scopes ejecutables',
-    script: {
-      command: '/plan-expand 001-mi-feature',
-      output: [
-        '  ⟳ Expandiendo plan 001-mi-feature con Claude...',
-        '    ├── scope-01: Configuración inicial',
-        '    ├── scope-02: Implementación core',
-        '    └── scope-03: Pruebas y documentación',
-        '',
-        '  ✓ Plan expandido a 3 scopes. Estado → EXPANSION',
-        '',
-      ],
-    },
-  },
-  {
-    id: 3,
-    label: '/plan-scope 001-mi-feature scope-01',
-    desc: 'Ejecuta todas las tareas del primer scope',
-    script: {
-      command: '/plan-scope 001-mi-feature scope-01',
-      output: [
-        '  ⟳ Ejecutando scope-01: Configuración inicial...',
-        '    ✓ estructura de directorios creada',
-        '    ✓ dependencias configuradas',
-        '    ✓ archivos base generados',
-        '',
-        '  ✓ Scope scope-01 completado exitosamente',
-        '  ➜ Siguiente: /plan-done 001-mi-feature scope-01',
-        '',
-      ],
-    },
-  },
-]
-
-const demoScripts: TerminalScript[] = steps.map((s) => s.script)
-
-const workspaceStates = [
+const workspaceFiles = [
   {
     files: [
       { name: '.planning', level: 0, type: 'folder' },
@@ -105,74 +14,41 @@ const workspaceStates = [
       { name: 'finished', level: 1, type: 'folder' },
     ],
     tab: 'GUIDE.md',
-    code: [
-      '| Code | Repository / Area |',
-      '|------|------------------|',
-      '| `AP` | `api/` — backend service |',
-      '| `WB` | `web/` — frontend app |',
-      '| `DO` | `docs/` — documentation |',
-      '| `IN` | `infra/` — infrastructure |',
-      '| `W`  | `.planning/` — meta |',
-    ],
   },
   {
     files: [
       { name: '.planning', level: 0, type: 'folder' },
       { name: 'active', level: 1, type: 'folder' },
-      { name: '001-mi-feature', level: 2, type: 'folder' },
+      { name: '001-feature', level: 2, type: 'folder' },
       { name: 'plan.md', level: 3, type: 'file' },
       { name: 'scope-01.md', level: 3, type: 'file' },
       { name: 'finished', level: 1, type: 'folder' },
     ],
     tab: 'plan.md',
-    code: [
-      '# 001-mi-feature',
-      '',
-      'Estado: INITIAL',
-      '',
-      '## Idea',
-      'Mi feature pendiente de expansión.',
-    ],
   },
   {
     files: [
       { name: '.planning', level: 0, type: 'folder' },
       { name: 'active', level: 1, type: 'folder' },
-      { name: '001-mi-feature', level: 2, type: 'folder' },
+      { name: '001-feature', level: 2, type: 'folder' },
       { name: 'plan.md', level: 3, type: 'file' },
       { name: 'scope-01.md', level: 3, type: 'file' },
       { name: 'scope-02.md', level: 3, type: 'file' },
       { name: 'scope-03.md', level: 3, type: 'file' },
     ],
     tab: 'scope-01.md',
-    code: [
-      '# scope-01: Configuración inicial',
-      '',
-      '- Crear estructura base',
-      '- Configurar dependencias',
-      '- Preparar validaciones',
-    ],
   },
   {
     files: [
       { name: '.planning', level: 0, type: 'folder' },
       { name: 'active', level: 1, type: 'folder' },
-      { name: '001-mi-feature', level: 2, type: 'folder' },
+      { name: '001-feature', level: 2, type: 'folder' },
       { name: 'plan.md', level: 3, type: 'file' },
       { name: 'scope-01.md', level: 3, type: 'file', done: true },
       { name: 'scope-02.md', level: 3, type: 'file' },
       { name: 'scope-03.md', level: 3, type: 'file' },
     ],
     tab: 'scope-01.md',
-    code: [
-      '# scope-01: Configuración inicial',
-      '',
-      'Estado: DONE',
-      '',
-      '- [x] estructura de directorios creada',
-      '- [x] dependencias configuradas',
-      '- [x] archivos base generados',
-    ],
   },
 ]
 
@@ -180,10 +56,20 @@ function WorkspaceMock({
   activeStep,
   completedStep,
   onStepComplete,
+  workspaceStates,
+  workspaceProject,
+  initialHint,
+  waitingLabel,
+  demoScripts,
 }: {
   activeStep: number | null
   completedStep: number | null
   onStepComplete: (index: number) => void
+  workspaceStates: Array<{ files: Array<{ name: string; level: number; type: string; done?: boolean }>; tab: string; code: string[] }>
+  workspaceProject: string
+  initialHint: string[]
+  waitingLabel: string
+  demoScripts: TerminalScript[]
 }) {
   const state = completedStep === null ? null : workspaceStates[completedStep]
 
@@ -205,7 +91,7 @@ function WorkspaceMock({
             </div>
             <div className="px-2 py-3">
               <div className="mb-2 px-1 text-[11px] font-semibold uppercase text-surface-400">
-                mi-proyecto
+                {workspaceProject}
               </div>
               {(state?.files ?? [{ name: 'src', level: 0, type: 'folder' }, { name: 'README.md', level: 0, type: 'file' }]).map((file) => (
                 <div
@@ -235,7 +121,7 @@ function WorkspaceMock({
 
             <div className="grid flex-1 grid-rows-[minmax(180px,1fr)_minmax(260px,320px)]">
               <pre className="overflow-hidden bg-surface-950/80 p-5 font-mono text-xs leading-6 text-surface-300">
-                {(state?.code ?? ['# mi-proyecto', '', 'Selecciona /plan-init para iniciar el flujo.', 'Los siguientes pasos se habilitan en orden.']).map((line, i) => (
+                {(state?.code ?? initialHint).map((line, i) => (
                   <div key={i} className="flex gap-4">
                     <span className="w-6 shrink-0 text-right text-surface-700">{i + 1}</span>
                     <span className={line.startsWith('#') ? 'text-brand-300' : line.includes('[x]') ? 'text-green-400' : 'text-surface-300'}>
@@ -255,7 +141,7 @@ function WorkspaceMock({
                   <div className="p-5 font-mono text-sm text-surface-500">
                     <span className="text-cyan-400">└─</span>
                     <span className="text-yellow-400">▪</span>{' '}
-                    <span className="text-surface-600">esperando comando...</span>
+                    <span className="text-surface-600">{waitingLabel}</span>
                   </div>
                 ) : (
                   <TerminalAnimation
@@ -278,11 +164,13 @@ function InstallCard({
   title,
   description,
   code,
+  note,
   cloneInstructions,
 }: {
   title: string
   description: string
-  code: string
+  code?: string
+  note?: string
   cloneInstructions?: boolean
 }) {
   return (
@@ -310,15 +198,14 @@ function InstallCard({
               </code>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-surface-500 bg-surface-800/50 rounded-xl px-4 py-3 border border-surface-700/50">
-            <svg className="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>
-              El symlink apunta el plugin directamente a tu clon local.
-              Cualquier cambio en el repo queda disponible de inmediato, sin reinstalar.
-            </span>
-          </div>
+          {note && (
+            <div className="flex items-center gap-2 text-xs text-surface-500 bg-surface-800/50 rounded-xl px-4 py-3 border border-surface-700/50">
+              <svg className="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{note}</span>
+            </div>
+          )}
         </div>
       ) : (
         <div className="code-block">
@@ -342,13 +229,23 @@ function InstallCard({
 }
 
 export default function Installation() {
+  const t = useTranslation()
   const [activeStep, setActiveStep] = useState<number | null>(null)
   const [completedStep, setCompletedStep] = useState<number | null>(null)
   const [maxEnabledStep, setMaxEnabledStep] = useState(0)
 
+  const steps = t.installation.steps
+  const workspaceStates = workspaceFiles.map((w, i) => ({
+    ...w,
+    code: t.installation.workspaceCodes[i],
+  }))
+  const demoScripts: TerminalScript[] = steps.map((s) => ({
+    command: s.command,
+    output: s.output,
+  }))
+
   const handleStepClick = (index: number) => {
     if (index > maxEnabledStep) return
-
     setActiveStep(index)
   }
 
@@ -365,19 +262,26 @@ export default function Installation() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="section-title mb-4">
-              Instalación en{' '}
-              <span className="gradient-text">2 pasos</span>
+              {t.installation.titlePrefix}{' '}
+              <span className="gradient-text">{t.installation.titleHighlight}</span>
             </h2>
             <p className="section-subtitle">
-              El plugin funciona con cualquier proyecto que use markdown.
-              Sin dependencias externas. Sin configuración previa.
+              {t.installation.subtitle}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-8">
-            {installMethods.map((method) => (
-              <InstallCard key={method.title} {...method} />
-            ))}
+            <InstallCard
+              title={t.installation.marketplace.title}
+              description={t.installation.marketplace.description}
+              code="/plugin install claude-planning-with-ai"
+            />
+            <InstallCard
+              title={t.installation.symlink.title}
+              description={t.installation.symlink.description}
+              cloneInstructions
+              note={t.installation.symlink.note}
+            />
           </div>
         </div>
       </section>
@@ -385,7 +289,7 @@ export default function Installation() {
       <section className="relative py-12 md:py-16 bg-surface-800/50">
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-2xl font-bold text-surface-50 text-center mb-12">
-            Primeros pasos
+            {t.installation.firstSteps}
           </h3>
 
           <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-8 items-start">
@@ -397,7 +301,7 @@ export default function Installation() {
 
                 return (
                   <button
-                    key={step.id}
+                    key={i}
                     type="button"
                     disabled={!isEnabled}
                     aria-disabled={!isEnabled}
@@ -453,12 +357,17 @@ export default function Installation() {
             <div className="lg:sticky lg:top-24">
               <div className="text-xs text-surface-500 font-mono mb-3 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                interactivo — ejecuta los pasos en orden
+                {t.installation.interactive}
               </div>
               <WorkspaceMock
                 activeStep={activeStep}
                 completedStep={completedStep}
                 onStepComplete={handleStepComplete}
+                workspaceStates={workspaceStates}
+                workspaceProject={t.installation.workspaceProject}
+                initialHint={t.installation.workspaceInitialHint}
+                waitingLabel={t.installation.waiting}
+                demoScripts={demoScripts}
               />
             </div>
           </div>

@@ -1,31 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-
-const slides = [
-  {
-    icon: '🎯',
-    question: '¿Tus historias de usuario llegan sin criterios de aceptación claros?',
-    answer: 'Después vienen los malentendidos. Y el retrabajo.',
-  },
-  {
-    icon: '⏳',
-    question: '¿Pasas más tiempo organizando tareas que escribiendo código?',
-    answer: 'El caos no planificado consume tu energía creativa.',
-  },
-  {
-    icon: '📅',
-    question: '¿Tus planes de proyecto se desactualizan en cuestión de días?',
-    answer: 'El software es cambio constante. Tu plan debería adaptarse.',
-  },
-  {
-    icon: '🤖',
-    question: '¿Te gustaría que Claude Code ejecute planes completos por sí solo?',
-    answer: 'Idea → Expansión → Ejecución → Archivo. Sin supervisión constante.',
-  },
-]
+import { useTranslation } from '../locales'
 
 const SLIDE_DURATION = 6000
 
 export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
+  const t = useTranslation()
+  const slides = t.splash.slides
+
   const [current, setCurrent] = useState(0)
   const [phase, setPhase] = useState<'question' | 'answer'>('question')
   const [revealed, setRevealed] = useState(false)
@@ -37,7 +18,7 @@ export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
     } else {
       setRevealed(true)
     }
-  }, [current])
+  }, [current, slides.length])
 
   useEffect(() => {
     if (revealed) return
@@ -51,8 +32,8 @@ export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
 
   useEffect(() => {
     if (!revealed) return
-    const t = setTimeout(onDismiss, 8000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(onDismiss, 8000)
+    return () => clearTimeout(timer)
   }, [revealed, onDismiss])
 
   return (
@@ -102,12 +83,11 @@ export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
             <div className="space-y-8 animate-fade-in">
               <div className="text-6xl">📋</div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-surface-50 leading-tight">
-                Planning with AI resuelve{' '}
-                <span className="gradient-text">todo esto</span>.
+                {t.splash.revealTitle}{' '}
+                <span className="gradient-text">{t.splash.revealGradient}</span>.
               </h2>
               <p className="text-lg text-surface-400 max-w-xl mx-auto">
-                Un plugin para Claude Code que estructura cada fase de tu proyecto.
-                Desde la idea hasta el archivo, con trazabilidad completa.
+                {t.splash.revealSubtitle}
               </p>
               <button
                 onClick={onDismiss}
@@ -116,7 +96,7 @@ export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
-                Ver el plugin
+                {t.splash.revealBtn}
               </button>
             </div>
           )}
@@ -125,13 +105,13 @@ export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
 
       {!revealed && (
         <div className="pb-8 text-center animate-fade-in">
-          <p className="text-sm text-surface-600 mb-3">¿Te sientes identificado?</p>
+          <p className="text-sm text-surface-600 mb-3">{t.splash.identify}</p>
           <div className="flex justify-center">
             <button
               onClick={onDismiss}
               className="text-xs text-surface-500 hover:text-surface-300 transition-colors underline underline-offset-4"
             >
-              Saltar introducción
+              {t.splash.skip}
             </button>
           </div>
         </div>

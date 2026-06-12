@@ -9,13 +9,12 @@ import Lifecycle from '@/components/Lifecycle'
 import Commands from '@/components/Commands'
 import CTA from '@/components/CTA'
 import Footer from '@/components/Footer'
+import { useTranslation } from '@/locales'
 
 const siteUrl = 'https://cmartinezs.github.io/claude-planning-with-ai'
-const siteName = 'Planning with AI — Plugin de planificación para Claude Code'
-const description =
-  'Plugin de planificación estructurada para Claude Code. Ciclo de vida completo: idea, expansión, ejecución, finalización y archivo. Gestión de backlog, épicas y scopes.'
 
 export default function Home() {
+  const t = useTranslation()
   const [splashDone, setSplashDone] = useState(false)
   const handleDismiss = useCallback(() => setSplashDone(true), [])
 
@@ -33,19 +32,19 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>{siteName}</title>
-        <meta name="description" content={description} />
+        <title>{t.meta.title}</title>
+        <meta name="description" content={t.meta.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         <meta property="og:type" content="website" />
         <meta property="og:url" content={siteUrl} />
-        <meta property="og:title" content={siteName} />
-        <meta property="og:description" content={description} />
+        <meta property="og:title" content={t.meta.title} />
+        <meta property="og:description" content={t.meta.description} />
         <meta property="og:site_name" content="Planning with AI" />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={siteName} />
-        <meta name="twitter:description" content={description} />
+        <meta name="twitter:title" content={t.meta.title} />
+        <meta name="twitter:description" content={t.meta.description} />
 
         <link rel="canonical" href={siteUrl} />
 
@@ -58,7 +57,7 @@ export default function Home() {
               name: 'Planning with AI',
               applicationCategory: 'DeveloperApplication',
               operatingSystem: 'Linux, macOS, Windows',
-              description: description,
+              description: t.meta.description,
               author: {
                 '@type': 'Person',
                 name: 'cmartinezs',

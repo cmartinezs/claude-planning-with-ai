@@ -1,63 +1,27 @@
-const stages = [
-  {
-    phase: 'INITIAL',
-    icon: '💡',
-    label: 'Idea',
-    description: 'Captura la idea inicial con /plan-new. Una semilla, sin estructura.',
-    color: 'text-brand-400',
-    border: 'border-brand-500/30',
-    bg: 'bg-brand-500/5',
-  },
-  {
-    phase: 'EXPANSION',
-    icon: '🔬',
-    label: 'Expansión',
-    description: 'Claude expande la idea: alcances, tareas, dependencias, criterios de éxito.',
-    color: 'text-cyan-400',
-    border: 'border-cyan-500/30',
-    bg: 'bg-cyan-500/5',
-  },
-  {
-    phase: 'DEEPENING',
-    icon: '⚡',
-    label: 'Ejecución',
-    description: 'Claude ejecuta scope por scope. Cada comando /plan-scope avanza el plan.',
-    color: 'text-emerald-400',
-    border: 'border-emerald-500/30',
-    bg: 'bg-emerald-500/5',
-  },
-  {
-    phase: 'COMPLETED',
-    icon: '✅',
-    label: 'Completado',
-    description: 'Marca scopes completados con /plan-done. El plan se acerca a su fin.',
-    color: 'text-blue-400',
-    border: 'border-blue-500/30',
-    bg: 'bg-blue-500/5',
-  },
-  {
-    phase: 'ARCHIVE',
-    icon: '📦',
-    label: 'Archivo',
-    description: 'Auditoría final y archivo en finished/. Todo queda documentado.',
-    color: 'text-purple-400',
-    border: 'border-purple-500/30',
-    bg: 'bg-purple-500/5',
-  },
+import { useTranslation } from '../locales'
+
+const stageConfig = [
+  { phase: 'INITIAL', icon: '💡', color: 'text-brand-400', border: 'border-brand-500/30', bg: 'bg-brand-500/5' },
+  { phase: 'EXPANSION', icon: '🔬', color: 'text-cyan-400', border: 'border-cyan-500/30', bg: 'bg-cyan-500/5' },
+  { phase: 'DEEPENING', icon: '⚡', color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-emerald-500/5' },
+  { phase: 'COMPLETED', icon: '✅', color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-blue-500/5' },
+  { phase: 'ARCHIVE', icon: '📦', color: 'text-purple-400', border: 'border-purple-500/30', bg: 'bg-purple-500/5' },
 ]
 
 export default function Lifecycle() {
+  const t = useTranslation()
+  const stages = stageConfig.map((c, i) => ({ ...c, ...t.lifecycle.stages[i] }))
+
   return (
     <section id="ciclo" className="relative py-24 md:py-32 bg-surface-800/50 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="section-title mb-4">
-            Ciclo de vida{' '}
-            <span className="gradient-text">completo</span>
+            {t.lifecycle.titlePrefix}{' '}
+            <span className="gradient-text">{t.lifecycle.titleHighlight}</span>
           </h2>
           <p className="section-subtitle">
-            Cada plan navega por 5 estados. El plugin guía cada transición
-            con comandos específicos.
+            {t.lifecycle.subtitle}
           </p>
         </div>
 
@@ -97,13 +61,13 @@ export default function Lifecycle() {
         <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-surface-700/50 border border-surface-600/50">
             <span className="text-surface-400 text-sm">
-              Estado actual del plan:
+              {t.lifecycle.statusLabel}
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
               /plan-status
             </span>
-            <span className="text-surface-500 text-sm">— consulta en vivo</span>
+            <span className="text-surface-500 text-sm">{t.lifecycle.statusNote}</span>
           </div>
         </div>
       </div>
