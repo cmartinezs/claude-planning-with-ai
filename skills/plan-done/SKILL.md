@@ -1,7 +1,7 @@
 ---
 name: plan-done
 description: Mark a specific task (or all tasks in a scope) as done and advance the planning if all scopes are complete.
-argument-hint: format: `NNN-slug scope-NN [task-N]`
+argument-hint: <NNN-slug> <scope-NN> [task-N]
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

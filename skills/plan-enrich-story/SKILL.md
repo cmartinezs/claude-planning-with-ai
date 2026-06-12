@@ -1,7 +1,7 @@
 ---
 name: plan-enrich-story
 description: Enrich a specific scope (user story) that is underspecified, ambiguous, or incomplete. Does not change scope status — only deepens the definition so it is ready to execute.
-argument-hint: format: `NNN-slug scope-NN` (e.g. `001-user-auth-api scope-03`)
+argument-hint: <NNN-slug> <scope-NN>  (e.g. 001-user-auth-api scope-03)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

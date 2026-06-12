@@ -1,7 +1,7 @@
 ---
 name: us-new
 description: Add a new user story to an existing story container. A container is either a directory of story files or a single document with story sections. The command mirrors the format and conventions it finds 
-argument-hint: format: `path/to/container [--interactive | --blank]`
+argument-hint: <path/to/container> [--interactive | --blank]
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

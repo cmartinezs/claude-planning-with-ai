@@ -1,7 +1,7 @@
 ---
 name: plan-split-story
 description: Split a scope (user story) that is too large or covers multiple concerns into two or more smaller, focused scopes. The original scope is replaced by the new ones in both `01-expansion.md` and `02-deep
-argument-hint: format: `NNN-slug scope-NN` (e.g. `001-user-auth-api scope-02`)
+argument-hint: <NNN-slug> <scope-NN>  (e.g. 001-user-auth-api scope-02)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

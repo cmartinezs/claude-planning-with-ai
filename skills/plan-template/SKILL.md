@@ -1,7 +1,7 @@
 ---
 name: plan-template
 description: Generate an idea document that captures a planning initiative in enough detail to feed directly into `/plan-new`. The document is saved to `.planning/ideas/` and can be filled interactively (Claude as
-argument-hint: format: `[slug] [--interactive | --blank]`
+argument-hint: [slug] [--interactive | --blank]
 allowed-tools: [Read, Write, Bash, Glob, WebFetch]
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: plan-scope
 description: Execute all tasks within a scope, following the GENERATE-DOCUMENT workflow for each task.
-argument-hint: format: `NNN-slug scope-NN` (e.g. `001-user-auth-api scope-01`)
+argument-hint: <NNN-slug> <scope-NN>  (e.g. 001-user-auth-api scope-01)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 

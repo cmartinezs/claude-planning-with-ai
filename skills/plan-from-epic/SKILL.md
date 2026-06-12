@@ -1,7 +1,7 @@
 ---
 name: plan-from-epic
 description: Generate a full execution planning in `.planning/active/` from a story container. One story → one scope. Scope done criteria come from each story's acceptance criteria and Definition of Done (if pre
-argument-hint: format: `NNN path/to/container [--filter field=value]`
+argument-hint: <NNN> <path/to/container> [--filter field=value]
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 
