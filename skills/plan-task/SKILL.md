@@ -38,6 +38,7 @@ Reference workflows:
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 9. Verify every `Done Criteria` item. If any is unmet, leave the task `IN PROGRESS`, list what is missing, and stop.
 10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the scope's `## Tasks` index.
-11. Report: task completed, files created/changed, test results, and the next pending task in the scope — or, if all tasks are `DONE`, suggest `/plan-done <planning-id> <scope-id>`.
+10b. Invoke `/doc-task <planning-id> <scope-id> <task-id>`. If the scope area is DO or W this is a silent no-op. Include any files written in the final report.
+11. Report: task completed, files created/changed, test results, doc files written (from step 10b), and the next pending task in the scope — or, if all tasks are `DONE`, suggest `/plan-done <planning-id> <scope-id>`.
 
 > Executes exactly ONE task. To run all tasks of a scope in order, use `/plan-scope <planning-id> <scope-id>`.
