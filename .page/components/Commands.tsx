@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { useTranslation } from '../locales'
 
 const categoryColors = [
@@ -6,11 +7,47 @@ const categoryColors = [
   'border-l-emerald-500',
   'border-l-amber-500',
   'border-l-purple-500',
+  'border-l-rose-500',
 ]
 
 export default function Commands() {
   const t = useTranslation()
-  const categories = t.commands.categories.map((cat, i) => ({ ...cat, color: categoryColors[i] }))
+  const categories = t.commands.categories.map((cat, i) => ({
+    ...cat,
+    color: categoryColors[i % categoryColors.length],
+  }))
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [activeSlide, setActiveSlide] = useState(0)
+  const [atStart, setAtStart] = useState(true)
+  const [atEnd, setAtEnd] = useState(false)
+
+  const handleScroll = () => {
+    const track = trackRef.current
+    if (!track) return
+    const cards = Array.from(track.children) as HTMLElement[]
+    const center = track.scrollLeft + track.clientWidth / 2
+    const closest = cards.reduce((best, card, i) => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2
+      return Math.abs(cardCenter - center) < Math.abs(best.distance) ? { index: i, distance: cardCenter - center } : best
+    }, { index: 0, distance: Infinity })
+    setActiveSlide(closest.index)
+    setAtStart(track.scrollLeft <= 4)
+    setAtEnd(track.scrollLeft >= track.scrollWidth - track.clientWidth - 4)
+  }
+
+  const scrollToSlide = (i: number) => {
+    const track = trackRef.current
+    const card = track?.children[i] as HTMLElement | undefined
+    if (!track || !card) return
+    track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' })
+  }
+
+  const scrollByCard = (dir: number) => {
+    const track = trackRef.current
+    const card = track?.children[0] as HTMLElement | undefined
+    if (!track || !card) return
+    track.scrollBy({ left: dir * (card.offsetWidth + 24), behavior: 'smooth' })
+  }
 
   return (
     <section id="comandos" className="relative py-24 md:py-32 scroll-mt-24">
@@ -25,33 +62,76 @@ export default function Commands() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat) => (
-            <div
-              key={cat.title}
-              className={`glass-card overflow-hidden ${cat.color} border-l-2`}
-            >
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-surface-50 mb-1">
-                  {cat.title}
-                </h3>
-                <p className="text-sm text-surface-500 mb-5">{cat.description}</p>
-                <div className="space-y-3">
-                  {cat.commands.map((c) => (
-                    <div key={c.cmd} className="group">
-                      <div className="code-block p-3">
-                        <code className="text-brand-400 text-xs leading-relaxed block">
-                          {c.cmd}
-                        </code>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => scrollByCard(-1)}
+            disabled={atStart}
+            aria-label="Previous"
+            className="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full border border-surface-700 bg-surface-900/90 text-surface-300 transition-all hover:border-brand-500/50 hover:text-brand-400 disabled:opacity-30 disabled:hover:border-surface-700 disabled:hover:text-surface-300"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByCard(1)}
+            disabled={atEnd}
+            aria-label="Next"
+            className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full border border-surface-700 bg-surface-900/90 text-surface-300 transition-all hover:border-brand-500/50 hover:text-brand-400 disabled:opacity-30 disabled:hover:border-surface-700 disabled:hover:text-surface-300"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <div
+            ref={trackRef}
+            onScroll={handleScroll}
+            className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 pb-2"
+          >
+            {categories.map((cat) => (
+              <div
+                key={cat.title}
+                className={`glass-card overflow-hidden ${cat.color} border-l-2 shrink-0 snap-center w-full sm:w-[420px] md:w-[380px]`}
+              >
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-surface-50 mb-1">
+                    {cat.title}
+                  </h3>
+                  <p className="text-sm text-surface-500 mb-5">{cat.description}</p>
+                  <div className="space-y-3">
+                    {cat.commands.map((c) => (
+                      <div key={c.cmd} className="group">
+                        <div className="code-block p-3">
+                          <code className="text-brand-400 text-xs leading-relaxed block">
+                            {c.cmd}
+                          </code>
+                        </div>
+                        <p className="text-xs text-surface-500 mt-1.5 pl-1">
+                          {c.desc}
+                        </p>
                       </div>
-                      <p className="text-xs text-surface-500 mt-1.5 pl-1">
-                        {c.desc}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 flex justify-center gap-2">
+          {categories.map((cat, i) => (
+            <button
+              key={cat.title}
+              type="button"
+              onClick={() => scrollToSlide(i)}
+              aria-label={`${i + 1} / ${categories.length}`}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                activeSlide === i ? 'w-6 bg-brand-400' : 'w-2 bg-surface-600'
+              }`}
+            />
           ))}
         </div>
 

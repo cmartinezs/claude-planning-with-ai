@@ -94,7 +94,7 @@ const es = {
   commands: {
     titlePrefix: 'Comandos',
     titleHighlight: 'esenciales',
-    subtitle: '16 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
+    subtitle: '19 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
     categories: [
       {
         title: 'Inicialización',
@@ -119,6 +119,15 @@ const es = {
           { cmd: '/plan-new NNN-slug -- intento', desc: 'Crea un plan en estado INITIAL' },
           { cmd: '/plan-new NNN-slug @ruta.md', desc: 'Crea un plan desde un documento de idea' },
           { cmd: '/plan-expand NNN-slug', desc: 'Avanza de INITIAL → EXPANSION' },
+        ],
+      },
+      {
+        title: 'Tareas atómicas',
+        description: 'Descomposición opcional antes de ejecutar',
+        commands: [
+          { cmd: '/plan-atomize NNN-slug scope-NN', desc: 'Descompone un scope en tareas atómicas' },
+          { cmd: '/plan-task NNN-slug scope-NN task-NN', desc: 'Ejecuta una sola tarea atómica' },
+          { cmd: '/plan-task-validate NNN-slug', desc: 'Audita las tareas atómicas contra el checklist de atomicidad' },
         ],
       },
       {

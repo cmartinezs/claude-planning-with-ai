@@ -93,7 +93,7 @@ const en = {
   commands: {
     titlePrefix: 'Essential',
     titleHighlight: 'commands',
-    subtitle: '16 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
+    subtitle: '19 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
     categories: [
       {
         title: 'Initialization',
@@ -118,6 +118,15 @@ const en = {
           { cmd: '/plan-new NNN-slug -- intent', desc: 'Creates a plan in INITIAL state' },
           { cmd: '/plan-new NNN-slug @path.md', desc: 'Creates a plan from an idea document' },
           { cmd: '/plan-expand NNN-slug', desc: 'Advances from INITIAL → EXPANSION' },
+        ],
+      },
+      {
+        title: 'Atomic tasks',
+        description: 'Optional decomposition before executing',
+        commands: [
+          { cmd: '/plan-atomize NNN-slug scope-NN', desc: 'Decomposes a scope into atomic task files' },
+          { cmd: '/plan-task NNN-slug scope-NN task-NN', desc: 'Executes a single atomic task' },
+          { cmd: '/plan-task-validate NNN-slug', desc: 'Audits atomic tasks against the atomicity checklist' },
         ],
       },
       {
