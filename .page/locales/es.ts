@@ -94,7 +94,7 @@ const es = {
   commands: {
     titlePrefix: 'Comandos',
     titleHighlight: 'esenciales',
-    subtitle: '19 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
+    subtitle: '23 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
     categories: [
       {
         title: 'Inicialización',
@@ -148,6 +148,16 @@ const es = {
           { cmd: '/plan-enrich-epic NNN-slug', desc: 'Añade nuevos scopes a un plan activo' },
           { cmd: '/plan-enrich-story NNN-slug scope-NN', desc: 'Profundiza un scope poco definido' },
           { cmd: '/plan-split-story NNN-slug scope-NN', desc: 'Divide un scope demasiado grande' },
+        ],
+      },
+      {
+        title: 'Agentes autónomos',
+        description: 'Pipeline completo con un solo comando',
+        commands: [
+          { cmd: '/plan-run NNN-slug', desc: 'Ejecuta un plan de punta a punta — detecta estado, confirma una vez, delega a agentes' },
+          { cmd: '/plan-agent-plan NNN-slug', desc: 'Agente de planificación: crea y expande sin interrupciones' },
+          { cmd: '/plan-agent-execute NNN-slug', desc: 'Agente de ejecución: atomiza y ejecuta scopes en paralelo' },
+          { cmd: '/plan-agent-validate NNN-slug', desc: 'Agente de cierre: valida, marca done y archiva' },
         ],
       },
     ],

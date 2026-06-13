@@ -93,7 +93,7 @@ const en = {
   commands: {
     titlePrefix: 'Essential',
     titleHighlight: 'commands',
-    subtitle: '19 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
+    subtitle: '23 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
     categories: [
       {
         title: 'Initialization',
@@ -147,6 +147,16 @@ const en = {
           { cmd: '/plan-enrich-epic NNN-slug', desc: 'Adds new scopes to an active plan' },
           { cmd: '/plan-enrich-story NNN-slug scope-NN', desc: 'Deepens an underspecified scope' },
           { cmd: '/plan-split-story NNN-slug scope-NN', desc: 'Splits an oversized scope' },
+        ],
+      },
+      {
+        title: 'Autonomous agents',
+        description: 'Full pipeline with a single command',
+        commands: [
+          { cmd: '/plan-run NNN-slug', desc: 'Runs a plan end-to-end — detects state, confirms once, delegates to agents' },
+          { cmd: '/plan-agent-plan NNN-slug', desc: 'Planning agent: creates and expands without interruptions' },
+          { cmd: '/plan-agent-execute NNN-slug', desc: 'Execution agent: atomizes and runs scopes in parallel' },
+          { cmd: '/plan-agent-validate NNN-slug', desc: 'Closing agent: validates, marks done, and archives' },
         ],
       },
     ],
