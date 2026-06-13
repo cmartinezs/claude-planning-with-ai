@@ -1,0 +1,85 @@
+---
+name: plan-run
+description: Run a planning end-to-end from the current state — detects where the planning is, shows a full execution plan, asks for one confirmation, then delegates to phase agents autonomously.
+argument-hint: [NNN-slug | "description"]
+allowed-tools: [Read, Bash, Glob]
+---
+
+Orchestrate a complete planning run. Detects state, confirms once, then delegates to `/plan-agent-plan`, `/plan-agent-execute`, and `/plan-agent-validate` without further interruptions.
+
+## Arguments
+
+`$ARGUMENTS` — one of:
+- `NNN-slug` — existing planning ID; the orchestrator detects its current state and runs from there
+- `"free text"` — description to create a new planning from scratch (from-scratch mode)
+- *(empty)* — list active plannings and ask which one to run
+
+## Steps
+
+1. **Resolve the target planning:**
+   - If `$ARGUMENTS` is empty: list all plannings in `.planning/` (INITIAL), `.planning/active/` (EXPANSION/DEEPENING), and ask the user which to run. Stop until answered.
+   - If `$ARGUMENTS` matches `\d{3}-[a-z0-9-]+`: check all three directories for the planning.
+   - Otherwise: from-scratch mode — `$ARGUMENTS` is a description for a new planning.
+
+2. **Determine current state:**
+
+   | Location | State |
+   |----------|-------|
+   | `.planning/NNN-slug/` | INITIAL |
+   | `.planning/active/NNN-slug/` with no scope files | EXPANSION incomplete |
+   | `.planning/active/NNN-slug/` with scope files, some not DONE | DEEPENING/EXECUTION |
+   | `.planning/active/NNN-slug/` with all scopes DONE | READY TO CLOSE |
+   | `.planning/finished/NNN-slug/` | COMPLETED — nothing to do |
+
+3. **Build the execution plan.** Determine which phases need to run:
+
+   | Phase | Agent | Runs when |
+   |-------|-------|-----------|
+   | Planning | `/plan-agent-plan` | state is INITIAL or from-scratch |
+   | Execute | `/plan-agent-execute` | state is INITIAL, EXPANSION incomplete, or DEEPENING |
+   | Validate | `/plan-agent-validate` | always (last phase) |
+
+   If the planning is already COMPLETED, report and stop.
+
+   If the planning has scope files, read them and report: N total scopes, N pending, N already DONE. Show whether any scopes have inter-dependencies (parallel vs. sequential execution shape).
+
+4. **Present the execution plan to the user** in this format:
+
+   ```
+   Planning: NNN-slug
+   Current state: INITIAL / EXPANSION / DEEPENING
+
+   Phases to execute:
+   ✓ plan-agent-plan   — create/expand planning
+   ✓ plan-agent-execute — atomize + execute N scopes (X parallel batches)
+   ✓ plan-agent-validate — validate + archive
+
+   Parallel execution: scopes A, B, C can run simultaneously; scope D waits for C.
+
+   Proceed? (yes/no)
+   ```
+
+5. **Wait for confirmation.** If the user says no or requests changes: stop. If yes: continue without further questions for the rest of the run (unless a critical error occurs).
+
+6. **Execute phases in sequence:**
+   - If Planning phase is needed: invoke `/plan-agent-plan` with the planning ID or description.
+   - Invoke `/plan-agent-execute` with the planning ID.
+   - Invoke `/plan-agent-validate` with the planning ID.
+
+   Each phase agent is invoked as a skill (inline, same session) — not via the Agent tool. Subagent parallelism happens inside `/plan-agent-execute`.
+
+7. **Report final summary:**
+
+   ```
+   Planning NNN-slug completed.
+
+   Phases run: plan-agent-plan, plan-agent-execute, plan-agent-validate
+   Scopes: N completed, N blocked (if any)
+   Tasks executed: N total
+   Archived: .planning/finished/NNN-slug/
+
+   Blocked scopes (if any):
+   - scope-NN: <reason>
+   ```
+
+> This is the entry point for the full autonomous pipeline. For phase-by-phase control, use the individual phase agents directly.
