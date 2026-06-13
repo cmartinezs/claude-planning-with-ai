@@ -262,7 +262,7 @@ export default function Installation() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm text-surface-400">
             <span>{t.installation.updateNote}</span>
             <code className="code-block px-3 py-1.5 text-sm font-mono text-brand-400">
-              claude plugin update claude-planning-with-ai
+              claude plugin update claude-planning-with-ai@cmartinezs
             </code>
           </div>
         </div>

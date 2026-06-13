@@ -40,7 +40,7 @@ claude plugin install claude-planning-with-ai@cmartinezs
 To update to the latest version later:
 
 ```bash
-claude plugin update claude-planning-with-ai
+claude plugin update claude-planning-with-ai@cmartinezs
 ```
 
 ---
