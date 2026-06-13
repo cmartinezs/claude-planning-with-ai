@@ -38,6 +38,9 @@ Full command listing with flags, arguments, and the structure installed by `/pla
 | `/plan-status` | Show all active plannings and their scopes |
 | `/plan-validate [NNN-slug]` | Check structural integrity (file locations, scope consistency, workflow IDs, dependencies) |
 | `/plan-expand NNN-slug` | Advance INITIAL → EXPANSION |
+| `/plan-atomize NNN-slug scope-NN` | Decompose a scope into atomic task files (technical design + implementation + unit tests) |
+| `/plan-task NNN-slug scope-NN task-NN` | Execute a single atomic task end to end |
+| `/plan-task-validate NNN-slug [scope-NN] [task-NN]` | Audit atomic tasks against the atomicity checklist (read-only) |
 | `/plan-scope NNN-slug scope-NN` | Execute all tasks in a scope |
 | `/plan-done NNN-slug scope-NN` | Mark a scope complete and advance |
 | `/plan-archive NNN-slug` | Audit and archive to `finished/` |
@@ -88,7 +91,8 @@ Areas are the columns of the traceability matrix — every planning scope tracks
 │   ├── 00-initial.md
 │   ├── 01-expansion.md
 │   ├── 02-deepening/
-│   │   └── scope-NN-name.md
+│   │   ├── scope-NN-name.md
+│   │   └── task-NN-name.md    ← atomic task blueprint (used by /plan-atomize)
 │   └── TRACEABILITY.md     ← columns filled in by plan-init
 ├── WORKFLOWS/
 │   ├── 01-PLANNING-WORKFLOWS/

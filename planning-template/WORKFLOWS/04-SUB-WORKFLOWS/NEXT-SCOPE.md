@@ -9,7 +9,7 @@ Identifies the next scope to be executed within the current planning's DEEPENING
 ## Steps
 
 1. Open the planning's `02-deepening/` directory and list all scope files.
-2. Find the scope with the lowest sequence number that has status `PENDING`.
+2. Find the scope with the lowest sequence number that has status `TODO`.
 3. Check that all dependencies of that scope (if any) are `DONE`.
 4. If dependencies are not done: find the next scope with satisfied dependencies.
 5. Return the identified scope as the next to execute.

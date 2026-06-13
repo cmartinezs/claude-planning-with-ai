@@ -141,7 +141,38 @@ ACTIVE
 
 ---
 
-## Paso 4 — Ejecutar
+## Paso 4 (opcional) — Atomizar un scope
+
+Si las tareas de un scope siguen siendo demasiado gruesas para implementarlas directamente, descomponlo en tareas atómicas:
+
+```
+/plan-atomize 001-jwt-auth-api scope-03
+```
+
+Claude propone el desglose y, al confirmar, crea un archivo por tarea:
+
+```
+.planning/active/001-jwt-auth-api/02-deepening/
+├── scope-03-api-auth.md             ← la tabla de tareas pasa a ser el índice
+└── scope-03-api-auth/
+    ├── task-01-jwt-filter.md        ← diseño técnico + pasos + tests + done criteria
+    ├── task-02-login-endpoint.md
+    └── task-03-refresh-endpoint.md
+```
+
+Cada tarea es ejecutable en una sola sesión y cumple el checklist de atomicidad (`[CHECK-ATOMICITY]`): un solo entregable verificable, diseño técnico decidido, pasos concretos, plan de tests unitarios y done criteria binarios.
+
+```
+# Ejecutar una tarea individual
+/plan-task 001-jwt-auth-api scope-03 task-01
+
+# Auditar que las tareas están bien formadas (solo lectura)
+/plan-task-validate 001-jwt-auth-api scope-03
+```
+
+---
+
+## Paso 5 — Ejecutar
 
 ```
 /plan-scope 001-jwt-auth-api scope-01
@@ -158,7 +189,7 @@ Si ejecutas algún scope a mano, márcalo después:
 
 ---
 
-## Paso 5 — Archivar
+## Paso 6 — Archivar
 
 Valida la integridad estructural y, si no hay FAIL, archiva:
 

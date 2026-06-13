@@ -21,7 +21,7 @@ flowchart LR
 |-------|---------|-------------|
 | **INITIAL** | `00-initial.md` | General idea without dimensioning. What needs to be achieved, why, approximate context. Clarity of intent — not exhaustiveness. |
 | **EXPANSION** | `01-expansion.md` | All transversal scopes are identified and listed. Dependencies between them are mapped. Impact per SDLC phase is documented. |
-| **DEEPENING** | `02-deepening/` | One `.md` file per scope. Each one details its specific tasks with assigned workflow types. |
+| **DEEPENING** | `02-deepening/` | One `.md` file per scope. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a scope into atomic task files under `scope-NN-name/`, each with technical design, implementation steps, and unit tests. |
 
 ---
 
@@ -47,6 +47,9 @@ planning/
 │       ├── 01-expansion.md
 │       ├── 02-deepening/
 │       │   ├── scope-01-[name].md
+│       │   ├── scope-01-[name]/         # Atomic tasks (optional, via /plan-atomize)
+│       │   │   ├── task-01-[name].md
+│       │   │   └── task-NN-[name].md
 │       │   └── scope-NN-[name].md
 │       └── TRACEABILITY.md
 │
@@ -88,6 +91,7 @@ The **macro structures** (columns of the matrix) are the project areas configure
 - Plannings are numbered sequentially: `001-`, `002-`, etc.
 - The name describes the topic: `001-planning-system-bootstrap`
 - Scopes inside `02-deepening/` follow the same pattern: `scope-01-name.md`
+- Atomic tasks live in a folder named after their scope file (without `.md`): `scope-01-name/task-01-name.md`
 - Content inside files may be in any language the team uses.
 
 ---

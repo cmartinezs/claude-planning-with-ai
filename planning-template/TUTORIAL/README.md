@@ -67,6 +67,9 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-new NNN-slug @path.md` | Crea planning en INITIAL desde documento |
 | `/plan-status` | Estado de todos los plannings |
 | `/plan-expand NNN-slug` | INITIAL → EXPANSION (solo flujo general) |
+| `/plan-atomize NNN-slug scope-NN` | Descompone un scope en tareas atómicas (diseño + implementación + tests) |
+| `/plan-task NNN-slug scope-NN task-NN` | Ejecuta una sola tarea atómica |
+| `/plan-task-validate NNN-slug [scope-NN]` | Audita tareas atómicas contra el checklist de atomicidad |
 | `/plan-scope NNN-slug scope-NN` | Ejecuta todas las tareas de un scope |
 | `/plan-done NNN-slug scope-NN` | Marca scope completo y avanza |
 | `/plan-done NNN-slug scope-NN task-N` | Marca una tarea específica |

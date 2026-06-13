@@ -1,6 +1,6 @@
 # 🔍 DEEPENING: Scope NN — [Scope Name]
 
-> **Status:** PENDING
+> **Status:** TODO
 > [← 01-expansion.md](../01-expansion.md) | [← planning/README.md](../../README.md)
 
 ---
@@ -15,10 +15,12 @@
 
 ## Tasks
 
+> *Optional: `/plan-atomize` decomposes this scope into atomic task files under `scope-NN-name/` — this table then becomes the index, with each task name linking to its file.*
+
 | # | Task | Workflow | Status | Output |
 |---|------|----------|--------|--------|
-| 1 | [Task description] | [WORKFLOW-NAME] | PENDING | [Expected file or change] |
-| 2 | [Task description] | [WORKFLOW-NAME] | PENDING | [Expected file or change] |
+| 1 | [Task description] | [WORKFLOW-NAME] | TODO | [Expected file or change] |
+| 2 | [Task description] | [WORKFLOW-NAME] | TODO | [Expected file or change] |
 
 ---
 

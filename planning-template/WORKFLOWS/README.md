@@ -24,6 +24,7 @@ All workflows and sub-workflows for the planning system. Every task in every sco
 |---------|-------------|
 | [ADVANCE-PLANNING](01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.md) | You have a scope in DEEPENING to advance to the next task |
 | [CREATE-PLANNING](01-PLANNING-WORKFLOWS/CREATE-PLANNING.md) | You need to start a brand new planning |
+| [ATOMIZE-SCOPE](02-EXECUTION-WORKFLOWS/ATOMIZE-SCOPE.md) | A scope's tasks are too coarse to execute directly — decompose into atomic task files |
 | [GENERATE-DOCUMENT](02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md) | Creating a new document from scratch or from a template |
 | [REVIEW-COHERENCE](02-EXECUTION-WORKFLOWS/REVIEW-COHERENCE.md) | Validating cross-references and consistency after changes |
 | [EXPAND-ELEMENT](02-EXECUTION-WORKFLOWS/EXPAND-ELEMENT.md) | Deepening an existing document section or template |
@@ -49,6 +50,7 @@ flowchart TD
     end
 
     subgraph Execution
+        AS[ATOMIZE-SCOPE]
         GD[GENERATE-DOCUMENT]
         RC[REVIEW-COHERENCE]
         EE[EXPAND-ELEMENT]
@@ -65,6 +67,8 @@ flowchart TD
     end
 
     CP --> AP
+    AP --> AS
+    AS --> GD
     AP --> GD
     AP --> EE
     GD --> RC
@@ -91,6 +95,7 @@ Sub-workflows are reusable steps invoked within the main workflows above. See [0
 | [[RESOLVE-CONFLICT]](04-SUB-WORKFLOWS/RESOLVE-CONFLICT.md) | RECORD-INCONSISTENCY, CASCADE-CHANGE |
 | [[APPLY-RESIDUAL-ABSORPTION]](04-SUB-WORKFLOWS/APPLY-RESIDUAL-ABSORPTION.md) | RESIDUAL-VERIFICATION |
 | [[PROPAGATE-TERM]](04-SUB-WORKFLOWS/PROPAGATE-TERM.md) | UPDATE-TRACEABILITY, CASCADE-CHANGE |
+| [[CHECK-ATOMICITY]](04-SUB-WORKFLOWS/CHECK-ATOMICITY.md) | ATOMIZE-SCOPE |
 | [[CHECK-AGNOSTIC-BOUNDARY]](04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md) | GENERATE-DOCUMENT, REVIEW-COHERENCE |
 | [[CHECK-PHASE-CONTEXT]](04-SUB-WORKFLOWS/CHECK-PHASE-CONTEXT.md) | GENERATE-DOCUMENT |
 | [[CHECK-TRACEABILITY]](04-SUB-WORKFLOWS/CHECK-TRACEABILITY.md) | INTEGRATE-MILESTONE, UPDATE-TRACEABILITY |

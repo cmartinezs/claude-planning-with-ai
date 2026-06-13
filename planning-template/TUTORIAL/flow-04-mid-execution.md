@@ -2,15 +2,16 @@
 
 > [← Tutorial](README.md)
 
-**Cuándo usar este flujo:** hay un planning activo en `.planning/active/` y algo cambió — aparece trabajo nuevo, un scope resulta ser demasiado vago para ejecutar, o un scope es mucho más grande de lo esperado.
+**Cuándo usar este flujo:** hay un planning activo en `.planning/active/` y algo cambió — aparece trabajo nuevo, un scope resulta ser demasiado vago para ejecutar, un scope es mucho más grande de lo esperado, o sus tareas son demasiado gruesas para implementarlas directamente.
 
-Tres situaciones, tres comandos:
+Cuatro situaciones, cuatro comandos:
 
 | Situación | Comando |
 |-----------|---------|
 | [Trabajo nuevo no previsto](#trabajo-nuevo-no-previsto) | `/plan-enrich-epic` |
 | [Scope mal definido o ambiguo](#scope-mal-definido) | `/plan-enrich-story` |
 | [Scope demasiado amplio](#scope-demasiado-amplio) | `/plan-split-story` |
+| [Tareas demasiado gruesas para ejecutar](#tareas-demasiado-gruesas) | `/plan-atomize` |
 
 ---
 
@@ -171,6 +172,44 @@ ACTIVE
 ```
 
 > **Regla:** no se puede dividir un scope en estado `DONE`. Si el scope ya terminó pero apareció trabajo adicional, usa `/plan-enrich-epic` en cambio.
+
+---
+
+<a id="tareas-demasiado-gruesas"></a>
+## Tareas demasiado gruesas para ejecutar
+
+El scope está bien definido y tiene el tamaño correcto, pero sus tareas esconden decisiones de diseño, varios entregables, o trabajo sin tests. No hay que dividir el scope (es una sola unidad coherente) — hay que **atomizarlo**:
+
+```
+/plan-atomize 003-rubric-generation scope-03
+```
+
+Claude analiza el scope y propone el desglose en tareas atómicas:
+
+```
+scope-03-rubric-validation — propuesta de atomización:
+
+  task-01-validation-rules    Modelo ValidationRule + las 3 reglas del objetivo
+  task-02-validation-service  RubricValidationService usando las reglas — depends: task-01
+  task-03-api-error-response  Respuesta 400 con detalle de violaciones — depends: task-02
+
+¿Confirmas este desglose, o quieres ajustar? >
+```
+
+Al confirmar, cada tarea queda en su propio archivo bajo `02-deepening/scope-03-rubric-validation/`, con diseño técnico, pasos de implementación, plan de tests unitarios y done criteria binarios. La tabla de tareas del scope se convierte en el índice. Después:
+
+```
+# Ejecutar tarea por tarea
+/plan-task 003-rubric-generation scope-03 task-01
+
+# O todo el scope en orden de dependencias
+/plan-scope 003-rubric-generation scope-03
+
+# Auditar el desglose en cualquier momento (solo lectura)
+/plan-task-validate 003-rubric-generation scope-03
+```
+
+> **Cómo decidir entre los tres comandos de scope:** si el scope es ambiguo → `/plan-enrich-story`. Si mezcla áreas o es demasiado grande → `/plan-split-story`. Si está claro y bien dimensionado pero sus tareas no son directamente implementables → `/plan-atomize`.
 
 ---
 

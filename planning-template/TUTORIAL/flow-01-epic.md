@@ -148,6 +148,24 @@ ACTIVE
 
 ## Paso 4 — Ejecutar los scopes
 
+### Opcional — atomizar antes de ejecutar
+
+Si las tareas de un scope son demasiado gruesas para implementarlas directamente:
+
+```
+/plan-atomize 005-grading-assistance scope-01
+```
+
+Claude descompone el scope en tareas atómicas — un archivo por tarea bajo `02-deepening/scope-01-*/`, cada una con diseño técnico, pasos de implementación, tests unitarios y done criteria. Luego puedes ejecutarlas una a una:
+
+```
+/plan-task 005-grading-assistance scope-01 task-01
+```
+
+o todas en orden con `/plan-scope`, que detecta el scope atomizado.
+
+### Ejecutar el scope completo
+
 ```
 /plan-scope 005-grading-assistance scope-01
 ```

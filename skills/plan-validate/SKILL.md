@@ -1,6 +1,6 @@
 ---
 name: plan-validate
-description: Validate the structural integrity of one planning (or all plannings) — file locations, scope consistency, workflow IDs, dependencies, and done criteria.
+description: Validate the structural integrity of one planning (or all plannings) — file locations, scope consistency, workflow IDs, dependencies, done criteria, and atomized task files.
 argument-hint: "[NNN-slug]"
 allowed-tools: [Read, Bash, Glob]
 ---
@@ -34,6 +34,7 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
    b. Every scope row must have a matching `02-deepening/scope-NN-*.md` file **if** the planning is in DEEPENING. A scope file without a table row, or a row without a file (when expected), is a **FAIL**.
    c. Every `Depends On` value must reference an existing scope ID in the same table. Detect circular dependencies (e.g. 01 → 02 → 01) and flag them as **FAIL**.
    d. The scope status in the summary table must match the `> **Status:**` line of the corresponding scope file. Mismatch is a **FAIL**.
+   e. Valid status values are `TODO`, `IN PROGRESS`, and `DONE` — for scopes and tasks alike. Any other label (e.g. `PENDING`, a legacy synonym of `TODO`) is a **WARN**: suggest normalizing to `TODO`.
 
 6. **Check each scope file (`02-deepening/scope-NN-*.md`):**
    a. Required sections: `## Objective`, `## Tasks`, `## Done Criteria`.
@@ -43,11 +44,20 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
    e. A scope with all tasks DONE but status not DONE is a **WARN** (likely forgot `/plan-done`).
    f. Placeholder text surviving from the template (`[Task description]`, `[Scope Name]`, `[WORKFLOW-NAME]`) is a **WARN** in active plannings and a **FAIL** in `finished/`.
 
-7. **Check dependency order:** a scope with status IN PROGRESS or DONE whose `Depends On` scopes are not all DONE is a **WARN** (dependency executed out of order).
+7. **Check atomized scopes.** For each scope with a task folder (`02-deepening/<scope-id>-*/` containing `task-NN-*.md`):
+   a. Every row in the scope's `## Tasks` index must link to an existing task file, and every task file must have an index row. Orphans in either direction are a **FAIL**.
+   b. Task numbers must be unique and sequential starting at `task-01`.
+   c. Every task `Depends On` must reference an existing task in the same scope, with no cycles. Violations are a **FAIL**.
+   d. Each task file must contain `## Objective`, `## Technical Design`, `## Implementation Steps`, `## Unit Tests`, and `## Done Criteria`. Missing sections are a **FAIL**.
+   e. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.
+   f. Index status must match each task file's `> **Status:**` line. Mismatch is a **FAIL**.
+   g. A task `DONE` with unchecked Done Criteria is a **FAIL**. For deep atomicity auditing, point to `/plan-task-validate`.
 
-8. **Check traceability:** if any scope file's Done Criteria mentions TRACEABILITY and is checked, `TRACEABILITY.md` must exist and be non-empty. Empty or missing while referenced is a **WARN**.
+8. **Check dependency order:** a scope with status IN PROGRESS or DONE whose `Depends On` scopes are not all DONE is a **WARN** (dependency executed out of order).
 
-9. **Report.** Print one block per planning:
+9. **Check traceability:** if any scope file's Done Criteria mentions TRACEABILITY and is checked, `TRACEABILITY.md` must exist and be non-empty. Empty or missing while referenced is a **WARN**.
+
+10. **Report.** Print one block per planning:
 
 ```
 NNN-slug (LOCATION: initial | active | finished)
@@ -58,6 +68,6 @@ NNN-slug (LOCATION: initial | active | finished)
 
 End with a global summary: `N plannings validated — X clean, Y with warnings, Z with failures.` Exit message must state clearly that nothing was modified.
 
-10. **Suggest fixes.** For each FAIL, suggest the command that fixes it (e.g. status mismatch → `/plan-done NNN-slug scope-NN`; missing scope file → `/plan-enrich-story NNN-slug scope-NN`). Do not apply any fix.
+11. **Suggest fixes.** For each FAIL, suggest the command that fixes it (e.g. status mismatch → `/plan-done NNN-slug scope-NN`; missing scope file → `/plan-enrich-story NNN-slug scope-NN`; malformed atomized scope → `/plan-task-validate NNN-slug scope-NN`). Do not apply any fix.
 
 > This command is read-only. It does not modify any files.

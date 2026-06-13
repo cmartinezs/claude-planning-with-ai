@@ -59,13 +59,13 @@ Plannings in INITIAL live at `planning/NNN-name/`. They move to `planning/active
 Every task in every scope must reference a workflow ID from `WORKFLOWS/`. The four main groups are:
 
 - `01-PLANNING-WORKFLOWS/` — CREATE-PLANNING, ADVANCE-PLANNING
-- `02-EXECUTION-WORKFLOWS/` — GENERATE-DOCUMENT, REVIEW-COHERENCE, EXPAND-ELEMENT, INTEGRATE-MILESTONE
+- `02-EXECUTION-WORKFLOWS/` — ATOMIZE-SCOPE, GENERATE-DOCUMENT, REVIEW-COHERENCE, EXPAND-ELEMENT, INTEGRATE-MILESTONE
 - `03-MAINTENANCE-WORKFLOWS/` — UPDATE-TRACEABILITY, RECORD-INCONSISTENCY, CASCADE-CHANGE, AUDIT-PLANNING, etc.
 - `04-SUB-WORKFLOWS/` — Reusable step sequences embedded via `[SUB-WORKFLOW-NAME]`
 
 ### Validation
 
-There is no compiler or schema engine — the markdown files are the only representation. Structural integrity is checked by the `/plan-validate` skill, which verifies planning structure (file locations per state, scope table ↔ scope file consistency, workflow IDs against the `WORKFLOWS/` catalog, dependency references) directly from the markdown.
+There is no compiler or schema engine — the markdown files are the only representation. Structural integrity is checked by the `/plan-validate` skill, which verifies planning structure (file locations per state, scope table ↔ scope file consistency, workflow IDs against the `WORKFLOWS/` catalog, dependency references, atomized task folders) directly from the markdown. The `/plan-task-validate` skill audits atomic task files against the `[CHECK-ATOMICITY]` requirements.
 
 ## Coding conventions
 

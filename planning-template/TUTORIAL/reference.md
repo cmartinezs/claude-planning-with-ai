@@ -65,6 +65,15 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-validate                         # todos los plannings
 /plan-validate NNN-slug                # solo uno
 
+# Descomponer un scope en tareas atómicas (diseño técnico + implementación + tests unitarios por tarea)
+/plan-atomize NNN-slug scope-NN
+
+# Ejecutar una sola tarea atómica
+/plan-task NNN-slug scope-NN task-NN
+
+# Auditar tareas atómicas contra el checklist de atomicidad (solo lectura)
+/plan-task-validate NNN-slug [scope-NN] [task-NN]
+
 # Ejecutar todas las tareas de un scope
 /plan-scope NNN-slug scope-NN
 
@@ -117,6 +126,9 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Planificar trabajo técnico sin epic | `/plan-template` → `/plan-new` → `/plan-expand` |
 | Ver todos los plannings activos | `/plan-status` |
 | Verificar que un planning está bien formado | `/plan-validate NNN-slug` |
+| Las tareas de un scope son muy gruesas para ejecutar | `/plan-atomize NNN-slug scope-NN` |
+| Ejecutar una sola tarea atómica | `/plan-task NNN-slug scope-NN task-NN` |
+| Verificar que las tareas atómicas están bien formadas | `/plan-task-validate NNN-slug scope-NN` |
 | Ejecutar un scope | `/plan-scope NNN-slug scope-NN` |
 | Trabajo nuevo apareció durante ejecución | `/plan-enrich-epic NNN-slug` |
 | Scope del planning está mal especificado | `/plan-enrich-story NNN-slug scope-NN` |
@@ -138,6 +150,9 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-new` | `NNN-slug -- intent` ó `NNN-slug @path.md` |
 | `/plan-expand` | `NNN-slug` |
 | `/plan-validate` | `[NNN-slug]` (vacío = todos) |
+| `/plan-atomize` | `NNN-slug scope-NN` |
+| `/plan-task` | `NNN-slug scope-NN task-NN` |
+| `/plan-task-validate` | `NNN-slug [scope-NN] [task-NN]` |
 | `/plan-scope` | `NNN-slug scope-NN` |
 | `/plan-done` | `NNN-slug scope-NN` ó `NNN-slug scope-NN task-N` |
 | `/plan-archive` | `NNN-slug` |

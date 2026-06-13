@@ -9,8 +9,8 @@
 
 | # | Scope | SDLC Phase(s) | Depends On | Status |
 |---|-------|--------------|------------|--------|
-| 01 | [scope name] | [D / R / S / …] | — | PENDING |
-| 02 | [scope name] | [D / R / S / …] | 01 | PENDING |
+| 01 | [scope name] | [D / R / S / …] | — | TODO |
+| 02 | [scope name] | [D / R / S / …] | 01 | TODO |
 
 ---
 

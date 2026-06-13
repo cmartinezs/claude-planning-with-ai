@@ -12,6 +12,9 @@ A self-contained unit of work tracked by the system. Each planning has a lifecyc
 ### Scope
 A transversal work unit inside a planning. Maps to one area of your project (a service, a module, a directory). Each scope has its own tasks, done criteria, and status.
 
+### Atomic task
+The smallest executable unit of work, produced by decomposing a scope with `/plan-atomize`. One file per task under `02-deepening/scope-NN-name/`, each containing its own technical design, implementation steps, unit test plan, and binary done criteria — granular enough to be implemented directly in a single session.
+
 ### Area
 A distinct surface of your project that the traceability matrix tracks. Configured once during `/plan-init`. Examples: `AP` for `api/`, `WB` for `web/`, `IN` for `infra/`. Every scope declares which areas it touches.
 
@@ -97,7 +100,11 @@ Use this when you have an idea but no stories yet.
 # Expand the idea into scopes
 /plan-expand 002-payment-gateway
 
-# Execute
+# Optional: decompose a scope into atomic tasks (design + implementation + unit tests per task)
+/plan-atomize 002-payment-gateway scope-01
+/plan-task    002-payment-gateway scope-01 task-01
+
+# Execute (runs atomic tasks in order if the scope was atomized)
 /plan-scope 002-payment-gateway scope-01
 /plan-done  002-payment-gateway scope-01
 ...
@@ -171,6 +178,9 @@ Use these when a planning is already active and reality has changed.
 | `/plan-status` | — | Show all plannings and scope statuses |
 | `/plan-validate` | `[NNN-slug]` | Check structural integrity of one or all plannings (read-only) |
 | `/plan-expand` | `NNN-slug` | Advance INITIAL → EXPANSION |
+| `/plan-atomize` | `NNN-slug scope-NN` | Decompose a scope into atomic task files |
+| `/plan-task` | `NNN-slug scope-NN task-NN` | Execute a single atomic task |
+| `/plan-task-validate` | `NNN-slug [scope-NN] [task-NN]` | Audit atomic tasks against the atomicity checklist (read-only) |
 | `/plan-scope` | `NNN-slug scope-NN` | Execute all tasks in a scope |
 | `/plan-done` | `NNN-slug scope-NN [task-N]` | Mark a scope (or single task) done |
 | `/plan-archive` | `NNN-slug` | Audit and archive to `finished/` |
@@ -195,6 +205,15 @@ Use these when a planning is already active and reality has changed.
 
 Only P0 stories generate scopes. The rest are ignored for now.
 
+### Decomposing a scope into atomic tasks
+
+```
+/plan-atomize 001-checkout scope-02
+/plan-task    001-checkout scope-02 task-01
+```
+
+When a scope's tasks are too coarse to implement directly, `/plan-atomize` proposes a breakdown into atomic tasks — one file each under `02-deepening/scope-02-*/`, with technical design, implementation steps, unit tests, and binary done criteria. Execute them one at a time with `/plan-task`, or all in dependency order with `/plan-scope`. Audit the breakdown anytime with `/plan-task-validate` (read-only).
+
 ### Marking a single task done (not the whole scope)
 
 ```
@@ -217,7 +236,7 @@ Shows all plannings (INITIAL, active, completed) and the status of each scope.
 /plan-validate 001-checkout
 ```
 
-Read-only structural audit: file locations per state, scope table ↔ scope file consistency, workflow IDs against the catalog, dependency references, and done criteria. Run it without arguments to validate every planning. Fix any FAIL it reports before `/plan-archive`.
+Read-only structural audit: file locations per state, scope table ↔ scope file consistency, workflow IDs against the catalog, dependency references, done criteria, and atomized task folders. Run it without arguments to validate every planning. Fix any FAIL it reports before `/plan-archive`.
 
 ---
 
@@ -237,6 +256,7 @@ If you add a new directory to your project and want it tracked:
 
 - **One planning per initiative.** Don't create a planning for a task that takes 30 minutes. Use plannings for work that spans multiple sessions or areas.
 - **Enrich before generating.** Running `/us-enrich` on stories before `/plan-from-epic` produces richer scopes with better done criteria.
+- **Atomize when tasks hide design decisions.** If a scope row says "implement validation" and you can't start typing from it, `/plan-atomize` forces the design, tests, and steps to be decided before execution.
 - **`/plan-status` is your dashboard.** Check it at the start of every session to orient yourself.
 - **`/plan-validate` before `/plan-archive`.** A clean validation report means the audit will pass without surprises. It's read-only, so run it as often as you like.
 - **Residuals are not failures.** If something can't be resolved in the current scope, record it as a residual (it moves to the next planning). The system is designed for this.

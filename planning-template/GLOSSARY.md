@@ -18,6 +18,11 @@ A transversal work unit within a planning. Defined during the EXPANSION phase an
 
 ---
 
+### Atomic Task
+The smallest executable unit of work, produced by decomposing a scope with `/plan-atomize` (the `ATOMIZE-SCOPE` workflow). Lives as one file per task under `02-deepening/scope-NN-name/`, and the scope's task table becomes its index. Every atomic task must satisfy the atomicity requirements verified by `[CHECK-ATOMICITY]`: a single verifiable deliverable, independent executability (or explicit dependencies), a technical design, concrete implementation steps, a unit test plan, binary done criteria, a workflow reference from the catalog, and a size that fits one work session.
+
+---
+
 ### Workflow
 A defined sequence of steps for executing a specific type of task. Every task in a scope must specify which workflow governs its execution. See [`WORKFLOWS/README.md`](WORKFLOWS/README.md) for the full catalog.
 

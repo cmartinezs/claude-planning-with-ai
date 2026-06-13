@@ -10,6 +10,7 @@ Workflows for producing, reviewing, and integrating documentation content.
 
 | Workflow | Description |
 |----------|-------------|
+| [ATOMIZE-SCOPE](ATOMIZE-SCOPE.md) | Decompose a scope into atomic task files (design + implementation + unit tests) |
 | [GENERATE-DOCUMENT](GENERATE-DOCUMENT.md) | Create a new document from scratch or from a template |
 | [REVIEW-COHERENCE](REVIEW-COHERENCE.md) | Validate cross-references and consistency after changes |
 | [EXPAND-ELEMENT](EXPAND-ELEMENT.md) | Deepen an existing document section or template |
