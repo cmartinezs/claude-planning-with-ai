@@ -24,7 +24,7 @@ const es = {
     demoBtn: 'Ver demo',
     stats: [
       { value: '5', label: 'Estados del ciclo' },
-      { value: '16', label: 'Comandos' },
+      { value: '35', label: 'Comandos' },
       { value: 'Markdown', label: 'Formato nativo' },
       { value: '0', label: 'Dependencias' },
     ],
@@ -166,6 +166,15 @@ const es = {
           { cmd: '/plan-merge NNN-origen scope-NN NNN-destino', desc: 'Mueve un scope entre plannings activos' },
           { cmd: '/us-split historia.md', desc: 'Divide una historia en dos con referencias cruzadas' },
           { cmd: '/us-status ruta/', desc: 'Estado de enriquecimiento de todas las stories de un container' },
+        ],
+      },
+      {
+        title: 'Documentación',
+        description: 'Genera docs automáticamente del trabajo realizado',
+        commands: [
+          { cmd: '/doc-generate NNN [scope] [task]', desc: 'Genera inline docs, ADRs, changelogs o guías de usuario según área y nivel' },
+          { cmd: '/doc-task NNN scope-NN task-NN', desc: 'Genera docs de nivel tarea tras marcar una tarea como DONE' },
+          { cmd: '/doc-scope NNN scope-NN', desc: 'Genera docs de nivel scope al completar un scope' },
         ],
       },
       {

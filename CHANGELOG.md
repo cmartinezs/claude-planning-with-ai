@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-06-13
+
+### Added
+
+- `/doc-generate` — central documentation generator. Detects level (task/scope/planning) and area (WB/AP/IN/AG/DO/W) and writes the appropriate doc types: inline guides to `docs/guides/`, ADRs to `docs/adr/`, changelog entries and user guides to `docs/changelog/` and `docs/guides/`, and RELEASE.md/README.md consolidations at the planning level.
+- `/doc-task` — thin wrapper over `/doc-generate` at task granularity; invoked automatically by `plan-task` at step 10b after marking a task DONE.
+- `/doc-scope` — thin wrapper over `/doc-generate` at scope granularity; invoked automatically by `plan-scope` at step 7b after completing a scope.
+
+### Changed
+
+- `plan-task` — added step 10b: invokes `/doc-task` after marking a task DONE; includes doc files written in the final report.
+- `plan-scope` — added step 7b: invokes `/doc-scope` after completing a scope; includes doc files written in the final report.
+
 ## [1.3.0] — 2026-06-13
 
 ### Added
@@ -65,6 +78,9 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/releases/tag/v1.0.0

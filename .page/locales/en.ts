@@ -24,7 +24,7 @@ const en = {
     demoBtn: 'See demo',
     stats: [
       { value: '5', label: 'Lifecycle states' },
-      { value: '16', label: 'Commands' },
+      { value: '35', label: 'Commands' },
       { value: 'Markdown', label: 'Native format' },
       { value: '0', label: 'Dependencies' },
     ],
@@ -165,6 +165,15 @@ const en = {
           { cmd: '/plan-merge NNN-source scope-NN NNN-target', desc: 'Move a scope between active plannings' },
           { cmd: '/us-split story.md', desc: 'Split a story into two with cross-references' },
           { cmd: '/us-status path/', desc: 'Enrichment status of all stories in a container' },
+        ],
+      },
+      {
+        title: 'Documentation',
+        description: 'Auto-generate docs from completed work',
+        commands: [
+          { cmd: '/doc-generate NNN [scope] [task]', desc: 'Generate inline docs, ADRs, changelogs, or user guides based on area and level' },
+          { cmd: '/doc-task NNN scope-NN task-NN', desc: 'Generate task-level docs after a task is marked DONE' },
+          { cmd: '/doc-scope NNN scope-NN', desc: 'Generate scope-level docs after a scope is completed' },
         ],
       },
       {
