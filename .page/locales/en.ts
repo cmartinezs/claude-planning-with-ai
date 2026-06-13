@@ -93,7 +93,7 @@ const en = {
   commands: {
     titlePrefix: 'Essential',
     titleHighlight: 'commands',
-    subtitle: '23 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
+    subtitle: '35 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
     categories: [
       {
         title: 'Initialization',
@@ -147,6 +147,24 @@ const en = {
           { cmd: '/plan-enrich-epic NNN-slug', desc: 'Adds new scopes to an active plan' },
           { cmd: '/plan-enrich-story NNN-slug scope-NN', desc: 'Deepens an underspecified scope' },
           { cmd: '/plan-split-story NNN-slug scope-NN', desc: 'Splits an oversized scope' },
+        ],
+      },
+      {
+        title: 'Utilities',
+        description: 'Recovery, reports, and reuse',
+        commands: [
+          { cmd: '/plan-retry NNN-slug', desc: 'Retry all BLOCKED scopes after resolving a blocker' },
+          { cmd: '/plan-scope-skip NNN-slug scope-NN', desc: 'Mark a scope SKIPPED without executing it' },
+          { cmd: '/plan-rollback NNN-slug scope-NN', desc: 'Revert a DONE scope to TODO for re-execution' },
+          { cmd: '/plan-standup NNN-slug', desc: 'Generate standup text: yesterday / today / blockers' },
+          { cmd: '/plan-report NNN-slug', desc: 'Executive summary: scopes, technical decisions, duration' },
+          { cmd: '/plan-history NNN-slug', desc: 'Timeline of status changes extracted from git history' },
+          { cmd: '/plan-clone NNN-slug NNN-new', desc: 'Clone a planning with all statuses reset to TODO' },
+          { cmd: '/plan-export NNN-slug', desc: 'Export as PR description, tickets, or markdown' },
+          { cmd: '/plan-health', desc: 'Full-system diagnostic of the .planning/ directory' },
+          { cmd: '/plan-merge NNN-source scope-NN NNN-target', desc: 'Move a scope between active plannings' },
+          { cmd: '/us-split story.md', desc: 'Split a story into two with cross-references' },
+          { cmd: '/us-status path/', desc: 'Enrichment status of all stories in a container' },
         ],
       },
       {

@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-06-13
+
+### Added
+
+- `/plan-retry` — retry all BLOCKED scopes in a planning after fixing a blocker, respecting dependency order
+- `/plan-scope-skip` — mark a scope as SKIPPED (no longer applicable) to allow planning closure without executing it
+- `/plan-rollback` — revert a DONE scope back to TODO, removing its atomized task folder; requires confirmation
+- `/plan-standup` — generate standup text (yesterday/today/blockers) from scope statuses and recent git activity
+- `/plan-report` — generate an executive summary with scope stats, key technical decisions, and git-derived timeline
+- `/plan-history` — show a chronological table of scope status transitions extracted from git history
+- `/plan-clone` — clone a planning into a new ID, preserving scope structure and resetting all statuses to TODO
+- `/plan-export` — export a planning as a PR description, ticket list, or standalone markdown document
+- `/plan-health` — full-system health check across 8 structural checks (duplicate IDs, orphaned files, stale plannings, index sync)
+- `/plan-merge` — move a scope from one active planning to another, preserving task folders
+- `/us-split` — split a user story into two focused stories with cross-references
+- `/us-status` — show enrichment status of all stories in a container (DoD, Technical Notes, Dependencies, planning linkage)
+
 ## [1.2.0] — 2026-06-13
 
 ### Added

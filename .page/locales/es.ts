@@ -94,7 +94,7 @@ const es = {
   commands: {
     titlePrefix: 'Comandos',
     titleHighlight: 'esenciales',
-    subtitle: '23 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
+    subtitle: '35 comandos cubren todo el ciclo de vida. Sin flags crípticas. Sin configuraciones infinitas.',
     categories: [
       {
         title: 'Inicialización',
@@ -148,6 +148,24 @@ const es = {
           { cmd: '/plan-enrich-epic NNN-slug', desc: 'Añade nuevos scopes a un plan activo' },
           { cmd: '/plan-enrich-story NNN-slug scope-NN', desc: 'Profundiza un scope poco definido' },
           { cmd: '/plan-split-story NNN-slug scope-NN', desc: 'Divide un scope demasiado grande' },
+        ],
+      },
+      {
+        title: 'Utilidades',
+        description: 'Recuperación, reportes y reutilización',
+        commands: [
+          { cmd: '/plan-retry NNN-slug', desc: 'Reintenta todos los scopes BLOCKED tras resolver un bloqueo' },
+          { cmd: '/plan-scope-skip NNN-slug scope-NN', desc: 'Marca un scope como SKIPPED sin ejecutarlo' },
+          { cmd: '/plan-rollback NNN-slug scope-NN', desc: 'Revierte un scope DONE a TODO para re-ejecutarlo' },
+          { cmd: '/plan-standup NNN-slug', desc: 'Genera el texto de standup: ayer / hoy / bloqueantes' },
+          { cmd: '/plan-report NNN-slug', desc: 'Resumen ejecutivo: scopes, decisiones técnicas, duración' },
+          { cmd: '/plan-history NNN-slug', desc: 'Línea de tiempo de cambios de estado extraída del git' },
+          { cmd: '/plan-clone NNN-slug NNN-nuevo', desc: 'Clona un planning con todos los estados en TODO' },
+          { cmd: '/plan-export NNN-slug', desc: 'Exporta como PR, tickets o markdown standalone' },
+          { cmd: '/plan-health', desc: 'Diagnóstico global del sistema .planning/' },
+          { cmd: '/plan-merge NNN-origen scope-NN NNN-destino', desc: 'Mueve un scope entre plannings activos' },
+          { cmd: '/us-split historia.md', desc: 'Divide una historia en dos con referencias cruzadas' },
+          { cmd: '/us-status ruta/', desc: 'Estado de enriquecimiento de todas las stories de un container' },
         ],
       },
       {
