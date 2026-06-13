@@ -36,7 +36,8 @@ Reference workflows:
 7. After all tasks: execute `[EXECUTE-SCOPE]` to verify done criteria are met.
    - If `BLOCKED`: list unmet criteria and stop.
    - If `DONE`: set scope status to `DONE` in the scope file.
-8. Report: scope completed, N tasks done, done criteria satisfied.
+7b. Invoke `/doc-scope <planning-id> <scope-id>`. If the scope area is DO or W this is a silent no-op. Include any files written in the final report.
+8. Report: scope completed, N tasks done, done criteria satisfied, doc files written (from step 7b).
 
 > To advance to the next scope, use `/plan-advance <planning-id>`.
 > To decompose a scope into atomic task files before executing it, use `/plan-atomize <planning-id> <scope-id>`. To execute a single atomic task, use `/plan-task`.
