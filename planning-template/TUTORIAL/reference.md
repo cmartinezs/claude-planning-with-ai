@@ -104,6 +104,22 @@ Todos los comandos disponibles con su sintaxis exacta.
 
 ---
 
+## Pipeline autónomo con agentes
+
+```bash
+# Orquestador: detecta estado, confirma una vez, delega a agentes fase a fase
+/plan-run NNN-slug                 # retoma desde el estado actual
+/plan-run "descripción"            # crea un planning nuevo y ejecuta todo el ciclo
+/plan-run                          # sin argumento: lista plannings activos y pregunta cuál correr
+
+# Agentes de fase (invocables de forma independiente)
+/plan-agent-plan NNN-slug          # INITIAL → EXPANSION sin interrupciones
+/plan-agent-execute NNN-slug       # atomiza + ejecuta todos los scopes pendientes (paralelo)
+/plan-agent-validate NNN-slug      # valida integridad + plan-done + plan-archive
+```
+
+---
+
 ## Regla fundamental y bypass
 
 Nada se ejecuta sin estar dentro de un planning activo.
@@ -135,6 +151,10 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Scope del planning es demasiado grande | `/plan-split-story NNN-slug scope-NN` |
 | Story nueva + scope nuevo coordinados | `/us-new` → `/plan-enrich-epic` |
 | Cerrar el planning | `/plan-archive NNN-slug` |
+| Ejecutar todo el ciclo sin intervención | `/plan-run NNN-slug` |
+| Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |
+| Solo la ejecución paralela de scopes | `/plan-agent-execute NNN-slug` |
+| Solo la validación y cierre autónomo | `/plan-agent-validate NNN-slug` |
 
 ---
 
@@ -159,6 +179,10 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-enrich-epic` | `NNN-slug` |
 | `/plan-enrich-story` | `NNN-slug scope-NN` |
 | `/plan-split-story` | `NNN-slug scope-NN` |
+| `/plan-run` | `[NNN-slug]` ó `"descripción libre"` (vacío = lista plannings) |
+| `/plan-agent-plan` | `NNN-slug` ó `"descripción libre"` |
+| `/plan-agent-execute` | `NNN-slug` |
+| `/plan-agent-validate` | `NNN-slug` |
 
 **Resolución de argumentos en comandos de producto:**
 Los comandos `us-enrich`, `us-new`, `epic-enrich`, y `plan-from-epic` reciben rutas — no IDs ni slugs hardcodeados. Cuando se pasa un ID (`US-040`) o nombre parcial en lugar de ruta, el comando busca recursivamente desde el directorio actual el archivo cuyo contenido o nombre coincida.

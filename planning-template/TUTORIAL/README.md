@@ -14,6 +14,7 @@ Guías por escenario real. Cada archivo cubre una situación concreta de princip
 | Tengo trabajo transversal que no pertenece a ningún epic | [→ Flujo B](flow-02-general.md) |
 | Quiero refinar el backlog sin ejecutar nada todavía | [→ Flujo C](flow-03-backlog.md) |
 | El planning ya está activo y necesito ajustarlo | [→ Flujo D](flow-04-mid-execution.md) |
+| Quiero ejecutar un planning de punta a punta sin intervención | [→ Flujo E](flow-05-autonomous.md) |
 | Solo quiero la referencia rápida de comandos | [→ Referencia](reference.md) |
 
 ---
@@ -82,6 +83,15 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-enrich-epic NNN-slug` | Agrega scopes nuevos al planning |
 | `/plan-enrich-story NNN-slug scope-NN` | Profundiza un scope incompleto o ambiguo |
 | `/plan-split-story NNN-slug scope-NN` | Divide un scope demasiado amplio |
+
+**Pipeline autónomo con agentes:**
+
+| Comando | Qué hace |
+|---------|----------|
+| `/plan-run [NNN-slug\|"descripción"]` | Ejecuta el ciclo completo — detecta estado, confirma una vez, delega a agentes |
+| `/plan-agent-plan NNN-slug` | Agente de planificación: crea y expande sin interrupciones |
+| `/plan-agent-execute NNN-slug` | Agente de ejecución: atomiza y ejecuta scopes en paralelo |
+| `/plan-agent-validate NNN-slug` | Agente de cierre: valida, marca done y archiva |
 
 ---
 
