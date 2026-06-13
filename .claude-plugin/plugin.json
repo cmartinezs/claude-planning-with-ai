@@ -1,7 +1,7 @@
 {
   "name": "claude-planning-with-ai",
-  "description": "Structured planning system for software projects. Lifecycle management (plan-new, plan-expand, plan-scope, plan-done, plan-archive), atomic task decomposition (plan-atomize, plan-task, plan-task-validate), backlog enrichment (us-enrich, us-new, epic-enrich), and epic-to-planning bridge (plan-from-epic). Works with any markdown-based story/epic structure.",
-  "version": "1.1.0",
+  "description": "Structured planning system for software projects. Full autonomous pipeline (/plan-run), phase agents (/plan-agent-plan, /plan-agent-execute, /plan-agent-validate), lifecycle management (plan-new, plan-expand, plan-scope, plan-done, plan-archive), atomic task decomposition (plan-atomize, plan-task, plan-task-validate), backlog enrichment (us-enrich, us-new, epic-enrich), and epic-to-planning bridge (plan-from-epic).",
+  "version": "1.2.0",
   "author": {
     "name": "cmartinezs",
     "email": "carlos.f.martinez.s@gmail.com",
