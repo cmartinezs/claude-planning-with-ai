@@ -264,7 +264,8 @@ Only for area `IN`.
 - If none found: report "no task-level ADRs found for <scope-id> — run /doc-generate <planning-id> <scope-id> <task-id> for each task first" and skip.
 - Derive `scope-slug`: take the scope filename, remove the leading `scope-NN-` prefix, strip `.md`.
 - Target path: `docs/adr/<YYYY-MM-DD>-<scope-slug>.md`.
-- Write (overwrite if exists):
+
+**If the file does not exist**, write:
 
 ```markdown
 # ADR Summary: <scope name>
@@ -278,6 +279,23 @@ Only for area `IN`.
 <One paragraph per source ADR summarising its Decision section>
 
 ## Combined Consequences
+<Merged Consequences sections from all source ADRs>
+```
+
+**If the file already exists**, append:
+
+```markdown
+
+---
+
+## Update — <today>
+
+**Source ADRs:** <comma-separated list of source ADR filenames>
+
+### Decisions Made in This Scope
+<One paragraph per source ADR summarising its Decision section>
+
+### Combined Consequences
 <Merged Consequences sections from all source ADRs>
 ```
 
