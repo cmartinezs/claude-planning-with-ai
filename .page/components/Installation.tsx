@@ -224,7 +224,7 @@ export default function Installation() {
 
   return (
     <>
-      <section id="instalacion" className="relative pt-24 md:pt-32 pb-8 scroll-mt-24">
+      <section id="installation" className="relative pt-24 md:pt-32 pb-8 scroll-mt-24">
         <div className="absolute inset-0 bg-surface-800/30" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useTranslation } from '../locales'
 
 export default function Footer() {
@@ -8,12 +9,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
-            <a href="#" className="flex items-center gap-2 mb-4">
+            <Link href="/" className="flex items-center gap-2 mb-4">
               <span className="text-xl">📋</span>
               <span className="text-lg font-bold text-surface-50">
                 Planning with AI
               </span>
-            </a>
+            </Link>
             <p className="text-sm text-surface-500 leading-relaxed max-w-xs">
               {t.footer.description}
             </p>
@@ -27,15 +28,23 @@ export default function Footer() {
               <ul className="space-y-3">
                 {group.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-surface-500 hover:text-surface-300 transition-colors"
-                      {...(link.href.startsWith('http') || link.href.startsWith('mailto')
-                        ? { target: '_blank', rel: 'noopener noreferrer' }
-                        : {})}
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith('http') || link.href.startsWith('mailto') ? (
+                      <a
+                        href={link.href}
+                        className="text-sm text-surface-500 hover:text-surface-300 transition-colors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-surface-500 hover:text-surface-300 transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

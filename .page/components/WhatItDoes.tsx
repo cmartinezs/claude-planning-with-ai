@@ -48,7 +48,7 @@ export default function WhatItDoes() {
   }
 
   return (
-    <section id="que-hace" className="relative py-24 md:py-32 scroll-mt-24">
+    <section id="what-it-does" className="relative py-24 md:py-32 scroll-mt-24">
       <div className="absolute inset-0 bg-surface-800/30" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

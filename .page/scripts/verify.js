@@ -13,7 +13,7 @@
  *   --url <url>        Base URL (default: autodetect localhost:3000/3001)
  *   --widths <list>    Comma-separated viewport widths (default: 320,390,768)
  *   --shots <list>     Comma-separated CSS selectors to screenshot at the
- *                      first width (default: body,#instalacion,#que-hace)
+ *                      first width (default: body,#installation,#what-it-does)
  *   --out <dir>        Screenshot output dir (default: scripts/shots)
  *   --click <list>     Comma-separated CSS selectors to click (in order)
  *                      after load, before measuring/shooting
@@ -73,7 +73,7 @@ async function openPage(browser, url, width) {
   } catch {}
   try {
     await page.waitForFunction(() => {
-      const el = document.querySelector('#que-hace')
+      const el = document.querySelector('#what-it-does')
       return !!el && el.getBoundingClientRect().height > 0
     }, { timeout: 30000 })
   } catch {}
@@ -117,7 +117,7 @@ async function shoot(page, selector, file) {
 
 ;(async () => {
   const widths = arg('widths', '320,390,768').split(',').map(Number)
-  const shots = arg('shots', 'body,#instalacion,#que-hace').split(',')
+  const shots = arg('shots', 'body,#installation,#what-it-does').split(',')
   const outDir = arg('out', path.join(__dirname, 'shots'))
   const clicks = arg('click', '').split(',').filter(Boolean)
   const settle = Number(arg('settle', '4000'))

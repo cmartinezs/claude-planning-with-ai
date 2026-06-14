@@ -104,12 +104,12 @@ export default function SplashScreen({ onDismiss }: { onDismiss: () => void }) {
       </div>
 
       {!revealed && (
-        <div className="pb-8 text-center animate-fade-in">
+        <div className="pb-16 sm:pb-20 text-center animate-fade-in">
           <p className="text-sm text-surface-600 mb-3">{t.splash.identify}</p>
           <div className="flex justify-center">
             <button
               onClick={onDismiss}
-              className="text-xs text-surface-500 hover:text-surface-300 transition-colors underline underline-offset-4"
+              className="px-3 py-2 text-lg text-surface-500 hover:text-surface-300 transition-colors underline underline-offset-4"
             >
               {t.splash.skip}
             </button>

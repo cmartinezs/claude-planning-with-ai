@@ -13,7 +13,7 @@ export default function Lifecycle() {
   const stages = stageConfig.map((c, i) => ({ ...c, ...t.lifecycle.stages[i] }))
 
   return (
-    <section id="ciclo" className="relative py-24 md:py-32 bg-surface-800/50 scroll-mt-24">
+    <section id="lifecycle" className="relative py-24 md:py-32 bg-surface-800/50 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="section-title mb-4">

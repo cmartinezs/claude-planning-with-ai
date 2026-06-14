@@ -12,14 +12,23 @@ import Footer from '@/components/Footer'
 import { useTranslation } from '@/locales'
 
 const siteUrl = 'https://cmartinezs.github.io/claude-planning-with-ai'
+const splashSessionKey = 'planning-with-ai:splash-dismissed'
 
 export default function Home() {
   const t = useTranslation()
-  const [splashDone, setSplashDone] = useState(false)
-  const handleDismiss = useCallback(() => setSplashDone(true), [])
+  const [splashDone, setSplashDone] = useState<boolean | null>(null)
 
   useEffect(() => {
-    if (splashDone) return
+    setSplashDone(sessionStorage.getItem(splashSessionKey) === '1')
+  }, [])
+
+  const handleDismiss = useCallback(() => {
+    sessionStorage.setItem(splashSessionKey, '1')
+    setSplashDone(true)
+  }, [])
+
+  useEffect(() => {
+    if (splashDone !== false) return
 
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -74,7 +83,7 @@ export default function Home() {
         />
       </Head>
 
-      {!splashDone && <SplashScreen onDismiss={handleDismiss} />}
+      {splashDone === false && <SplashScreen onDismiss={handleDismiss} />}
 
       <Header />
       <main>

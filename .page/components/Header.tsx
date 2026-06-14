@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useTranslation } from '../locales'
 
@@ -7,10 +8,11 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
 
   const navLinks = [
-    { href: '#instalacion', label: t.header.nav.install },
-    { href: '#que-hace', label: t.header.nav.whatItDoes },
-    { href: '#ciclo', label: t.header.nav.lifecycle },
-    { href: '#comandos', label: t.header.nav.commands },
+    { href: '/#installation', label: t.header.nav.install },
+    { href: '/#what-it-does', label: t.header.nav.whatItDoes },
+    { href: '/#lifecycle', label: t.header.nav.lifecycle },
+    { href: '/commands', label: t.header.nav.commands },
+    { href: '/tutorials', label: t.header.nav.tutorials },
   ]
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <a href="#" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group">
             <span className="text-2xl">📋</span>
             <div>
               <span className="text-lg font-bold text-surface-50 group-hover:text-brand-400 transition-colors">
@@ -39,17 +41,17 @@ export default function Header() {
                 /plugin
               </span>
             </div>
-          </a>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 className="text-sm text-surface-400 hover:text-surface-200 transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 

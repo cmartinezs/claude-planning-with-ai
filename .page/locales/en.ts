@@ -1,3 +1,6 @@
+import commandsPage from './commandsPage.en'
+import tutorialsPage from './tutorialsPage.en'
+
 const en = {
   meta: {
     title: 'Planning with AI — Structured planning plugin for Claude Code',
@@ -10,6 +13,7 @@ const en = {
       whatItDoes: 'What it does',
       lifecycle: 'Lifecycle',
       commands: 'Commands',
+      tutorials: 'Tutorials',
     },
   },
   hero: {
@@ -24,7 +28,7 @@ const en = {
     demoBtn: 'See demo',
     stats: [
       { value: '5', label: 'Lifecycle states' },
-      { value: '35', label: 'Commands' },
+      { value: '38', label: 'Commands' },
       { value: 'Markdown', label: 'Native format' },
       { value: '0', label: 'Dependencies' },
     ],
@@ -91,104 +95,35 @@ const en = {
     statusNote: '— live query',
   },
   commands: {
-    titlePrefix: 'Essential',
-    titleHighlight: 'commands',
-    subtitle: '35 commands cover the entire lifecycle. No cryptic flags. No endless configuration.',
-    categories: [
+    titlePrefix: 'Usage',
+    titleHighlight: 'reference',
+    subtitle: 'The complete list lives at /commands. The landing now keeps only the main entry points for quick orientation.',
+    cards: [
       {
-        title: 'Initialization',
-        description: 'Run once per project',
-        commands: [{ cmd: '/plan-init', desc: 'Creates the .planning/ structure in the project' }],
+        title: 'Complete commands',
+        description: 'Browse all 38 commands with arguments, behavior, source, and use cases.',
+        href: '/commands',
+        linkLabel: 'Open reference',
+        iconPath: 'M4 6h16M4 12h16M4 18h10',
       },
       {
-        title: 'Backlog',
-        description: 'Story and epic management',
-        commands: [
-          { cmd: '/us-new path/', desc: 'Adds a new story to a directory or file' },
-          { cmd: '/us-enrich story.md', desc: 'Adds DoD, technical notes, dependencies' },
-          { cmd: '/epic-enrich path/', desc: 'Detects gaps and adds new stories' },
-          { cmd: '/plan-from-epic NNN path/', desc: 'Generates a full plan from an epic' },
-        ],
+        title: 'Flow tutorials',
+        description: 'Choose the right route: from epic, from scratch, backlog, adjustments, or autonomous agents.',
+        href: '/tutorials',
+        linkLabel: 'View tutorials',
+        iconPath: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
       },
       {
-        title: 'Planning',
-        description: 'Create and manage plans',
-        commands: [
-          { cmd: '/plan-template slug', desc: 'Generates an interactive idea document' },
-          { cmd: '/plan-new NNN-slug -- intent', desc: 'Creates a plan in INITIAL state' },
-          { cmd: '/plan-new NNN-slug @path.md', desc: 'Creates a plan from an idea document' },
-          { cmd: '/plan-expand NNN-slug', desc: 'Advances from INITIAL → EXPANSION' },
-        ],
-      },
-      {
-        title: 'Atomic tasks',
-        description: 'Optional decomposition before executing',
-        commands: [
-          { cmd: '/plan-atomize NNN-slug scope-NN', desc: 'Decomposes a scope into atomic task files' },
-          { cmd: '/plan-task NNN-slug scope-NN task-NN', desc: 'Executes a single atomic task' },
-          { cmd: '/plan-task-validate NNN-slug', desc: 'Audits atomic tasks against the atomicity checklist' },
-        ],
-      },
-      {
-        title: 'Execution',
-        description: 'Run and close scopes',
-        commands: [
-          { cmd: '/plan-scope NNN-slug scope-NN', desc: 'Runs all tasks in a scope' },
-          { cmd: '/plan-done NNN-slug scope-NN', desc: 'Marks a scope as complete' },
-          { cmd: '/plan-status', desc: 'Shows all active plans and their scopes' },
-          { cmd: '/plan-validate', desc: 'Checks structural integrity of plannings' },
-          { cmd: '/plan-archive NNN-slug', desc: 'Audits and archives in finished/' },
-        ],
-      },
-      {
-        title: 'Adjustments',
-        description: 'Mid-plan modifications',
-        commands: [
-          { cmd: '/plan-enrich-epic NNN-slug', desc: 'Adds new scopes to an active plan' },
-          { cmd: '/plan-enrich-story NNN-slug scope-NN', desc: 'Deepens an underspecified scope' },
-          { cmd: '/plan-split-story NNN-slug scope-NN', desc: 'Splits an oversized scope' },
-        ],
-      },
-      {
-        title: 'Utilities',
-        description: 'Recovery, reports, and reuse',
-        commands: [
-          { cmd: '/plan-retry NNN-slug', desc: 'Retry all BLOCKED scopes after resolving a blocker' },
-          { cmd: '/plan-scope-skip NNN-slug scope-NN', desc: 'Mark a scope SKIPPED without executing it' },
-          { cmd: '/plan-rollback NNN-slug scope-NN', desc: 'Revert a DONE scope to TODO for re-execution' },
-          { cmd: '/plan-standup NNN-slug', desc: 'Generate standup text: yesterday / today / blockers' },
-          { cmd: '/plan-report NNN-slug', desc: 'Executive summary: scopes, technical decisions, duration' },
-          { cmd: '/plan-history NNN-slug', desc: 'Timeline of status changes extracted from git history' },
-          { cmd: '/plan-clone NNN-slug NNN-new', desc: 'Clone a planning with all statuses reset to TODO' },
-          { cmd: '/plan-export NNN-slug', desc: 'Export as PR description, tickets, or markdown' },
-          { cmd: '/plan-health', desc: 'Full-system diagnostic of the .planning/ directory' },
-          { cmd: '/plan-merge NNN-source scope-NN NNN-target', desc: 'Move a scope between active plannings' },
-          { cmd: '/us-split story.md', desc: 'Split a story into two with cross-references' },
-          { cmd: '/us-status path/', desc: 'Enrichment status of all stories in a container' },
-        ],
-      },
-      {
-        title: 'Documentation',
-        description: 'Auto-generate docs from completed work',
-        commands: [
-          { cmd: '/doc-generate NNN [scope] [task]', desc: 'Generate inline docs, ADRs, changelogs, or user guides based on area and level' },
-          { cmd: '/doc-task NNN scope-NN task-NN', desc: 'Generate task-level docs after a task is marked DONE' },
-          { cmd: '/doc-scope NNN scope-NN', desc: 'Generate scope-level docs after a scope is completed' },
-        ],
-      },
-      {
-        title: 'Autonomous agents',
-        description: 'Full pipeline with a single command',
-        commands: [
-          { cmd: '/plan-run NNN-slug', desc: 'Runs a plan end-to-end — detects state, confirms once, delegates to agents' },
-          { cmd: '/plan-agent-plan NNN-slug', desc: 'Planning agent: creates and expands without interruptions' },
-          { cmd: '/plan-agent-execute NNN-slug', desc: 'Execution agent: atomizes and runs scopes in parallel' },
-          { cmd: '/plan-agent-validate NNN-slug', desc: 'Closing agent: validates, marks done, and archives' },
-        ],
+        title: 'First command',
+        description: 'Start with /plan-init to create .planning/ and detect project areas.',
+        href: '/#installation',
+        linkLabel: 'Go to installation',
+        iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
       },
     ],
-    docsLink: 'See full documentation on GitHub',
   },
+  commandsPage,
+  tutorialsPage,
   installation: {
     titlePrefix: 'Install in',
     titleHighlight: '2 steps',
@@ -326,14 +261,16 @@ const en = {
         title: 'Plugin',
         links: [
           { label: 'GitHub', href: 'https://github.com/cmartinezs/claude-planning-with-ai' },
-          { label: 'Installation', href: '#instalacion' },
-          { label: 'Commands', href: '#comandos' },
+          { label: 'Installation', href: '/#installation' },
+          { label: 'Commands', href: '/commands' },
+          { label: 'Tutorials', href: '/tutorials' },
         ],
       },
       {
         title: 'Resources',
         links: [
           { label: 'Documentation', href: 'https://github.com/cmartinezs/claude-planning-with-ai' },
+          { label: 'Tutorials', href: '/tutorials' },
           { label: 'Claude Code', href: 'https://docs.anthropic.com/en/docs/claude-code/overview' },
         ],
       },
