@@ -1,6 +1,6 @@
 ---
 name: us-status
-description: Show the enrichment status of all stories in a container — which have DoD, Technical Notes, Dependencies; which are already linked to an active planning scope.
+description: Show the enrichment status of all stories in a container — which have DoD, Technical Notes, Dependencies; which are already linked to a active planning story.
 argument-hint: <path/to/container/>
 allowed-tools: [Read, Bash, Glob]
 ---

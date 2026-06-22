@@ -21,12 +21,12 @@ A good prompt does not just say what to do. It tells the AI:
 ## Prompt Structure Template
 
 ```
-Context: [Brief description of the planning and current scope]
+Context: [Brief description of the planning and current story]
 Task: [Exactly what needs to be produced or modified]
 Constraints:
   - [Constraint 1: e.g., "Agents do not persist domain entities directly"]
   - [Constraint 2: e.g., "Follow Spring Boot module structure in docs/04-architecture/repository-structure.md"]
-  - [Constraint 3: e.g., "Update cross-references in related scope files"]
+  - [Constraint 3: e.g., "Update cross-references in related story files"]
 Done when:
   - [Criterion 1]
   - [Criterion 2]
@@ -37,9 +37,9 @@ Done when:
 ## General Rules
 
 ### 1. Reference the planning before executing
-Every prompt should name the active planning and scope it belongs to.
+Every prompt should name the active planning and story it belongs to.
 
-> ✅ *"As part of planning 019-web-scaffold, scope-02-assessment-pages: create the assessment creation page…"*
+> ✅ *"As part of planning 019-web-scaffold, story-02-assessment-pages: create the assessment creation page…"*
 >
 > ❌ *"Create the assessment creation page."*
 
@@ -74,7 +74,7 @@ When the prompt should trigger a full workflow, name it explicitly:
 ---
 
 ### 6. Cascade prompts for cross-repo changes
-If the task affects multiple repos (e.g., a new API endpoint also requires a web client update), split into individual scope prompts per repo, or use `CASCADE-CHANGE` workflow explicitly.
+If the task affects multiple repos (e.g., a new API endpoint also requires a web client update), split into individual story prompts per repo, or use `CASCADE-CHANGE` workflow explicitly.
 
 ---
 
@@ -86,12 +86,12 @@ If you discover a contradiction between a `docs/` decision and the implementatio
 
 ## Prompt Library (Reusable)
 
-### Advance to next scope
+### Advance to next story
 
 ```
-Context: Planning [NNN-name], current scope is [scope-NN], status DONE.
-Task: Execute [NEXT-SCOPE] sub-workflow. Verify all scope done criteria are met,
-      update TRACEABILITY.md, and identify the next scope to execute.
+Context: Planning [NNN-name], current story is [story-NN], status DONE.
+Task: Execute [NEXT-STORY] sub-workflow. Verify all story done criteria are met,
+      update TRACEABILITY.md, and identify the next story to execute.
 ```
 
 ---
@@ -99,7 +99,7 @@ Task: Execute [NEXT-SCOPE] sub-workflow. Verify all scope done criteria are met,
 ### Scaffold a new API module
 
 ```
-Context: Planning [NNN-name], scope [NN-name].
+Context: Planning [NNN-name], story [NN-name].
 Task: Execute GENERATE-DOCUMENT workflow for [module-name] module in [api-directory/].
       Reference [docs/your-repository-structure-doc] for module structure.
       Reference [docs/your-api-design-doc] for endpoint contracts.
@@ -121,7 +121,7 @@ Done when:
 ### Implement an agent
 
 ```
-Context: Planning [NNN-name], scope [NN-name]. Working on [AgentName] agent in [agents-directory/].
+Context: Planning [NNN-name], story [NN-name]. Working on [AgentName] agent in [agents-directory/].
 Task: Execute GENERATE-DOCUMENT for [AgentName] agent.
       Reference [docs/your-agent-spec-doc] for the agent's input/output contract.
       Reference [docs/your-repository-structure-doc] for the agent directory structure.
@@ -143,7 +143,7 @@ Done when:
 ### Scaffold a frontend page or component
 
 ```
-Context: Planning [NNN-name], scope [NN-name]. Working on [page/component] in [frontend-directory/].
+Context: Planning [NNN-name], story [NN-name]. Working on [page/component] in [frontend-directory/].
 Task: Execute GENERATE-DOCUMENT for [component or page name].
       Reference [docs/your-ux-doc] for UX intent and interaction flows.
       Reference [docs/your-repository-structure-doc] for routing and directory structure.
@@ -163,7 +163,7 @@ Done when:
 ### Infrastructure change
 
 ```
-Context: Planning [NNN-name], scope [NN-name]. Working on infrastructure in [infra-directory/].
+Context: Planning [NNN-name], story [NN-name]. Working on infrastructure in [infra-directory/].
 Task: Execute GENERATE-DOCUMENT for [IaC module or CI/CD workflow].
       Reference [docs/your-deployment-doc] for topology and environment conventions.
 Constraints:
@@ -181,7 +181,7 @@ Done when:
 ### Review coherence after changes
 
 ```
-Context: Planning [NNN-name]. Scope [NN-name] just completed [X].
+Context: Planning [NNN-name]. Story [NN-name] just completed [X].
 Task: Execute REVIEW-COHERENCE workflow.
       Check cross-references from [list of related files or modules].
       Verify implementation matches the relevant docs/ contract.
@@ -210,7 +210,7 @@ Task: Execute UPDATE-TRACEABILITY workflow.
 ```
 Context: Planning [NNN-name] is about to be archived.
 Task: Execute AUDIT-PLANNING workflow.
-      Verify all scopes are DONE, all tasks have outputs, traceability is updated,
+      Verify all stories are DONE, all tasks have outputs, traceability is updated,
       no open inconsistencies, no pending residuals.
       If all checks pass, move to `.planning/finished/`.
 ```

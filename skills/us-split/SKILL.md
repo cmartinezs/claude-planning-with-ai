@@ -40,4 +40,4 @@ Split an oversized or mixed-concern user story into two focused stories. The cou
 
 7. Report: two story files now exist. List which AC items stayed and which moved. If either story now looks underspecified, suggest `/us-enrich <path>`.
 
-> Does NOT touch the `.planning/` system. If this story is already linked to a planning scope, you may need to run `/plan-enrich-epic` to add a scope for the new story.
+> Does NOT touch the `.planning/` system. If this story is already linked to a planning story, you may need to run `/plan-enrich-epic` to add a story for the new story.

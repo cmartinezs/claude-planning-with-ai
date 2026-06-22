@@ -1,11 +1,11 @@
 ---
 name: doc-generate
-description: Generate documentation from planning artifacts (inline docs, ADRs, changelogs, user guides) at task, scope, or planning level.
-argument-hint: <NNN-slug> [<scope-NN> [<task-NN>]]  (e.g. 001-user-auth-api scope-01 task-02)
+description: Generate documentation from planning artifacts (inline docs, ADRs, changelogs, user guides) at task, story, or planning level.
+argument-hint: <NNN-slug> [<story-NN> [<task-NN>]]  (e.g. 001-user-auth-api story-01 task-02)
 allowed-tools: [Read, Write, Bash, Glob, Grep]
 ---
 
-Generate documentation from planning artifacts. Detects the level (task / scope / planning) from the number of tokens in `$ARGUMENTS` and the area code from the scope file, then writes to `docs/`.
+Generate documentation from planning artifacts. Detects the level (task / story / planning) from the number of tokens in `$ARGUMENTS` and the area code from the story file, then writes to `docs/`.
 
 **Area → document matrix:**
 
@@ -22,8 +22,8 @@ Generate documentation from planning artifacts. Detects the level (task / scope 
 ## Arguments
 
 `$ARGUMENTS` — one of:
-- `NNN-slug scope-NN task-NN` — **task level** (3 tokens)
-- `NNN-slug scope-NN` — **scope level** (2 tokens)
+- `NNN-slug story-NN task-NN` — **task level** (3 tokens)
+- `NNN-slug story-NN` — **story level** (2 tokens)
 - `NNN-slug` — **planning level** (1 token)
 
 ## Steps
@@ -31,8 +31,8 @@ Generate documentation from planning artifacts. Detects the level (task / scope 
 ### 0. Parse arguments and detect level
 
 Split `$ARGUMENTS` on whitespace:
-- 3 tokens → task level. `planning-id` = token 1, `scope-id` = token 2, `task-id` = token 3.
-- 2 tokens → scope level. `planning-id` = token 1, `scope-id` = token 2.
+- 3 tokens → task level. `planning-id` = token 1, `story-id` = token 2, `task-id` = token 3.
+- 2 tokens → story level. `planning-id` = token 1, `story-id` = token 2.
 - 1 token → planning level. `planning-id` = token 1.
 - Any other count: stop and report usage.
 
@@ -42,11 +42,11 @@ Split `$ARGUMENTS` on whitespace:
 
 ### T1. Locate task file
 
-Find `.planning/active/<planning-id>/02-deepening/<scope-id>-*/<task-id>-*.md`. If not found, stop and report. Read the file completely: Objective, Technical Design, Implementation Steps, Unit Tests, Done Criteria.
+Find `.planning/active/<planning-id>/02-deepening/<story-id>-*/<task-id>-*.md`. If not found, stop and report. Read the file completely: Objective, Technical Design, Implementation Steps, Unit Tests, Done Criteria.
 
 ### T2. Determine area
 
-Read the scope file `.planning/active/<planning-id>/02-deepening/<scope-id>-*.md`. Look for a field named `Area:` or `Repository Area:` (case-insensitive, anywhere in the file). Extract the area code (e.g. `WB`, `AP`, `IN`, `AG`, `DO`, `W`). If not found, treat as `unknown`.
+Read the story file `.planning/active/<planning-id>/02-deepening/<story-id>-*.md`. Look for a field named `Area:` or `Repository Area:` (case-insensitive, anywhere in the file). Extract the area code (e.g. `WB`, `AP`, `IN`, `AG`, `DO`, `W`). If not found, treat as `unknown`.
 
 ### T3. Area gate
 
@@ -60,7 +60,7 @@ If `docs/` does not exist at the project root, create it with `mkdir -p docs/gui
 
 Skip this step for area `IN`.
 
-- Target path: `docs/guides/<planning-id>/<scope-id>/<task-id>.md`
+- Target path: `docs/guides/<planning-id>/<story-id>/<task-id>.md`
 - Create parent directories if needed.
 - Extract from task file:
   - **Objective** section (or first descriptive paragraph)
@@ -120,7 +120,7 @@ Skip this step for area `WB`.
 
 **Date:** <today>
 **Status:** Accepted
-**Planning:** <planning-id> / <scope-id> / <task-id>
+**Planning:** <planning-id> / <story-id> / <task-id>
 
 ## Context
 <Technical Design — Approach field, or the full Technical Design section if no labelled fields>
@@ -158,11 +158,11 @@ List every file written and every sub-step skipped with the reason.
 
 ---
 
-## Scope level
+## Story level
 
-### S1. Locate scope file
+### S1. Locate story file
 
-Find `.planning/active/<planning-id>/02-deepening/<scope-id>-*.md`. If not found, stop and report. Read it completely: name, objective, area, done criteria, task list.
+Find `.planning/active/<planning-id>/02-deepening/<story-id>-*.md`. If not found, stop and report. Read it completely: name, objective, area, done criteria, task list.
 
 ### S2. Determine area
 
@@ -180,18 +180,18 @@ If `docs/` does not exist, create `docs/guides docs/adr docs/changelog` with `mk
 
 Skip for areas `IN` and `AG`.
 
-- Target path: `docs/changelog/<planning-id>/<scope-id>.md`
+- Target path: `docs/changelog/<planning-id>/<story-id>.md`
 - Create parent directories if needed.
 
 **If the file does not exist**, write:
 
 ```markdown
-# <scope name in plain language>
+# <story name in plain language>
 
 **Planning:** <planning-id> | **Date:** <today> | **Area:** <area>
 
 ## What changed
-- <User-facing bullet derived from scope objective — "Users can now…" / "Fixed…" / "Added…">
+- <User-facing bullet derived from story objective — "Users can now…" / "Fixed…" / "Added…">
 - <Additional bullets from done criteria, rephrased for end users>
 
 ## Who is affected
@@ -207,7 +207,7 @@ Skip for areas `IN` and `AG`.
 ## Update — <today>
 
 ### What changed
-- <Bullets from scope objective and done criteria>
+- <Bullets from story objective and done criteria>
 
 ### Who is affected
 <Inferred audience>
@@ -217,25 +217,25 @@ Skip for areas `IN` and `AG`.
 
 Skip for areas `IN` and `AG`.
 
-- Collect existing task inline docs under `docs/guides/<planning-id>/<scope-id>/` as source material (read all `task-NN-*.md` files found there).
-- Target path: `docs/guides/<planning-id>/<scope-id>.md`
+- Collect existing task inline docs under `docs/guides/<planning-id>/<story-id>/` as source material (read all `task-NN-*.md` files found there).
+- Target path: `docs/guides/<planning-id>/<story-id>.md`
 - Create parent directories if needed.
 
 **If the file does not exist**, write:
 
 ```markdown
-# <scope name — feature title>
+# <story name — feature title>
 
 **Date:** <today> | **Area:** <area>
 
 ## Overview
-<Scope objective rephrased for end users — no technical jargon>
+<Story objective rephrased for end users — no technical jargon>
 
 ## How to use
-<Narrative guide synthesised from: task inline docs (if any), done criteria, scope task descriptions>
+<Narrative guide synthesised from: task inline docs (if any), done criteria, story task descriptions>
 
 ## Related components
-<Links to task-level inline docs under docs/guides/<planning-id>/<scope-id>/ — or "None">
+<Links to task-level inline docs under docs/guides/<planning-id>/<story-id>/ — or "None">
 ```
 
 **If the file already exists**, append:
@@ -247,7 +247,7 @@ Skip for areas `IN` and `AG`.
 ## Revision — <today>
 
 ### Overview
-<Scope objective rephrased for end users>
+<Story objective rephrased for end users>
 
 ### How to use
 <Narrative from task inline docs and done criteria>
@@ -260,22 +260,22 @@ Skip for areas `IN` and `AG`.
 
 Only for area `IN`.
 
-- Collect ADR files in `docs/adr/` whose filename contains the scope-id (e.g. `scope-01`).
-- If none found: report "no task-level ADRs found for <scope-id> — run /doc-generate <planning-id> <scope-id> <task-id> for each task first" and skip.
-- Derive `scope-slug`: take the scope filename, remove the leading `scope-NN-` prefix, strip `.md`.
-- Target path: `docs/adr/<YYYY-MM-DD>-<scope-slug>.md`.
+- Collect ADR files in `docs/adr/` whose filename contains the story-id (e.g. `story-01`).
+- If none found: report "no task-level ADRs found for <story-id> — run /doc-generate <planning-id> <story-id> <task-id> for each task first" and skip.
+- Derive `story-slug`: take the story filename, remove the leading `story-NN-` prefix, strip `.md`.
+- Target path: `docs/adr/<YYYY-MM-DD>-<story-slug>.md`.
 
 **If the file does not exist**, write:
 
 ```markdown
-# ADR Summary: <scope name>
+# ADR Summary: <story name>
 
 **Date:** <today>
 **Status:** Accepted
-**Planning:** <planning-id> / <scope-id>
+**Planning:** <planning-id> / <story-id>
 **Source ADRs:** <comma-separated list of source ADR filenames>
 
-## Decisions Made in This Scope
+## Decisions Made in This Story
 <One paragraph per source ADR summarising its Decision section>
 
 ## Combined Consequences
@@ -292,7 +292,7 @@ Only for area `IN`.
 
 **Source ADRs:** <comma-separated list of source ADR filenames>
 
-### Decisions Made in This Scope
+### Decisions Made in This Story
 <One paragraph per source ADR summarising its Decision section>
 
 ### Combined Consequences
@@ -311,39 +311,39 @@ List every file written and every step skipped with the reason.
 
 Look for `<planning-id>` under `.planning/active/`, `.planning/`, and `.planning/finished/` (in that order). If not found, stop and report.
 
-### P2. Collect scope changelogs
+### P2. Collect story changelogs
 
-Glob `docs/changelog/<planning-id>/scope-*.md`. If none found: report "no scope changelog entries — run `/doc-generate <planning-id> <scope-id>` for each scope first" and stop.
+Glob `docs/changelog/<planning-id>/story-*.md`. If none found: report "no story changelog entries — run `/doc-generate <planning-id> <story-id>` for each story first" and stop.
 
 ### P3. Consolidate release notes
 
-Sort the collected scope changelog files by scope number (ascending). Write `docs/changelog/<planning-id>/RELEASE.md` (always overwrite):
+Sort the collected story changelog files by story number (ascending). Write `docs/changelog/<planning-id>/RELEASE.md` (always overwrite):
 
 ```markdown
 # Release Notes — <planning-id>
 
 **Generated:** <today>
 
-<contents of scope-01.md>
+<contents of story-01.md>
 
 ---
 
-<contents of scope-02.md>
+<contents of story-02.md>
 
 ---
 
-<… one section per scope, separated by ---, in scope-number order>
+<… one section per story, separated by ---, in story-number order>
 ```
 
-### P4. Collect scope guides
+### P4. Collect story guides
 
-Glob `docs/guides/<planning-id>/scope-*.md`.
+Glob `docs/guides/<planning-id>/story-*.md`.
 
-If none found: report "no scope guides found — run `/doc-generate <planning-id> <scope-id>` for each scope first" and write only the RELEASE.md.
+If none found: report "no story guides found — run `/doc-generate <planning-id> <story-id>` for each story first" and write only the RELEASE.md.
 
 ### P5. Consolidate user guide
 
-Sort the collected scope guide files by scope number (ascending). Write `docs/guides/<planning-id>/README.md` (always overwrite):
+Sort the collected story guide files by story number (ascending). Write `docs/guides/<planning-id>/README.md` (always overwrite):
 
 ```markdown
 # User Guide — <planning-id>
@@ -351,26 +351,26 @@ Sort the collected scope guide files by scope number (ascending). Write `docs/gu
 **Generated:** <today>
 
 ## Table of Contents
-- [<scope-01 title>](<scope-01 filename>)
-- [<scope-02 title>](<scope-02 filename>)
+- [<story-01 title>](<story-01 filename>)
+- [<story-02 title>](<story-02 filename>)
 - …
 
 ---
 
-<contents of scope-01.md>
+<contents of story-01.md>
 
 ---
 
-<contents of scope-02.md>
+<contents of story-02.md>
 
 ---
 
-<… in scope-number order>
+<… in story-number order>
 ```
 
 ### P6. Report
 
-List RELEASE.md and README.md written (or skipped), and any scopes missing from the consolidated files.
+List RELEASE.md and README.md written (or skipped), and any stories missing from the consolidated files.
 
 ---
 

@@ -3,7 +3,7 @@
 > **Status:** TODO
 > **Workflow:** [WORKFLOW-NAME]
 > **Depends On:** — *(or `task-NN`, comma-separated)*
-> [← scope file](../scope-NN-name.md)
+> [← story file](../story-NN-name.md)
 
 ---
 
@@ -19,10 +19,10 @@
 
 > *Decisions made before implementation. If this section cannot be filled, the task is not ready to execute.*
 
-- **Approach:** [How this will be solved, in 2–4 sentences]
-- **Affected files / components:** [Concrete paths or component names]
-- **Interfaces / contracts:** [Signatures, schemas, endpoints, or "none"]
-- **Design notes:** [Edge cases, constraints, alternatives discarded]
+- **Approach:** [Why this solution and not the obvious alternative — argue the design decision in the context of this story. If the obvious approach is correct, say so explicitly. If alternatives were discarded, name them briefly.]
+- **Affected files / components:** [Exact list of files that will be created or modified]
+- **Interfaces / contracts:** [What this task exposes to the rest of the story: types, routes, tokens, schemas. "None" if fully internal.]
+- **Design notes:** [Constraints, invariants, gotchas the implementer must know before touching code]
 
 ---
 
@@ -37,9 +37,11 @@
 
 ## Unit Tests
 
-| # | Case | Expected result | Location |
-|---|------|----------------|----------|
-| 1 | [What is verified] | [Pass condition] | [Test file path] |
+> *If the task produces no code (config, assets, docs), list manual verifications instead.*
+
+| # | Verification | How to validate |
+|---|-------------|----------------|
+| 1 | [What is checked] | [Exact steps to confirm it passes] |
 
 ---
 
@@ -47,8 +49,9 @@
 
 - [ ] [Deliverable exists and is verifiable: specific and binary]
 - [ ] All unit tests listed above pass
-- [ ] No scope creep: the task still satisfies `[CHECK-ATOMICITY]`
+- [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
+- [ ] No scope creep: the task satisfies `[CHECK-ATOMICITY]`
 
 ---
 
-> [← scope file](../scope-NN-name.md)
+> [← story file](../story-NN-name.md)

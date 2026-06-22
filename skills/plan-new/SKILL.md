@@ -44,6 +44,13 @@ The `@` prefix signals a file path. The file is read in full and its content is 
    - If contains ` -- ` and no `@`: **Mode A** — extract `NNN-slug` and `intent`.
    - If contains `@`: **Mode B** — extract `NNN-slug` and file path (strip the `@`).
 
+2b. **Supersession check.** Before creating any files, compare the new planning's intent against existing plannings in `.planning/active/` and `.planning/finished/`. Look for any of:
+    - Same functional domain or feature area.
+    - Intent that mentions replacing, discarding, migrating from, or rebuilding something already implemented.
+    - The new planning would modify files that an existing planning produced as output.
+    If a match is found, execute `SUPERSEDE-PLANNING` (`.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/SUPERSEDE-PLANNING.md`) before continuing. Do not create the new planning until SUPERSEDE-PLANNING is complete and the superseded planning is archived.
+    If no match is found, proceed to step 3.
+
 3. **Mode B only:** Read the idea document at the given path. Extract from it:
    - `Intent` — from an explicit Intent section, or from the document title/first paragraph.
    - `Why` — from a Why, Motivation, Problem, or Context section (use as-is).

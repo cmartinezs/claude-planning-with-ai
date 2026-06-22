@@ -1,11 +1,11 @@
 ---
 name: plan-from-epic
-description: Generate a full execution planning in `.planning/active/` from a story container. One story → one scope. Scope done criteria come from each story's acceptance criteria and Definition of Done (if pre
+description: Generate a full execution planning in `.planning/active/` from a story container. One story → one story. Story done criteria come from each story's acceptance criteria and Definition of Done (if pre
 argument-hint: <NNN> <path/to/container> [--filter field=value]
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 
-Generate a full execution planning in `.planning/active/` from a story container. One story → one scope. Scope done criteria come from each story's acceptance criteria and Definition of Done (if present).
+Generate a full execution planning in `.planning/active/` from a story container. One story → one story. Story done criteria come from each story's acceptance criteria and Definition of Done (if present).
 
 Works with any directory of story files or single document with story sections — not tied to a specific project structure or naming convention.
 
@@ -75,22 +75,22 @@ Populate from the epic context gathered in Step 2:
 
 ### 6 — Fill `01-expansion.md`
 
-Build the scopes table: one row per story, in the order they appear in the container.
+Build the stories table: one row per story, in the order they appear in the container.
 
 For each story, extract:
-- **Scope ID**: `scope-NN` (sequential, starting from `scope-01`)
-- **Scope name**: story title in kebab-case
+- **Story ID**: `story-NN` (sequential, starting from `story-01`)
+- **Story name**: story title in kebab-case
 - **Area**: from the story's Technical Notes or equivalent field; if absent, infer from the narrative and mark as `[inferred]`
 - **Priority / order**: from any priority field found in the story; if absent, preserve the file order
-- **Dependencies**: from the story's Dependencies section; map referenced story IDs or titles to the corresponding `scope-NN`
+- **Dependencies**: from the story's Dependencies section; map referenced story IDs or titles to the corresponding `story-NN`
 
 Build the dependency map section and the "Impact per area" summary.
 
 Add a `## Source` section: container path, filter applied (if any), generation date.
 
-### 7 — Create scope files
+### 7 — Create story files
 
-For each story, create `.planning/active/NNN-<slug>/02-deepening/scope-NN-<story-title>.md`:
+For each story, create `.planning/active/NNN-<slug>/02-deepening/story-NN-<story-title>.md`:
 
 ```markdown
 ## Objective
@@ -114,30 +114,30 @@ For each story, create `.planning/active/NNN-<slug>/02-deepening/scope-NN-<story
 [copy from story's Technical Notes if present; otherwise leave blank]
 
 ## Dependencies
-[map story dependencies to scope-NN IDs]
+[map story dependencies to story-NN IDs]
 ```
 
 ### 8 — Update indexes
 
 - `.planning/README.md`: ensure `### 🚧 In Progress` links to `active/README.md`
-- `.planning/active/README.md`: add entry for this planning with source container, scope list, and filter applied
+- `.planning/active/README.md`: add entry for this planning with source container, story list, and filter applied
 
 ### 9 — Report
 
 ```
 Planning created: .planning/active/NNN-slug/
-Source: [container path] ([N stories] → [N scopes])
+Source: [container path] ([N stories] → [N stories])
 Filter: [applied filter or "none"]
 
-Scopes:
-  scope-01  [story title]  [area]  [priority if any]
-  scope-02  [story title]  [area]  ← no DoD found, criteria from AC only
+Stories:
+  story-01  [story title]  [area]  [priority if any]
+  story-02  [story title]  [area]  ← no DoD found, criteria from AC only
   ...
 
 Attention:
-  [list scopes whose stories had no DoD or no Technical Notes — suggest /us-enrich path/story.md]
+  [list stories whose stories had no DoD or no Technical Notes — suggest /us-enrich path/story.md]
 
-Next step: /plan-scope NNN-slug scope-01
+Next step: /plan-story NNN-slug story-01
 ```
 
-> Stories missing DoD or Technical Notes still generate a scope — area is marked `[inferred]`. Run `/us-enrich` on the source story to fill the gap upstream.
+> Stories missing DoD or Technical Notes still generate a story — area is marked `[inferred]`. Run `/us-enrich` on the source story to fill the gap upstream.

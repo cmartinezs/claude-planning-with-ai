@@ -1,11 +1,11 @@
 ---
 name: plan-split-story
-description: Split a scope (user story) that is too large or covers multiple concerns into two or more smaller, focused scopes. The original scope is replaced by the new ones in both `01-expansion.md` and `02-deep
-argument-hint: <NNN-slug> <scope-NN>  (e.g. 001-user-auth-api scope-02)
+description: Split a story (user story) that is too large or covers multiple concerns into two or more smaller, focused stories. The original story is replaced by the new ones in both `01-expansion.md` and `02-deep
+argument-hint: <NNN-slug> <story-NN>  (e.g. 001-user-auth-api story-02)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 
-Split a scope (user story) that is too large or covers multiple concerns into two or more smaller, focused scopes. The original scope is replaced by the new ones in both `01-expansion.md` and `02-deepening/`.
+Split a story (user story) that is too large or covers multiple concerns into two or more smaller, focused stories. The original story is replaced by the new ones in both `01-expansion.md` and `02-deepening/`.
 
 Reference workflows:
 - `.planning/WORKFLOWS/02-EXECUTION-WORKFLOWS/EXPAND-ELEMENT.md`
@@ -13,34 +13,34 @@ Reference workflows:
 
 ## Arguments
 
-`$ARGUMENTS` — format: `NNN-slug scope-NN` (e.g. `001-user-auth-api scope-02`)
+`$ARGUMENTS` — format: `NNN-slug story-NN` (e.g. `001-user-auth-api story-02`)
 
 ## Preconditions
 
-- The target scope must be in `TODO` or `IN PROGRESS` status.
-- Splitting a `DONE` scope is not allowed — if needed, use `/plan-enrich-epic` to add new scopes instead.
+- The target story must be in `TODO` or `IN PROGRESS` status.
+- Splitting a `DONE` story is not allowed — if needed, use `/plan-enrich-epic` to add new stories instead.
 
 ## Steps
 
-1. Parse `$ARGUMENTS` to extract planning id and scope id.
-2. Read `.planning/active/<planning-id>/02-deepening/<scope-id>-*.md`. If it doesn't exist, stop and report.
-3. Check scope status. If `DONE`, stop and explain the precondition. Suggest `/plan-enrich-epic` instead.
-4. Read `01-expansion.md` to understand the full scope sequence and dependencies.
-5. Analyze the scope and propose a split. A good split satisfies:
-   - Each resulting scope has a single, clear responsibility.
-   - Each resulting scope is independently executable (or the dependency is made explicit).
-   - No task appears in more than one resulting scope.
+1. Parse `$ARGUMENTS` to extract planning id and story id.
+2. Read `.planning/active/<planning-id>/02-deepening/<story-id>-*.md`. If it doesn't exist, stop and report.
+3. Check story status. If `DONE`, stop and explain the precondition. Suggest `/plan-enrich-epic` instead.
+4. Read `01-expansion.md` to understand the full story sequence and dependencies.
+5. Analyze the story and propose a split. A good split satisfies:
+   - Each resulting story has a single, clear responsibility.
+   - Each resulting story is independently executable (or the dependency is made explicit).
+   - No task appears in more than one resulting story.
    Present the proposed split to the user and wait for confirmation before proceeding.
 6. Once the split is confirmed:
-   a. Determine the IDs for the new scopes: if the original is `scope-02` and there are already scopes up to `scope-04`, new scopes become `scope-02a` / `scope-02b` — or renumber sequentially if the user prefers (ask).
-   b. Create `.planning/active/<planning-id>/02-deepening/scope-NNa-name.md` and `scope-NNb-name.md` (and more if needed) distributing tasks from the original scope.
-   c. Set each new scope's status to match the original (`TODO` → `TODO`; `IN PROGRESS` → `IN PROGRESS` on the one that continues the work, `TODO` on the rest).
+   a. Determine the IDs for the new stories: if the original is `story-02` and there are already stories up to `story-04`, new stories become `story-02a` / `story-02b` — or renumber sequentially if the user prefers (ask).
+   b. Create `.planning/active/<planning-id>/02-deepening/story-NNa-name.md` and `story-NNb-name.md` (and more if needed) distributing tasks from the original story.
+   c. Set each new story's status to match the original (`TODO` → `TODO`; `IN PROGRESS` → `IN PROGRESS` on the one that continues the work, `TODO` on the rest).
    d. Update `01-expansion.md`:
-      - Replace the original scope row with the new rows.
-      - Update the dependency map: any scope that depended on the original now depends on the last of the new scopes (or as appropriate — clarify with user if ambiguous).
-   e. Delete (or rename with a `_split-into` note in its header) the original scope file.
-7. Update `.planning/active/README.md` to reflect the new scope list.
-8. Run `[CHECK-AGNOSTIC-BOUNDARY]` on each new scope file to verify consistency with `docs/` contracts.
-9. Report: original scope replaced by N new scopes, list them with IDs and names. Note any dependency changes made.
+      - Replace the original story row with the new rows.
+      - Update the dependency map: any story that depended on the original now depends on the last of the new stories (or as appropriate — clarify with user if ambiguous).
+   e. Delete (or rename with a `_split-into` note in its header) the original story file.
+7. Update `.planning/active/README.md` to reflect the new story list.
+8. Run `[CHECK-AGNOSTIC-BOUNDARY]` on each new story file to verify consistency with `docs/` contracts.
+9. Report: original story replaced by N new stories, list them with IDs and names. Note any dependency changes made.
 
-> If any task in the original scope was already `[x]`, carry that mark into the appropriate new scope file.
+> If any task in the original story was already `[x]`, carry that mark into the appropriate new story file.

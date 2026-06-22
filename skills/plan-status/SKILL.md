@@ -12,7 +12,7 @@ Show the current state of all plannings in the `.planning/` system.
 1. Read `.planning/README.md` to get the root index (Initial plannings listed there).
 2. Read `.planning/active/README.md` to get all plannings in EXPANSION or DEEPENING.
 3. Read `.planning/finished/README.md` to get all completed plannings.
-4. For each active planning found, read its `01-expansion.md` (if exists) to extract scope statuses.
+4. For each active planning found, read its `01-expansion.md` (if exists) to extract story statuses.
 5. Report a concise summary table:
 
 ```
@@ -21,8 +21,8 @@ INITIAL
 
 ACTIVE (EXPANSION / DEEPENING)
   NNN-slug — intent
-    scope-01-name [TODO / IN PROGRESS / DONE]
-    scope-02-name [TODO / IN PROGRESS / DONE]
+    story-01-name [TODO / IN PROGRESS / DONE]
+    story-02-name [TODO / IN PROGRESS / DONE]
 
 COMPLETED
   NNN-slug — intent

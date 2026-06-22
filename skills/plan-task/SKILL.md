@@ -1,7 +1,7 @@
 ---
 name: plan-task
-description: Execute a single atomic task from an atomized scope — technical design, implementation, and unit tests. Marks the task DONE in both the task file and the scope index.
-argument-hint: <NNN-slug> <scope-NN> <task-NN>  (e.g. 001-user-auth-api scope-01 task-02)
+description: Execute a single atomic task from an atomized story — technical design, implementation, and unit tests. Marks the task DONE in both the task file and the story index.
+argument-hint: <NNN-slug> <story-NN> <task-NN>  (e.g. 001-user-auth-api story-01 task-02)
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
@@ -16,19 +16,22 @@ Reference workflows:
 
 ## Arguments
 
-`$ARGUMENTS` — format: `NNN-slug scope-NN task-NN` (e.g. `001-user-auth-api scope-01 task-02`)
+`$ARGUMENTS` — format: `NNN-slug story-NN task-NN` (e.g. `001-user-auth-api story-01 task-02`)
 
 ## Steps
 
-1. Parse `$ARGUMENTS` to extract planning id, scope id, and task id.
-2. Locate `.planning/active/<planning-id>/02-deepening/<scope-id>-*/<task-id>-*.md`. If it doesn't exist, stop and report. If the scope has no task folder, suggest `/plan-atomize <planning-id> <scope-id>` first.
+1. Parse `$ARGUMENTS` to extract planning id, story id, and task id.
+2. Locate `.planning/active/<planning-id>/02-deepening/<story-id>-*/<task-id>-*.md`.
+   - If the file exists: read it completely and continue.
+   - If the story subfolder does not exist: create it, then generate `<task-id>-slug.md` from `_template/02-deepening/task-NN-name.md` filling all sections using the story file, `00-initial.md`, and `01-expansion.md` as context. Update the story's `## Tasks` table to link the task name to its new file. Then continue with the newly created file.
+   - If the subfolder exists but this specific task file is missing: generate it the same way and update the story table link. Then continue.
 3. Read the task file completely: objective, technical design, implementation steps, unit tests, done criteria, workflow, dependencies.
 4. **Readiness checks** (stop and report if any fails):
    a. Task status must not be `DONE`.
    b. Every task in `Depends On` must have status `DONE` in its own file. List the pending ones otherwise.
-   c. Execute `[CHECK-ATOMICITY]` on the task file. If `REJECTED`, stop and suggest `/plan-task-validate <planning-id> <scope-id>` — the task definition must be fixed before executing.
-   d. Execute `[CHECK-PHASE-CONTEXT]` for the scope's area — verify required `docs/` contracts exist and have been read.
-5. Set the task status to `IN PROGRESS` in the task file and in the scope's `## Tasks` index. If the scope status is `TODO`, set it to `IN PROGRESS` too.
+   c. Execute `[CHECK-ATOMICITY]` on the task file. If `REJECTED`, stop and suggest `/plan-task-validate <planning-id> <story-id>` — the task definition must be fixed before executing.
+   d. Execute `[CHECK-PHASE-CONTEXT]` for the story's area — verify required `docs/` contracts exist and have been read.
+5. Set the task status to `IN PROGRESS` in the task file and in the story's `## Tasks` index. If the story status is `TODO`, set it to `IN PROGRESS` too.
 6. **Execute the task**, governed by its `Workflow`:
    a. Follow the `Technical Design` as written. If reality contradicts the design, update the design section first, stating why — then proceed.
    b. Apply the `Implementation Steps` in order, announcing each one.
@@ -37,8 +40,8 @@ Reference workflows:
 7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the output is consistent with `docs/` contracts.
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 9. Verify every `Done Criteria` item. If any is unmet, leave the task `IN PROGRESS`, list what is missing, and stop.
-10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the scope's `## Tasks` index.
-10b. Invoke `/doc-task <planning-id> <scope-id> <task-id>`. If the scope area is DO or W this is a silent no-op. Include any files written in the final report.
-11. Report: task completed, files created/changed, test results, doc files written (from step 10b), and the next pending task in the scope — or, if all tasks are `DONE`, suggest `/plan-done <planning-id> <scope-id>`.
+10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
+10b. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If the story area is DO or W this is a silent no-op. Include any files written in the final report.
+11. Report: task completed, files created/changed, test results, doc files written (from step 10b), and the next pending task in the story — or, if all tasks are `DONE`, suggest `/plan-done <planning-id> <story-id>`.
 
-> Executes exactly ONE task. To run all tasks of a scope in order, use `/plan-scope <planning-id> <scope-id>`.
+> Executes exactly ONE task. To run all tasks of a story in order, use `/plan-story <planning-id> <story-id>`.

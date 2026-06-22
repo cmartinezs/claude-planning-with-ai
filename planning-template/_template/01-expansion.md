@@ -5,12 +5,12 @@
 
 ---
 
-## Scope Summary
+## Story Summary
 
-| # | Scope | SDLC Phase(s) | Depends On | Status |
+| # | Story | SDLC Phase(s) | Depends On | Status |
 |---|-------|--------------|------------|--------|
-| 01 | [scope name] | [D / R / S / …] | — | TODO |
-| 02 | [scope name] | [D / R / S / …] | 01 | TODO |
+| 01 | [story name] | [D / R / S / …] | — | TODO |
+| 02 | [story name] | [D / R / S / …] | 01 | TODO |
 
 ---
 
@@ -18,7 +18,7 @@
 
 ```mermaid
 flowchart LR
-    S01[Scope 01: Name] --> S02[Scope 02: Name]
+    S01[Story 01: Name] --> S02[Story 02: Name]
 ```
 
 ---

@@ -1,6 +1,6 @@
 ---
 name: plan-report
-description: Generate an executive summary of a planning — objective, scope completion, key technical decisions, duration, and next steps.
+description: Generate an executive summary of a planning — objective, story completion, key technical decisions, duration, and next steps.
 argument-hint: <NNN-slug>
 allowed-tools: [Read, Bash, Glob]
 ---
@@ -17,15 +17,15 @@ Generate a structured report for a planning, suitable for retrospectives, stakeh
 
 2. Read `00-initial.md`: extract intent, why, approximate scope, open questions.
 
-3. Read `01-expansion.md` (if it exists): extract scope list, area codes, dependency map.
+3. Read `01-expansion.md` (if it exists): extract story list, area codes, dependency map.
 
-4. Read all scope files under `02-deepening/*.md`. For each scope, collect: name, status, done criteria, and any notes.
+4. Read all story files under `02-deepening/*.md`. For each story, collect: name, status, done criteria, and any notes.
 
-5. For each atomized scope with task files (`02-deepening/<scope-id>-*/task-*.md`): read the `Technical Design` section of each task to extract key decisions made during execution.
+5. For each atomized story with task files (`02-deepening/<story-id>-*/task-*.md`): read the `Technical Design` section of each task to extract key decisions made during execution.
 
 6. Run `git log --oneline -- .planning/**/<planning-id>/**` and extract: first commit date (planning start), last commit date (last activity), total commit count.
 
-7. Compute summary stats: total scopes, DONE count, IN PROGRESS count, TODO count, BLOCKED count, SKIPPED count.
+7. Compute summary stats: total stories, DONE count, IN PROGRESS count, TODO count, BLOCKED count, SKIPPED count.
 
 8. Output the report:
 
@@ -39,7 +39,7 @@ Generated: <today's date>
 ## Why
 <why from 00-initial.md>
 
-## Scope Summary
+## Story Summary
 | Status | Count |
 |--------|-------|
 | DONE | N |
@@ -49,16 +49,16 @@ Generated: <today's date>
 | SKIPPED | N |
 | **Total** | **N** |
 
-## Scope Detail
-| Scope | Area | Status | Notes |
+## Story Detail
+| Story | Area | Status | Notes |
 |-------|------|--------|-------|
-| scope-01-docs | DO | DONE | — |
-| scope-02-api-domain | AP | DONE | — |
+| story-01-docs | DO | DONE | — |
+| story-02-api-domain | AP | DONE | — |
 ...
 
 ## Key Technical Decisions
-- [scope-03 / task-01] Chose stateless JWT over session tokens to avoid distributed session storage.
-- [scope-03 / task-02] Spring Security filter chain ordered before CSRF filter.
+- [story-03 / task-01] Chose stateless JWT over session tokens to avoid distributed session storage.
+- [story-03 / task-02] Spring Security filter chain ordered before CSRF filter.
 ...
 (extracted from task Technical Design sections; empty if no atomized tasks)
 
@@ -72,7 +72,7 @@ Generated: <today's date>
 <open questions if any remain>
 
 ## Next Steps
-<list remaining TODO/IN PROGRESS scopes, or "Planning complete — ready to archive" if all DONE/SKIPPED>
+<list remaining TODO/IN PROGRESS stories, or "Planning complete — ready to archive" if all DONE/SKIPPED>
 ```
 
 > Read-only. Does not modify any files.

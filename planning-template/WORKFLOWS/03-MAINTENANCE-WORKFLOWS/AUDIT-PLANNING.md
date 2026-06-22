@@ -8,8 +8,8 @@ Verifies all completeness conditions before a planning can be archived to `finis
 
 ```mermaid
 flowchart TD
-    A[Check all scopes are DONE] --> B{Any scope not DONE?}
-    B -- Yes --> Z[Stop: resolve pending scopes first]
+    A[Check all stories are DONE] --> B{Any story not DONE?}
+    B -- Yes --> Z[Stop: resolve pending stories first]
     B -- No --> C[Check all tasks have outputs documented]
     C --> D[Check TRACEABILITY.md is complete]
     D --> E{Open inconsistencies?}
@@ -27,8 +27,8 @@ flowchart TD
 
 ## Steps
 
-1. Verify all scopes in `02-deepening/` have status `DONE`.
-2. Verify all tasks in each scope have their documented output.
+1. Verify all stories in `02-deepening/` have status `DONE`.
+2. Verify all tasks in each story have their documented output.
 3. Verify `TRACEABILITY.md` is fully populated (no empty cells for evaluated terms).
 4. Verify no open inconsistencies remain unaddressed.
 5. Verify `README.md` has a `## Retrospective` section.

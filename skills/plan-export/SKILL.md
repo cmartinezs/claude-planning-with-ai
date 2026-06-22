@@ -21,7 +21,7 @@ Export a planning's content as a formatted document for use outside the planning
 
 2. Locate the planning in `.planning/` (INITIAL), `.planning/active/`, or `.planning/finished/`. If not found, stop and report.
 
-3. Read `00-initial.md` (intent, why, scope), `01-expansion.md` (scope list, dependencies), and all `02-deepening/*.md` scope files (status, done criteria, tasks).
+3. Read `00-initial.md` (intent, why, scope), `01-expansion.md` (story list, dependencies), and all `02-deepening/*.md` story files (status, done criteria, tasks).
 
 4. **Format: `markdown`** — output a standalone document:
 ```
@@ -29,16 +29,16 @@ Export a planning's content as a formatted document for use outside the planning
 
 **Why:** <why from 00-initial.md>
 
-## Scopes
+## Stories
 
-| Scope | Area | Status | Summary |
+| Story | Area | Status | Summary |
 |-------|------|--------|---------|
-| scope-01-docs | DO | DONE | … |
+| story-01-docs | DO | DONE | … |
 …
 
-## Done Criteria (per scope)
+## Done Criteria (per story)
 
-### scope-01-docs
+### story-01-docs
 - [ ] Auth contract documented in docs/api/auth.md
 …
 
@@ -51,21 +51,21 @@ Export a planning's content as a formatted document for use outside the planning
 ## Summary
 
 - Implements <intent>
-- <scope-01>: <one-line scope description>
-- <scope-02>: <one-line scope description>
+- <story-01>: <one-line story description>
+- <story-02>: <one-line story description>
 …
 
-## Scopes
+## Stories
 
-| Scope | Status |
+| Story | Status |
 |-------|--------|
-| scope-01-docs | ✅ DONE |
+| story-01-docs | ✅ DONE |
 …
 
 ## Test Plan
 
-- [ ] <done criterion from scope-01>
-- [ ] <done criterion from scope-02>
+- [ ] <done criterion from story-01>
+- [ ] <done criterion from story-02>
 …
 
 ## Planning reference
@@ -76,14 +76,14 @@ Export a planning's content as a formatted document for use outside the planning
 ```
 ## Tickets — <planning-id>
 
-1. **[scope-01-docs]** Document auth contract
+1. **[story-01-docs]** Document auth contract
    Area: DO
-   Description: <scope objective>
+   Description: <story objective>
    Acceptance criteria:
    - <done criterion 1>
    - <done criterion 2>
 
-2. **[scope-02-api-domain]** …
+2. **[story-02-api-domain]** …
 ```
 
 7. Print the formatted output to the terminal. Do not write to any file unless the user pipes the output.

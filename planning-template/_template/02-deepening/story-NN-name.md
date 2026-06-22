@@ -1,4 +1,4 @@
-# 🔍 DEEPENING: Scope NN — [Scope Name]
+# 🔍 DEEPENING: Story NN — [Story Name]
 
 > **Status:** TODO
 > [← 01-expansion.md](../01-expansion.md) | [← planning/README.md](../../README.md)
@@ -7,7 +7,7 @@
 
 ## Objective
 
-> *What specifically must be produced or changed in this scope.*
+> *What specifically must be produced or changed in this story.*
 
 [Describe the concrete goal.]
 
@@ -15,7 +15,7 @@
 
 ## Tasks
 
-> *Optional: `/plan-atomize` decomposes this scope into atomic task files under `scope-NN-name/` — this table then becomes the index, with each task name linking to its file.*
+> **Each row in this table must have a corresponding `task-NN-name.md` file under `story-NN-name/` before this story can be marked `IN PROGRESS`.** Use `/plan-atomize` to generate all task files at once, or create them individually — but they must exist before execution begins. The task name in each row should link to its file once created.
 
 | # | Task | Workflow | Status | Output |
 |---|------|----------|--------|--------|
@@ -28,13 +28,13 @@
 
 - [ ] [Criterion 1: specific and verifiable]
 - [ ] [Criterion 2: specific and verifiable]
-- [ ] TRACEABILITY.md updated with new terms from this scope
+- [ ] TRACEABILITY.md updated with new terms from this story
 
 ---
 
 ## Inconsistencies Found
 
-*Record any contradictions or gaps detected during this scope. Use RECORD-INCONSISTENCY workflow.*
+*Record any contradictions or gaps detected during this story. Use RECORD-INCONSISTENCY workflow.*
 
 | # | Description | Docs Involved | Status | Resolution Path |
 |---|-------------|--------------|--------|----------------|

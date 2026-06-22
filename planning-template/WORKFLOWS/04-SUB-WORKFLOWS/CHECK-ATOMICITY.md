@@ -34,7 +34,7 @@ A task is atomic when **all** of the following hold:
 
 ---
 
-**Called by:** [`ATOMIZE-SCOPE`](../02-EXECUTION-WORKFLOWS/ATOMIZE-SCOPE.md), `/plan-task-validate`
+**Called by:** [`ATOMIZE-STORY`](../02-EXECUTION-WORKFLOWS/ATOMIZE-STORY.md), `/plan-task-validate`
 
 ---
 

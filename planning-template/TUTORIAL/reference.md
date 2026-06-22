@@ -29,7 +29,7 @@ Todos los comandos disponibles con su sintaxis exacta.
 ## Puente producto → ejecución
 
 ```bash
-# Genera planning completo en active/ (1 story = 1 scope)
+# Genera planning completo en active/ (1 story = 1 user story)
 # container puede ser directorio o archivo con secciones de story
 /plan-from-epic NNN path/to/container/
 /plan-from-epic NNN path/to/container/ --filter priority=P0
@@ -61,27 +61,27 @@ Todos los comandos disponibles con su sintaxis exacta.
 # Ver estado de todos los plannings
 /plan-status
 
-# Validar integridad estructural (solo lectura: ubicación, scopes, workflows, dependencias)
+# Validar integridad estructural (solo lectura: ubicación, stories, workflows, dependencias)
 /plan-validate                         # todos los plannings
 /plan-validate NNN-slug                # solo uno
 
-# Descomponer un scope en tareas atómicas (diseño técnico + implementación + tests unitarios por tarea)
-/plan-atomize NNN-slug scope-NN
+# Descomponer una story en tareas atómicas (diseño técnico + implementación + tests unitarios por tarea)
+/plan-atomize NNN-slug story-NN
 
 # Ejecutar una sola tarea atómica
-/plan-task NNN-slug scope-NN task-NN
+/plan-task NNN-slug story-NN task-NN
 
 # Auditar tareas atómicas contra el checklist de atomicidad (solo lectura)
-/plan-task-validate NNN-slug [scope-NN] [task-NN]
+/plan-task-validate NNN-slug [story-NN] [task-NN]
 
-# Ejecutar todas las tareas de un scope
-/plan-scope NNN-slug scope-NN
+# Ejecutar todas las tareas de una story
+/plan-story NNN-slug story-NN
 
-# Marcar scope completo (verifica done criteria y avanza al siguiente)
-/plan-done NNN-slug scope-NN
+# Marcar story completo (verifica done criteria y avanza al siguiente)
+/plan-done NNN-slug story-NN
 
-# Marcar solo una tarea (no avanza el scope)
-/plan-done NNN-slug scope-NN task-N
+# Marcar solo una tarea (no avanza la story)
+/plan-done NNN-slug story-NN task-N
 
 # Auditar y archivar a finished/
 /plan-archive NNN-slug
@@ -92,14 +92,14 @@ Todos los comandos disponibles con su sintaxis exacta.
 ## Enriquecimiento del planning (solo en plannings ACTIVE)
 
 ```bash
-# Agregar scopes nuevos al planning
+# Agregar stories nuevos al planning
 /plan-enrich-epic NNN-slug
 
-# Profundizar un scope incompleto o ambiguo (no cambia su status)
-/plan-enrich-story NNN-slug scope-NN
+# Profundizar una story incompleto o ambiguo (no cambia su status)
+/plan-enrich-story NNN-slug story-NN
 
-# Dividir un scope demasiado amplio en varios (solo en TODO o IN PROGRESS)
-/plan-split-story NNN-slug scope-NN
+# Dividir una story demasiado amplio en varios (solo en TODO o IN PROGRESS)
+/plan-split-story NNN-slug story-NN
 ```
 
 ---
@@ -114,7 +114,7 @@ Todos los comandos disponibles con su sintaxis exacta.
 
 # Agentes de fase (invocables de forma independiente)
 /plan-agent-plan NNN-slug          # INITIAL → EXPANSION sin interrupciones
-/plan-agent-execute NNN-slug       # atomiza + ejecuta todos los scopes pendientes (paralelo)
+/plan-agent-execute NNN-slug       # atomiza + ejecuta todos los stories pendientes (paralelo)
 /plan-agent-validate NNN-slug      # valida integridad + plan-done + plan-archive
 ```
 
@@ -142,18 +142,18 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Planificar trabajo técnico sin epic | `/plan-template` → `/plan-new` → `/plan-expand` |
 | Ver todos los plannings activos | `/plan-status` |
 | Verificar que un planning está bien formado | `/plan-validate NNN-slug` |
-| Las tareas de un scope son muy gruesas para ejecutar | `/plan-atomize NNN-slug scope-NN` |
-| Ejecutar una sola tarea atómica | `/plan-task NNN-slug scope-NN task-NN` |
-| Verificar que las tareas atómicas están bien formadas | `/plan-task-validate NNN-slug scope-NN` |
-| Ejecutar un scope | `/plan-scope NNN-slug scope-NN` |
+| Las tareas de una story son muy gruesas para ejecutar | `/plan-atomize NNN-slug story-NN` |
+| Ejecutar una sola tarea atómica | `/plan-task NNN-slug story-NN task-NN` |
+| Verificar que las tareas atómicas están bien formadas | `/plan-task-validate NNN-slug story-NN` |
+| Ejecutar una story | `/plan-story NNN-slug story-NN` |
 | Trabajo nuevo apareció durante ejecución | `/plan-enrich-epic NNN-slug` |
-| Scope del planning está mal especificado | `/plan-enrich-story NNN-slug scope-NN` |
-| Scope del planning es demasiado grande | `/plan-split-story NNN-slug scope-NN` |
+| Story del planning está mal especificado | `/plan-enrich-story NNN-slug story-NN` |
+| Story del planning es demasiado grande | `/plan-split-story NNN-slug story-NN` |
 | Story nueva + scope nuevo coordinados | `/us-new` → `/plan-enrich-epic` |
 | Cerrar el planning | `/plan-archive NNN-slug` |
 | Ejecutar todo el ciclo sin intervención | `/plan-run NNN-slug` |
 | Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |
-| Solo la ejecución paralela de scopes | `/plan-agent-execute NNN-slug` |
+| Solo la ejecución paralela de stories | `/plan-agent-execute NNN-slug` |
 | Solo la validación y cierre autónomo | `/plan-agent-validate NNN-slug` |
 
 ---
@@ -170,15 +170,15 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-new` | `NNN-slug -- intent` ó `NNN-slug @path.md` |
 | `/plan-expand` | `NNN-slug` |
 | `/plan-validate` | `[NNN-slug]` (vacío = todos) |
-| `/plan-atomize` | `NNN-slug scope-NN` |
-| `/plan-task` | `NNN-slug scope-NN task-NN` |
-| `/plan-task-validate` | `NNN-slug [scope-NN] [task-NN]` |
-| `/plan-scope` | `NNN-slug scope-NN` |
-| `/plan-done` | `NNN-slug scope-NN` ó `NNN-slug scope-NN task-N` |
+| `/plan-atomize` | `NNN-slug story-NN` |
+| `/plan-task` | `NNN-slug story-NN task-NN` |
+| `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` |
+| `/plan-story` | `NNN-slug story-NN` |
+| `/plan-done` | `NNN-slug story-NN` ó `NNN-slug story-NN task-N` |
 | `/plan-archive` | `NNN-slug` |
 | `/plan-enrich-epic` | `NNN-slug` |
-| `/plan-enrich-story` | `NNN-slug scope-NN` |
-| `/plan-split-story` | `NNN-slug scope-NN` |
+| `/plan-enrich-story` | `NNN-slug story-NN` |
+| `/plan-split-story` | `NNN-slug story-NN` |
 | `/plan-run` | `[NNN-slug]` ó `"descripción libre"` (vacío = lista plannings) |
 | `/plan-agent-plan` | `NNN-slug` ó `"descripción libre"` |
 | `/plan-agent-execute` | `NNN-slug` |

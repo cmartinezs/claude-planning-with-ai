@@ -12,16 +12,16 @@ Detailed reference for the lifecycle, structure, and naming conventions of the p
 
 ```mermaid
 flowchart LR
-    A[INITIAL\nUndimensioned idea] --> B[EXPANSION\nTransversal scopes]
-    B --> C[DEEPENING\nTasks per scope]
+    A[INITIAL\nUndimensioned idea] --> B[EXPANSION\nTransversal stories]
+    B --> C[DEEPENING\nTasks per story]
     C --> D[COMPLETED]
 ```
 
 | Phase | File(s) | Description |
 |-------|---------|-------------|
 | **INITIAL** | `00-initial.md` | General idea without dimensioning. What needs to be achieved, why, approximate context. Clarity of intent — not exhaustiveness. |
-| **EXPANSION** | `01-expansion.md` | All transversal scopes are identified and listed. Dependencies between them are mapped. Impact per SDLC phase is documented. |
-| **DEEPENING** | `02-deepening/` | One `.md` file per scope. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a scope into atomic task files under `scope-NN-name/`, each with technical design, implementation steps, and unit tests. |
+| **EXPANSION** | `01-expansion.md` | All user stories are identified and listed. Dependencies between them are mapped. Impact per SDLC phase is documented. |
+| **DEEPENING** | `02-deepening/` | One `.md` file per story. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a story into atomic task files under `story-NN-name/`, each with technical design, implementation steps, and unit tests. |
 
 ---
 
@@ -46,11 +46,11 @@ planning/
 │       ├── 00-initial.md
 │       ├── 01-expansion.md
 │       ├── 02-deepening/
-│       │   ├── scope-01-[name].md
-│       │   ├── scope-01-[name]/         # Atomic tasks (optional, via /plan-atomize)
+│       │   ├── story-01-[name].md
+│       │   ├── story-01-[name]/         # Atomic tasks (optional, via /plan-atomize)
 │       │   │   ├── task-01-[name].md
 │       │   │   └── task-NN-[name].md
-│       │   └── scope-NN-[name].md
+│       │   └── story-NN-[name].md
 │       └── TRACEABILITY.md
 │
 └── finished/                        # COMPLETED plannings (read-only / reference)
@@ -65,6 +65,37 @@ planning/
 | New planning | Create at root `planning/NNN-name/` |
 | `INITIAL` → `EXPANSION` | Move `planning/NNN-name/` → `planning/active/NNN-name/` |
 | `DEEPENING` → `COMPLETED` | Move `planning/active/NNN-name/` → `planning/finished/NNN-name/` |
+| Planning replaced by a new one | Move `planning/active/NNN-name/` → `planning/finished/NNN-name/` with status `SUPERSEDED` |
+
+---
+
+## ♻️ Superseded Plannings
+
+A planning is **superseded** when a new planning contradicts or rebuilds what it implemented, rendering its output partially or fully obsolete. This is distinct from completion — a superseded planning was not wrong, but circumstances changed.
+
+### When supersession applies
+
+- The new planning targets the same functional domain.
+- The new planning replaces, migrates away from, or discards something the previous planning built.
+- The new planning modifies files the previous planning produced as output.
+
+If any of these are true, execute `SUPERSEDE-PLANNING` **before** creating the new planning. See [`WORKFLOWS/03-MAINTENANCE-WORKFLOWS/SUPERSEDE-PLANNING.md`](WORKFLOWS/03-MAINTENANCE-WORKFLOWS/SUPERSEDE-PLANNING.md).
+
+### Path A — Revert first
+
+The previous planning left artifacts (code, dependencies, endpoints, config) that must be actively removed before the new planning executes. Leaving them would produce dead code, orphaned dependencies, or routes that must no longer exist.
+
+**Status:** `SUPERSEDED — REVERTED`
+
+The superseded planning's `README.md` documents every artifact that was deleted. The new planning's `00-initial.md § Supersedes` records the path and justification.
+
+### Path B — Overwrite
+
+The previous planning's artifacts are reused: pages stay, routes stay, component files stay — the new planning changes what happens *inside* them. No removal step is needed because the new planning replaces the internals cleanly.
+
+**Status:** `SUPERSEDED — OVERRIDDEN`
+
+The superseded planning's `README.md` documents which artifacts survived and which were internally replaced. The new planning inherits relevant traceability terms, marking modified ones as `⚠️` and absorbed ones as `✅`.
 
 ---
 
@@ -90,8 +121,8 @@ The **macro structures** (columns of the matrix) are the project areas configure
 - File and folder names are in **English**, in **kebab-case**.
 - Plannings are numbered sequentially: `001-`, `002-`, etc.
 - The name describes the topic: `001-planning-system-bootstrap`
-- Scopes inside `02-deepening/` follow the same pattern: `scope-01-name.md`
-- Atomic tasks live in a folder named after their scope file (without `.md`): `scope-01-name/task-01-name.md`
+- Stories inside `02-deepening/` follow the same pattern: `story-01-name.md`
+- Atomic tasks live in a folder named after their story file (without `.md`): `story-01-name/task-01-name.md`
 - Content inside files may be in any language the team uses.
 
 ---
@@ -118,7 +149,7 @@ This project has two separate "planning" concepts. They must never be conflated:
 
 | Domain | Location | What it is |
 |--------|----------|------------|
-| **Meta-planning system** | `.planning/` (this folder) | Tracks HOW implementation work is managed across all repos. Controls AI agent workflow. Contains plannings, scopes, traceability matrices, PDRs. |
+| **Meta-planning system** | `.planning/` (this folder) | Tracks HOW implementation work is managed across all repos. Controls AI agent workflow. Contains plannings, stories, traceability matrices, PDRs. |
 | **Product documentation** | `docs/` | Canonical product strategy, architecture, and technical specifications — already produced. Read-only unless a planning explicitly targets `docs/`. |
 
 ### When you are in the meta-planning system (`.planning/`)

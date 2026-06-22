@@ -26,9 +26,9 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
    | Location | State |
    |----------|-------|
    | `.planning/NNN-slug/` | INITIAL |
-   | `.planning/active/NNN-slug/` with no scope files | EXPANSION incomplete |
-   | `.planning/active/NNN-slug/` with scope files, some not DONE | DEEPENING/EXECUTION |
-   | `.planning/active/NNN-slug/` with all scopes DONE | READY TO CLOSE |
+   | `.planning/active/NNN-slug/` with no story files | EXPANSION incomplete |
+   | `.planning/active/NNN-slug/` with story files, some not DONE | DEEPENING/EXECUTION |
+   | `.planning/active/NNN-slug/` with all stories DONE | READY TO CLOSE |
    | `.planning/finished/NNN-slug/` | COMPLETED — nothing to do |
 
 3. **Build the execution plan.** Determine which phases need to run:
@@ -41,7 +41,7 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
 
    If the planning is already COMPLETED, report and stop.
 
-   If the planning has scope files, read them and report: N total scopes, N pending, N already DONE. Show whether any scopes have inter-dependencies (parallel vs. sequential execution shape).
+   If the planning has story files, read them and report: N total stories, N pending, N already DONE. Show whether any stories have inter-dependencies (parallel vs. sequential execution shape).
 
 4. **Present the execution plan to the user** in this format:
 
@@ -51,10 +51,10 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
 
    Phases to execute:
    ✓ plan-agent-plan   — create/expand planning
-   ✓ plan-agent-execute — atomize + execute N scopes (X parallel batches)
+   ✓ plan-agent-execute — atomize + execute N stories (X parallel batches)
    ✓ plan-agent-validate — validate + archive
 
-   Parallel execution: scopes A, B, C can run simultaneously; scope D waits for C.
+   Parallel execution: stories A, B, C can run simultaneously; story D waits for C.
 
    Proceed? (yes/no)
    ```
@@ -74,12 +74,12 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
    Planning NNN-slug completed.
 
    Phases run: plan-agent-plan, plan-agent-execute, plan-agent-validate
-   Scopes: N completed, N blocked (if any)
+   Stories: N completed, N blocked (if any)
    Tasks executed: N total
    Archived: .planning/finished/NNN-slug/
 
-   Blocked scopes (if any):
-   - scope-NN: <reason>
+   Blocked stories (if any):
+   - story-NN: <reason>
    ```
 
 > This is the entry point for the full autonomous pipeline. For phase-by-phase control, use the individual phase agents directly.

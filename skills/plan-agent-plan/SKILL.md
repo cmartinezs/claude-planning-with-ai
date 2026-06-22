@@ -24,12 +24,12 @@ Execute the planning phase: create (if mode is from-scratch) and expand a planni
 3. **Resume mode only:** Read `.planning/<NNN-slug>/00-initial.md`. Verify the planning is in INITIAL state (not inside `active/`). If it is already in EXPANSION or further, report "already past INITIAL — nothing to do" and stop.
 
 4. Invoke `/plan-expand <NNN-slug>`.
-   - Do NOT ask for scope descriptions from the user — infer all scopes from `00-initial.md` content. The agent must derive the scope list autonomously.
+   - Do NOT ask for story descriptions from the user — infer all stories from `00-initial.md` content. The agent must derive the story list autonomously.
 
-5. Verify the planning is now in `.planning/active/<NNN-slug>/` with `01-expansion.md` and at least one `02-deepening/scope-NN-*.md` file.
+5. Verify the planning is now in `.planning/active/<NNN-slug>/` with `01-expansion.md` and at least one `02-deepening/story-NN-*.md` file.
 
-6. Optionally invoke `/plan-enrich-epic <NNN-slug>` if any created scope file is missing an `Objective` or has fewer than two tasks in its task table — this indicates an underspecified scope.
+6. Optionally invoke `/plan-enrich-epic <NNN-slug>` if any created story file is missing an `Objective` or has fewer than two tasks in its task table — this indicates an underspecified scope.
 
-7. Report: planning ID, number of scopes created, list of scope names.
+7. Report: planning ID, number of stories created, list of story names.
 
 > Called by `/plan-run`. Can also be used independently for the planning phase only.

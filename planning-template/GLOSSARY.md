@@ -13,18 +13,18 @@ A self-contained unit of work inside the planning system. Each planning has a li
 
 ---
 
-### Scope
-A transversal work unit within a planning. Defined during the EXPANSION phase and detailed in a file under `02-deepening/`. Each scope targets a specific area of the repository (a phase template, a guide, a workflow file, etc.) and contains individual tasks with assigned workflows.
+### User Story (Story)
+A transversal work unit within a planning. Defined during the EXPANSION phase and detailed in a file under `02-deepening/`. Each user story targets a specific area of the repository (a phase template, a guide, a workflow file, etc.) and contains individual tasks with assigned workflows.
 
 ---
 
 ### Atomic Task
-The smallest executable unit of work, produced by decomposing a scope with `/plan-atomize` (the `ATOMIZE-SCOPE` workflow). Lives as one file per task under `02-deepening/scope-NN-name/`, and the scope's task table becomes its index. Every atomic task must satisfy the atomicity requirements verified by `[CHECK-ATOMICITY]`: a single verifiable deliverable, independent executability (or explicit dependencies), a technical design, concrete implementation steps, a unit test plan, binary done criteria, a workflow reference from the catalog, and a size that fits one work session.
+The smallest executable unit of work, produced by decomposing a story with `/plan-atomize` (the `ATOMIZE-STORY` workflow). Lives as one file per task under `02-deepening/story-NN-name/`, and the story's task table becomes its index. Every atomic task must satisfy the atomicity requirements verified by `[CHECK-ATOMICITY]`: a single verifiable deliverable, independent executability (or explicit dependencies), a technical design, concrete implementation steps, a unit test plan, binary done criteria, a workflow reference from the catalog, and a size that fits one work session.
 
 ---
 
 ### Workflow
-A defined sequence of steps for executing a specific type of task. Every task in a scope must specify which workflow governs its execution. See [`WORKFLOWS/README.md`](WORKFLOWS/README.md) for the full catalog.
+A defined sequence of steps for executing a specific type of task. Every task in a story must specify which workflow governs its execution. See [`WORKFLOWS/README.md`](WORKFLOWS/README.md) for the full catalog.
 
 ---
 
@@ -39,17 +39,17 @@ The first phase of a planning lifecycle. The planning exists as a general idea: 
 ---
 
 ### EXPANSION
-The second phase. All transversal scopes are identified, dependencies between them are mapped, and impact per SDLC phase is documented. The planning moves to `active/`.
+The second phase. All user stories are identified, dependencies between them are mapped, and impact per SDLC phase is documented. The planning moves to `active/`.
 
 ---
 
 ### DEEPENING
-The third phase. One file per scope under `02-deepening/`. Each file specifies detailed tasks with workflow types. This is where actual execution occurs.
+The third phase. One file per story under `02-deepening/`. Each file specifies detailed tasks with workflow types. This is where actual execution occurs.
 
 ---
 
 ### COMPLETED
-The final state of a planning. All scopes are done, all traceability is updated, and the planning is archived in `finished/`. Documents are not modified after this point.
+The final state of a planning. All stories are done, all traceability is updated, and the planning is archived in `finished/`. Documents are not modified after this point.
 
 ---
 
@@ -69,7 +69,7 @@ A record of a technical decision affecting the architecture of a specific projec
 ---
 
 ### Done Criteria
-The set of conditions that must be met for a task or scope to be marked as completed. Each scope file includes its own Done Criteria section. Used by the `[EXECUTE-SCOPE]` sub-workflow.
+The set of conditions that must be met for a task or story to be marked as completed. Each story file includes its own Done Criteria section. Used by the `[EXECUTE-STORY]` sub-workflow.
 
 ---
 
@@ -79,7 +79,7 @@ A detected contradiction, ambiguity, or gap between two or more documents in the
 ---
 
 ### Residual
-A task or inconsistency that cannot be resolved in the current scope but is documented and deferred to a later planning or scope. Not the same as "blocked" — a residual is acknowledged and intentionally deferred.
+A task or inconsistency that cannot be resolved in the current story but is documented and deferred to a later planning or story. Not the same as "blocked" — a residual is acknowledged and intentionally deferred.
 
 ---
 
