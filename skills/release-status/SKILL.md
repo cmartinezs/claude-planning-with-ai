@@ -1,7 +1,7 @@
 ---
 name: release-status
 description: Show live status of all releases or a specific release, reading planning states from .planning/. Use --mark-released or --mark-cancelled to transition status.
-argument-hint: [<vX.Y.Z>] [--mark-released | --mark-cancelled]
+argument-hint: [<vX.Y.Z>] [--mark-planned | --mark-in-progress | --mark-blocked | --mark-released | --mark-cancelled]
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 
@@ -13,6 +13,9 @@ Show release status with live planning states read from `.planning/` (the source
 
 - *(empty)* — summary table of all releases
 - `vX.Y.Z` — full detail for one release with live planning statuses
+- `vX.Y.Z --mark-planned` — transition to PLANNED
+- `vX.Y.Z --mark-in-progress` — transition to IN PROGRESS
+- `vX.Y.Z --mark-blocked` — mark as BLOCKED (when a planning is blocking progress)
 - `vX.Y.Z --mark-released` — mark as RELEASED (requires all plannings COMPLETED)
 - `vX.Y.Z --mark-cancelled` — mark as CANCELLED regardless of planning states
 
@@ -31,9 +34,9 @@ Show release status with live planning states read from `.planning/` (the source
    d. Compute `COMPLETED_COUNT` (rows with live status `COMPLETED`) and `TOTAL_COUNT`.
    e. Determine suggestion:
       - Any planning `NOT FOUND` → `⚠️ planning not found in .planning/`
-      - Any planning has live status `BLOCKED` and release status ≠ `BLOCKED` → `⚠️ has BLOCKED planning`
+      - Any planning has live status `BLOCKED` and release status ≠ `BLOCKED` → `⚠️ has BLOCKED planning — run \`/release-status <version> --mark-blocked\` or resolve the blocker`
       - All plannings `COMPLETED` and release status ≠ `RELEASED` → `✅ ready — run \`/release-status <version> --mark-released\``
-      - `COMPLETED_COUNT > 0` but not all done and release status is `DRAFT` → `consider moving to IN PROGRESS`
+      - `COMPLETED_COUNT > 0` but not all done and release status is `DRAFT` → `consider moving to IN PROGRESS — run \`/release-status <version> --mark-in-progress\``
       - `TOTAL_COUNT = 0` → `add plannings with \`/release-add <version> <NNN-slug>\``
       - No suggestion → `—`
 
@@ -63,7 +66,7 @@ Show release status with live planning states read from `.planning/` (the source
 
 5. Print suggestion below the output:
    - All plannings COMPLETED and status ≠ RELEASED → "✅ All plannings done — run `/release-status <version> --mark-released` to ship."
-   - Any planning BLOCKED → "⚠️ Planning `<id>` is BLOCKED — consider `/release-remove <version> <id>` or resolve the blocker first."
+   - Any planning BLOCKED → "⚠️ Planning `<id>` is BLOCKED — run `/release-status <version> --mark-blocked` or resolve the blocker first, then remove with `/release-remove`."
    - No data rows → "No plannings — add with `/release-add <version> <NNN-slug>`."
    - No suggestion needed → omit.
 
@@ -96,3 +99,41 @@ Show release status with live planning states read from `.planning/` (the source
 3. In `.releases/README.md`: find the table row where the Version column contains `<version>` and replace its Status column value with `CANCELLED`.
 
 4. Report: "Release `<version>` marked as CANCELLED."
+
+---
+
+### `--mark-planned` flag
+
+1. Parse `version` from `$ARGUMENTS`. Locate `.releases/<version>.md`. Stop if not found.
+
+2. In `.releases/<version>.md`: replace the line `> **Status:** <old>` with `> **Status:** PLANNED`.
+
+3. In `.releases/README.md`: find the table row where the Version column contains `<version>` and replace its Status column value with `PLANNED`.
+
+4. Report: "Release `<version>` marked as PLANNED."
+
+---
+
+### `--mark-in-progress` flag
+
+1. Parse `version` from `$ARGUMENTS`. Locate `.releases/<version>.md`. Stop if not found.
+
+2. In `.releases/<version>.md`: replace the line `> **Status:** <old>` with `> **Status:** IN PROGRESS`.
+
+3. In `.releases/README.md`: find the table row where the Version column contains `<version>` and replace its Status column value with `IN PROGRESS`.
+
+4. Report: "Release `<version>` marked as IN PROGRESS."
+
+---
+
+### `--mark-blocked` flag
+
+1. Parse `version` from `$ARGUMENTS`. Locate `.releases/<version>.md`. Stop if not found.
+
+2. Read each planning ID from `## Included Plannings` (skip placeholder row `| — |`). For each, read its live status from `.planning/active/<id>/00-initial.md` or `.planning/finished/<id>/00-initial.md`. If no planning has live status `BLOCKED`, warn: "No included planning is currently BLOCKED. Mark anyway? (yes/no)". Stop if not confirmed.
+
+3. In `.releases/<version>.md`: replace the line `> **Status:** <old>` with `> **Status:** BLOCKED`.
+
+4. In `.releases/README.md`: find the table row where the Version column contains `<version>` and replace its Status column value with `BLOCKED`.
+
+5. Report: "Release `<version>` marked as BLOCKED."
