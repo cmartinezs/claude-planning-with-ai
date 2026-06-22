@@ -197,9 +197,30 @@ Steps:
 
 ---
 
-## File creation responsibility
+## Initialization
 
-`.releases/` and `.releases/README.md` are created by `/release-new` on first use. `/plan-init` does **not** need to be modified.
+`.releases/` is **opt-in** — not every project using the planning system needs release management. A dedicated `/release-init` skill handles setup, mirroring the pattern of `/plan-init`.
+
+### `/release-init`
+
+No arguments.
+
+Steps:
+1. Check `.releases/` does not already exist. If it does, stop: "Already initialized — run `/release-status` to see existing releases."
+2. Create `.releases/`.
+3. Create `.releases/README.md` with empty index:
+
+```markdown
+# 🚀 Releases
+
+| Version | Target | Status | Est. Date | Plannings |
+|---------|--------|--------|-----------|-----------|
+| — | — | — | — | — |
+```
+
+4. Report: `.releases/` initialized. Next step: `/release-new`.
+
+**`/release-new` requires `/release-init` to have been run first.** If `.releases/` does not exist, stop: "Run `/release-init` first." `/plan-init` is **not** modified.
 
 ---
 
