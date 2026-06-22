@@ -29,7 +29,7 @@ Example: `v1.0.0 002-dashboard`
 
 5. Remove that row. Renumber all remaining data rows: set the `#` column to 1, 2, 3… in order.
 
-6. If the table now has no data rows (all were removed or only one was removed), restore the placeholder row: `| — | — | — | — |`
+6. If the table now has no data rows, restore the placeholder row: `| — | — | — | — |`
 
 7. Recount the table: `COMPLETED/TOTAL`. Update the `Plannings` column in `.releases/README.md` for this release.
 
