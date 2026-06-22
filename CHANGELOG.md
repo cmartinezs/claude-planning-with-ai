@@ -4,6 +4,44 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.0] — 2026-06-22
+
+### Added
+
+- `/release-init` — initialize `.releases/` for release planning (opt-in, independent of `/plan-init`)
+- `/release-new` — create a new release in DRAFT status with semantic version, target period (`YYYY-QN-MN-WN`), and estimated date
+- `/release-add` — add one or more plannings to a release; reads summaries and live statuses from `.planning/` automatically
+- `/release-remove` — remove a planning from a release; requires explicit confirmation if the release has already shipped
+- `/release-status` — show live release status (all releases or one in detail) with transition flags: `--mark-planned`, `--mark-in-progress`, `--mark-blocked`, `--mark-released`, `--mark-cancelled`
+
+## [2.0.0] — 2026-06-22
+
+### Added
+
+- `SUPERSEDE-PLANNING` workflow — formalized process for replacing an active or completed planning; two paths: Path A (revert artifacts first, status `SUPERSEDED — REVERTED`) and Path B (overwrite internals, status `SUPERSEDED — OVERRIDDEN`)
+- `## Supersedes` section in `00-initial.md` template — documents which planning is being replaced and the chosen path
+- `♻️ Superseded Plannings` section in `GUIDE.md` with lifecycle description and folder movement table
+
+### Changed
+
+- **Scope → User Story rename** — all occurrences of "scope" as a planning concept renamed to "user story" / "story" throughout the plugin:
+  - `skills/plan-scope/` → `skills/plan-story/`
+  - `skills/plan-scope-skip/` → `skills/plan-story-skip/`
+  - `skills/doc-scope/` → `skills/doc-story/`
+  - `planning-template/_template/02-deepening/scope-NN-name.md` → `story-NN-name.md`
+  - `WORKFLOWS/04-SUB-WORKFLOWS/EXECUTE-SCOPE.md` → `EXECUTE-STORY.md`
+  - `WORKFLOWS/04-SUB-WORKFLOWS/NEXT-SCOPE.md` → `NEXT-STORY.md`
+  - `WORKFLOWS/02-EXECUTION-WORKFLOWS/ATOMIZE-SCOPE.md` → `ATOMIZE-STORY.md`
+  - `GLOSSARY.md`: `### Scope` → `### User Story (Story)`
+- `task-NN-name.md` template — Approach field now asks for design rationale ("why this solution and not the obvious alternative"); Unit Tests table updated; Done Criteria requires build runner to pass
+- Story files — task files are now **mandatory**: every row in the Tasks table must have a corresponding `task-NN-name.md` before the story can be marked IN PROGRESS
+- `plan-story` (formerly `plan-scope`) — added step 3b: generates missing task files from template before proceeding
+- `plan-task` — creates missing task file from template if not found, instead of stopping
+- `EXECUTE-STORY` sub-workflow — added step 1b: task file audit; returns BLOCKED if any task file is missing
+- `plan-expand` — added step 5b: checks open residuals in `TRACEABILITY-GLOBAL.md` and links relevant ones as tasks
+- `CREATE-PLANNING` workflow — added bullet to consult `TRACEABILITY-GLOBAL.md → Consolidated Residuals` before creating story files
+- `plan-new` — added step 2b: supersession check; executes `SUPERSEDE-PLANNING` if the new planning targets the same domain as an active one
+
 ## [1.4.0] — 2026-06-13
 
 ### Added
@@ -78,7 +116,9 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.4.0...v2.0.0
 [1.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.1.0...v1.2.0
