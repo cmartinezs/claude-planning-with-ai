@@ -1,6 +1,6 @@
 ---
 name: release-status
-description: Show live status of all releases or a specific release, reading planning states from .planning/. Use --mark-released or --mark-cancelled to transition status.
+description: Show live status of all releases or a specific release, reading planning states from .planning/. Use --mark-planned, --mark-in-progress, --mark-blocked, --mark-released, or --mark-cancelled to transition status.
 argument-hint: [<vX.Y.Z>] [--mark-planned | --mark-in-progress | --mark-blocked | --mark-released | --mark-cancelled]
 allowed-tools: [Read, Write, Bash, Glob]
 ---
