@@ -1,7 +1,7 @@
 {
   "name": "claude-planning-with-ai",
-  "description": "Structured planning system for software projects. Full autonomous pipeline (/plan-run), phase agents (/plan-agent-plan, /plan-agent-execute, /plan-agent-validate), lifecycle management (plan-new, plan-expand, plan-story, plan-done, plan-archive), atomic task decomposition (plan-atomize, plan-task, plan-task-validate), backlog enrichment (us-enrich, us-new, epic-enrich), epic-to-planning bridge (plan-from-epic), and utilities: /plan-retry, /plan-story-skip, /plan-rollback, /plan-standup, /plan-report, /plan-history, /plan-clone, /plan-export, /plan-health, /plan-merge, /us-split, /us-status.",
-  "version": "2.0.0",
+  "description": "Structured planning system for software projects. Full autonomous pipeline (/plan-run), phase agents (/plan-agent-plan, /plan-agent-execute, /plan-agent-validate), lifecycle management (plan-new, plan-expand, plan-story, plan-done, plan-archive), atomic task decomposition (plan-atomize, plan-task, plan-task-validate), backlog enrichment (us-enrich, us-new, epic-enrich), epic-to-planning bridge (plan-from-epic), and utilities: /plan-retry, /plan-story-skip, /plan-rollback, /plan-standup, /plan-report, /plan-history, /plan-clone, /plan-export, /plan-health, /plan-merge, /us-split, /us-status, /release-init, /release-new, /release-add, /release-remove, /release-status.",
+  "version": "2.1.0",
   "author": {
     "name": "cmartinezs",
     "email": "carlos.f.martinez.s@gmail.com",
