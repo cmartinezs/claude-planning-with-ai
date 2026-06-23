@@ -12,10 +12,11 @@
 **Structured lifecycle planning for software projects**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.1.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-2.3.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
 [![Platform](https://img.shields.io/badge/Claude%20Code-plugin-7C3AED?style=flat-square)](https://claude.ai/code)
 [![Storage](https://img.shields.io/badge/storage-plain%20markdown-6B7280?style=flat-square)](planning-template/)
 [![Author](https://img.shields.io/badge/author-cmartinezs-0EA5E9?style=flat-square)](https://cmartinezs.github.io)
+[![Landing](https://img.shields.io/badge/landing-cmartinezs.github.io%2Fclaude--planning--with--ai-brand?style=flat-square)](https://cmartinezs.github.io/claude-planning-with-ai/)
 
 </div>
 
@@ -107,6 +108,7 @@ Full flag reference → [`docs/reference.md`](docs/reference.md)
 
 | | |
 |--|--|
+| [Landing page](https://cmartinezs.github.io/claude-planning-with-ai/) | Commands, tutorials and interactive training |
 | [User guide](docs/user-guide.md) | Concepts, flows, and worked examples |
 | [Developer guide](docs/developer-guide.md) | Architecture, skill format, how to extend |
 | [Command reference](docs/reference.md) | All commands, flags, and the installed structure |
