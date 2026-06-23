@@ -68,11 +68,12 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-new NNN-slug @path.md` | Crea planning en INITIAL desde documento |
 | `/plan-status` | Estado de todos los plannings |
 | `/plan-expand NNN-slug` | INITIAL → EXPANSION (solo flujo general) |
+| `/plan-git-config [--base-branch <branch>]` | Configura la rama base git (para proyectos ya inicializados) |
 | `/plan-atomize NNN-slug story-NN` | Descompone una story en tareas atómicas (diseño + implementación + tests) |
-| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una sola tarea atómica |
+| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una sola tarea atómica y hace commit con formato convencional |
 | `/plan-task-validate NNN-slug [story-NN]` | Audita tareas atómicas contra el checklist de atomicidad |
-| `/plan-story NNN-slug story-NN` | Ejecuta todas las tareas de una story |
-| `/plan-done NNN-slug story-NN` | Marca story completo y avanza |
+| `/plan-story NNN-slug story-NN` | Ejecuta todas las tareas de una story — crea rama, comitea por tarea, pushea y abre PR |
+| `/plan-done NNN-slug story-NN` | Marca story completo, pushea y abre PR si la rama está activa |
 | `/plan-done NNN-slug story-NN task-N` | Marca una tarea específica |
 | `/plan-archive NNN-slug` | Audita y archiva a `finished/` |
 

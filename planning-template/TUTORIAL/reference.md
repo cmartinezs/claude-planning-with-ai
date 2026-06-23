@@ -55,6 +55,52 @@ Todos los comandos disponibles con su sintaxis exacta.
 
 ---
 
+## Planificación de releases
+
+```bash
+# Inicializar gestión de releases (una vez por proyecto, independiente de /plan-init)
+/release-init
+
+# Crear nueva release
+/release-new v1.0.0 -- Primer release público con autenticación JWT
+
+# Agregar plannings a la release
+/release-add v1.0.0 001-user-auth-api 002-dashboard
+
+# Eliminar un planning de la release
+/release-remove v1.0.0 002-dashboard
+
+# Ver estado de todas las releases (lee .planning/ en tiempo real)
+/release-status
+
+# Ver detalle de una release
+/release-status v1.0.0
+
+# Transicionar estado de una release
+/release-status v1.0.0 --mark-planned
+/release-status v1.0.0 --mark-in-progress
+/release-status v1.0.0 --mark-blocked
+/release-status v1.0.0 --mark-released
+/release-status v1.0.0 --mark-cancelled
+```
+
+---
+
+## Configuración git
+
+```bash
+# Ver configuración git actual (.planning/config.yml)
+/plan-git-config
+
+# Establecer o cambiar la rama base
+/plan-git-config --base-branch develop
+/plan-git-config --base-branch main
+```
+
+> Útil en proyectos que ya tienen `.planning/` inicializado antes de que existiera la configuración git. `/plan-init` configura esto automáticamente en proyectos nuevos.
+
+---
+
 ## Ciclo de vida del planning
 
 ```bash
@@ -75,9 +121,11 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-task-validate NNN-slug [story-NN] [task-NN]
 
 # Ejecutar todas las tareas de una story
+# → crea rama desde base, commit por tarea (conventional commits), push + PR al final
 /plan-story NNN-slug story-NN
 
 # Marcar story completo (verifica done criteria y avanza al siguiente)
+# → push + PR si la rama de la story está activa
 /plan-done NNN-slug story-NN
 
 # Marcar solo una tarea (no avanza la story)
@@ -135,6 +183,13 @@ Nada se ejecuta sin estar dentro de un planning activo.
 
 | Situación | Comando |
 |-----------|---------|
+| Inicializar gestión de releases | `/release-init` |
+| Crear nueva release | `/release-new vX.Y.Z -- purpose` |
+| Agregar plannings a una release | `/release-add vX.Y.Z NNN-slug` |
+| Ver estado de todas las releases | `/release-status` |
+| Publicar una release | `/release-status vX.Y.Z --mark-released` |
+| Configurar rama base en un proyecto existente | `/plan-git-config --base-branch <branch>` |
+| Ver configuración git actual | `/plan-git-config` |
 | Crear una user story nueva | `/us-new epic-NN-slug` |
 | Story existe pero le faltan secciones de ejecución | `/us-enrich US-NNN` |
 | Epic necesita más stories | `/epic-enrich epic-NN-slug` |
@@ -173,6 +228,12 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-atomize` | `NNN-slug story-NN` |
 | `/plan-task` | `NNN-slug story-NN task-NN` |
 | `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` |
+| `/release-init` | *(sin argumentos)* |
+| `/release-new` | `vX.Y.Z -- <purpose>` |
+| `/release-add` | `vX.Y.Z NNN-slug [NNN-slug ...]` |
+| `/release-remove` | `vX.Y.Z NNN-slug` |
+| `/release-status` | `[vX.Y.Z] [--mark-planned\|--mark-in-progress\|--mark-blocked\|--mark-released\|--mark-cancelled]` |
+| `/plan-git-config` | `[--base-branch <branch>]` (vacío = mostrar config actual) |
 | `/plan-story` | `NNN-slug story-NN` |
 | `/plan-done` | `NNN-slug story-NN` ó `NNN-slug story-NN task-N` |
 | `/plan-archive` | `NNN-slug` |
