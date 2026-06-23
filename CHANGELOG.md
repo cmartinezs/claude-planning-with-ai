@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.0] — 2026-06-23
+
+### Added
+
+- `/plan-git-config` — view or update the git configuration for the planning system (`git.base_branch`); useful for projects initialized before git configuration existed
+- `planning-template/config.yml` — new config file written by `/plan-init` and `/plan-git-config` to store per-project git settings
+- Git workflow integrated into story execution:
+  - `plan-story` — pre-flight: syncs base branch, checks for branch collision, creates story branch; finalize: rebases, pushes, opens PR via `gh`
+  - `plan-task` — commits after each task using conventional commits (`type(scope): description`); type derived from task objective/workflow, scope from story slug, description from task slug
+  - `plan-done` — conditional push + PR when a full story is marked done and the story branch is active
+  - `plan-init` — new step 8: detects default remote branch and writes `.planning/config.yml`
+
+### Fixed
+
+- Landing page (`/commands`): `/plan-scope` → `/plan-story`, `/plan-scope-skip` → `/plan-story-skip`, `/doc-scope` → `/doc-story` — renames from v2.0.0 were never applied to the page
+- Landing page: 5 release commands (`/release-init`, `/release-new`, `/release-add`, `/release-remove`, `/release-status`) added — missing since v2.1.0
+- Command count updated: 38 → 44 (hero stat and reference card, ES + EN)
+
 ## [2.1.0] — 2026-06-22
 
 ### Added
@@ -116,7 +134,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.4.0...v2.0.0
 [1.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.3.0...v1.4.0
