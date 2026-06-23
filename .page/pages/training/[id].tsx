@@ -5,16 +5,34 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import TrainingRunner from '@/components/Training/TrainingRunner'
 import scenario01 from '@/data/training/scenario-01-first-planning'
+import scenario02 from '@/data/training/scenario-02-from-epic'
+import scenario03 from '@/data/training/scenario-03-plan-changes'
+import scenario04 from '@/data/training/scenario-04-backlog-first'
 import type { TrainingScenario } from '@/types/training'
 
 const SCENARIOS: Record<string, TrainingScenario> = {
   'first-planning': scenario01,
+  'from-epic': scenario02,
+  'plan-changes': scenario03,
+  'backlog-first': scenario04,
 }
 
 const META_ES: Record<string, { title: string; description: string }> = {
   'first-planning': {
     title: 'Primer planning',
     description: 'Aprende el flujo base: init, new, expand, story, done y archive.',
+  },
+  'from-epic': {
+    title: 'Desde un epic',
+    description: 'Convierte user stories existentes en un planning ejecutable con tareas atómicas.',
+  },
+  'plan-changes': {
+    title: 'Plan que cambia',
+    description: 'Adapta un planning activo: agrega stories, divide y omite trabajo obsoleto.',
+  },
+  'backlog-first': {
+    title: 'Backlog primero',
+    description: 'Enriquece un epic crudo antes de planificar: DoD, gaps y plan-from-epic.',
   },
 }
 

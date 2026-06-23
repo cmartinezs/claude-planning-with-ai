@@ -50,7 +50,7 @@ const SCENARIOS: ScenarioCard[] = [
     difficulty: 'basic',
     durationMin: 7,
     commands: ['/us-status', '/us-enrich', '/plan-from-epic', '/plan-atomize', '/plan-task'],
-    available: false,
+    available: true,
   },
   {
     id: 'plan-changes',
@@ -59,7 +59,7 @@ const SCENARIOS: ScenarioCard[] = [
     difficulty: 'intermediate',
     durationMin: 6,
     commands: ['/plan-enrich-epic', '/plan-split-story', '/plan-story-skip'],
-    available: false,
+    available: true,
   },
   {
     id: 'backlog-first',
@@ -68,7 +68,7 @@ const SCENARIOS: ScenarioCard[] = [
     difficulty: 'intermediate',
     durationMin: 7,
     commands: ['/us-new', '/us-enrich', '/epic-enrich', '/us-status', '/plan-from-epic'],
-    available: false,
+    available: true,
   },
   {
     id: 'release',
