@@ -14,6 +14,7 @@ const en = {
       lifecycle: 'Lifecycle',
       commands: 'Commands',
       tutorials: 'Tutorials',
+      training: 'Training',
     },
   },
   hero: {
@@ -28,7 +29,7 @@ const en = {
     demoBtn: 'See demo',
     stats: [
       { value: '5', label: 'Lifecycle states' },
-      { value: '38', label: 'Commands' },
+      { value: '44', label: 'Commands' },
       { value: 'Markdown', label: 'Native format' },
       { value: '0', label: 'Dependencies' },
     ],
@@ -101,7 +102,7 @@ const en = {
     cards: [
       {
         title: 'Complete commands',
-        description: 'Browse all 38 commands with arguments, behavior, source, and use cases.',
+        description: 'Browse all 44 commands with arguments, behavior, source, and use cases.',
         href: '/commands',
         linkLabel: 'Open reference',
         iconPath: 'M4 6h16M4 12h16M4 18h10',
@@ -120,7 +121,28 @@ const en = {
         linkLabel: 'Go to installation',
         iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
       },
+      {
+        title: 'Training',
+        description: '7 interactive scenarios to practice the plugin step by step, from basic to advanced.',
+        href: '/training',
+        linkLabel: 'Go to training',
+        iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+      },
     ],
+  },
+  training: {
+    runner: {
+      stepLabel: 'Step',
+      ofLabel: 'of',
+      contextLabel: 'Context',
+      nextLabel: 'Next step',
+      difficultyLabel: 'Difficulty',
+      completedLabel: 'Completed',
+      finishedTitle: 'Training completed!',
+      finishedSubtitle: 'You practiced the full plugin flow. Choose another training to keep learning.',
+      backLabel: 'Back to catalog',
+      restartLabel: 'Repeat',
+    },
   },
   commandsPage,
   tutorialsPage,
@@ -264,6 +286,7 @@ const en = {
           { label: 'Installation', href: '/#installation' },
           { label: 'Commands', href: '/commands' },
           { label: 'Tutorials', href: '/tutorials' },
+          { label: 'Training', href: '/training' },
         ],
       },
       {

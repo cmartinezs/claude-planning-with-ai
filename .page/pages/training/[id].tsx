@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import TrainingRunner from '@/components/Training/TrainingRunner'
 import { useTrainingProgress } from '@/hooks/useTrainingProgress'
+import { useTranslation } from '@/locales'
 import scenario01 from '@/data/training/scenario-01-first-planning'
 import scenario02 from '@/data/training/scenario-02-from-epic'
 import scenario03 from '@/data/training/scenario-03-plan-changes'
@@ -55,21 +56,9 @@ const META_ES: Record<string, { title: string; description: string }> = {
   },
 }
 
-const RUNNER_META = {
-  stepLabel: 'Paso',
-  ofLabel: 'de',
-  contextLabel: 'Contexto',
-  nextLabel: 'Siguiente paso',
-  difficultyLabel: 'Dificultad',
-  completedLabel: 'Completado',
-  finishedTitle: '¡Entrenamiento completado!',
-  finishedSubtitle: 'Practicaste el flujo completo del plugin. Elige otro entrenamiento para seguir aprendiendo.',
-  backLabel: 'Volver al catálogo',
-  restartLabel: 'Repetir',
-}
-
 export default function TrainingPage() {
   const router = useRouter()
+  const t = useTranslation()
   const id = typeof router.query.id === 'string' ? router.query.id : ''
   const scenario = SCENARIOS[id]
   const pageMeta = META_ES[id]
@@ -115,7 +104,7 @@ export default function TrainingPage() {
 
             <TrainingRunner
               scenario={scenario}
-              meta={{ ...RUNNER_META, title: pageMeta.title }}
+              meta={{ ...t.training.runner, title: pageMeta.title }}
               onComplete={() => markComplete(id)}
             />
           </div>

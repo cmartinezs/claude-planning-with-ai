@@ -13,6 +13,7 @@ export default function Header() {
     { href: '/#lifecycle', label: t.header.nav.lifecycle },
     { href: '/commands', label: t.header.nav.commands },
     { href: '/tutorials', label: t.header.nav.tutorials },
+    { href: '/training', label: t.header.nav.training },
   ]
 
   useEffect(() => {

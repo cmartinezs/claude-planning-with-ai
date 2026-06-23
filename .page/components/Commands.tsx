@@ -17,7 +17,7 @@ export default function Commands() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-5">
           {t.commands.cards.map((card) => (
             <article key={card.title} className="glass-card-hover p-6">
               <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-surface-600 bg-surface-900/70 text-brand-300">

@@ -14,6 +14,7 @@ const es = {
       lifecycle: 'Ciclo de vida',
       commands: 'Comandos',
       tutorials: 'Tutoriales',
+      training: 'Entrenamientos',
     },
   },
   hero: {
@@ -28,7 +29,7 @@ const es = {
     demoBtn: 'Ver demo',
     stats: [
       { value: '5', label: 'Estados del ciclo' },
-      { value: '38', label: 'Comandos' },
+      { value: '44', label: 'Comandos' },
       { value: 'Markdown', label: 'Formato nativo' },
       { value: '0', label: 'Dependencias' },
     ],
@@ -102,7 +103,7 @@ const es = {
     cards: [
       {
         title: 'Comandos completos',
-        description: 'Consulta los 38 comandos con argumentos, comportamiento, fuente y casos de uso.',
+        description: 'Consulta los 44 comandos con argumentos, comportamiento, fuente y casos de uso.',
         href: '/commands',
         linkLabel: 'Abrir referencia',
         iconPath: 'M4 6h16M4 12h16M4 18h10',
@@ -121,7 +122,28 @@ const es = {
         linkLabel: 'Ir a instalación',
         iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
       },
+      {
+        title: 'Entrenamientos',
+        description: '7 escenarios interactivos para practicar el plugin paso a paso, desde básico hasta avanzado.',
+        href: '/training',
+        linkLabel: 'Ir a entrenamientos',
+        iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+      },
     ],
+  },
+  training: {
+    runner: {
+      stepLabel: 'Paso',
+      ofLabel: 'de',
+      contextLabel: 'Contexto',
+      nextLabel: 'Siguiente paso',
+      difficultyLabel: 'Dificultad',
+      completedLabel: 'Completado',
+      finishedTitle: '¡Entrenamiento completado!',
+      finishedSubtitle: 'Practicaste el flujo completo del plugin. Elige otro entrenamiento para seguir aprendiendo.',
+      backLabel: 'Volver al catálogo',
+      restartLabel: 'Repetir',
+    },
   },
   commandsPage,
   tutorialsPage,
@@ -265,6 +287,7 @@ const es = {
           { label: 'Instalación', href: '/#installation' },
           { label: 'Comandos', href: '/commands' },
           { label: 'Tutoriales', href: '/tutorials' },
+          { label: 'Entrenamientos', href: '/training' },
         ],
       },
       {
