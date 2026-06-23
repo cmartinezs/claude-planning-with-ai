@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { useTrainingProgress } from '@/hooks/useTrainingProgress'
 import type { Difficulty } from '@/types/training'
 import { useState } from 'react'
 
@@ -103,6 +104,7 @@ type Filter = 'all' | Difficulty
 
 export default function TrainingCatalogPage() {
   const [filter, setFilter] = useState<Filter>('all')
+  const { completedIds } = useTrainingProgress()
 
   const filtered = filter === 'all'
     ? SCENARIOS
@@ -146,20 +148,27 @@ export default function TrainingCatalogPage() {
         <section className="pb-24 md:pb-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Filter bar */}
-            <div className="flex flex-wrap gap-2 mb-10">
-              {(['all', 'basic', 'intermediate', 'advanced'] as const).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    filter === f
-                      ? 'border-brand-500/50 bg-brand-500/15 text-brand-300'
-                      : 'border-surface-700 bg-surface-900/50 text-surface-400 hover:border-surface-600 hover:text-surface-300'
-                  }`}
-                >
-                  {f === 'all' ? 'Todos' : DIFFICULTY_LABEL[f]}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+              <div className="flex flex-wrap gap-2">
+                {(['all', 'basic', 'intermediate', 'advanced'] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                      filter === f
+                        ? 'border-brand-500/50 bg-brand-500/15 text-brand-300'
+                        : 'border-surface-700 bg-surface-900/50 text-surface-400 hover:border-surface-600 hover:text-surface-300'
+                    }`}
+                  >
+                    {f === 'all' ? 'Todos' : DIFFICULTY_LABEL[f]}
+                  </button>
+                ))}
+              </div>
+              {completedIds.size > 0 && (
+                <span className="text-sm font-medium text-green-400">
+                  ✓ {completedIds.size} completado{completedIds.size !== 1 ? 's' : ''}
+                </span>
+              )}
             </div>
 
             {/* Grid */}
@@ -172,9 +181,16 @@ export default function TrainingCatalogPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
-                      <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-mono mb-2 ${DIFFICULTY_COLOR[s.difficulty]}`}>
-                        {DIFFICULTY_STARS[s.difficulty]} {DIFFICULTY_LABEL[s.difficulty]}
-                      </span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-mono ${DIFFICULTY_COLOR[s.difficulty]}`}>
+                          {DIFFICULTY_STARS[s.difficulty]} {DIFFICULTY_LABEL[s.difficulty]}
+                        </span>
+                        {completedIds.has(s.id) && (
+                          <span className="inline-block rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-0.5 text-xs font-medium text-green-400">
+                            ✓ Completado
+                          </span>
+                        )}
+                      </div>
                       <h2 className="text-lg font-semibold text-surface-50 leading-tight">
                         {i + 1}. {s.title}
                       </h2>

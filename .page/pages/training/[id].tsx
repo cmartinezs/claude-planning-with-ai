@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import TrainingRunner from '@/components/Training/TrainingRunner'
+import { useTrainingProgress } from '@/hooks/useTrainingProgress'
 import scenario01 from '@/data/training/scenario-01-first-planning'
 import scenario02 from '@/data/training/scenario-02-from-epic'
 import scenario03 from '@/data/training/scenario-03-plan-changes'
@@ -72,6 +73,7 @@ export default function TrainingPage() {
   const id = typeof router.query.id === 'string' ? router.query.id : ''
   const scenario = SCENARIOS[id]
   const pageMeta = META_ES[id]
+  const { markComplete } = useTrainingProgress()
 
   if (!scenario || !pageMeta) {
     return (
@@ -114,6 +116,7 @@ export default function TrainingPage() {
             <TrainingRunner
               scenario={scenario}
               meta={{ ...RUNNER_META, title: pageMeta.title }}
+              onComplete={() => markComplete(id)}
             />
           </div>
         </div>
