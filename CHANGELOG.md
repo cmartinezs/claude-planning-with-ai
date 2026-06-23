@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.0] — 2026-06-23
+
+### Added
+
+- Training mode (`/training`): 7 interactive scenarios to practice the plugin step by step in the browser
+  - Scenario 1 — Primer planning (basic, ~8 min): plan-init → plan-new → plan-expand → plan-story → plan-done → plan-archive
+  - Scenario 2 — Desde un epic (basic, ~7 min): us-status → us-enrich → plan-from-epic → plan-atomize → plan-task → plan-done
+  - Scenario 3 — Plan que cambia (intermediate, ~6 min): plan-status → plan-enrich-epic → plan-split-story → plan-story-skip → plan-story
+  - Scenario 4 — Backlog primero (intermediate, ~7 min): us-new → us-enrich → epic-enrich → us-status → plan-from-epic
+  - Scenario 5 — Gestión de release (intermediate, ~6 min): release-init → release-new → release-add → release-status × 2
+  - Scenario 6 — Pipeline autónomo (advanced, ~5 min): plan-run → plan-agent-plan → plan-agent-execute → plan-agent-validate → plan-status
+  - Scenario 7 — Recuperación (advanced, ~6 min): plan-health → plan-validate → plan-rollback → plan-retry → plan-story
+- Per-scenario progress tracking via localStorage: ✓ badge on completed cards and global counter
+- "Entrenamientos" / "Training" nav link in header and footer (ES + EN)
+- 4th card in landing Commands section pointing to `/training`
+- Runner page uses i18n (`useTranslation`) — all UI strings available in ES + EN
+
 ## [2.2.0] — 2026-06-23
 
 ### Added
@@ -134,7 +151,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v1.4.0...v2.0.0
