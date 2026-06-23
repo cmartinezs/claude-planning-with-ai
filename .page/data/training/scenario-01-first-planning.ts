@@ -5,6 +5,26 @@ const scenario: TrainingScenario = {
   difficulty: 'basic',
   durationMin: 8,
   commands: ['/plan-init', '/plan-new', '/plan-expand', '/plan-story', '/plan-done', '/plan-status', '/plan-archive'],
+  initial: {
+    files: [
+      { name: 'api', level: 0, type: 'folder' },
+      { name: 'src', level: 1, type: 'folder' },
+      { name: 'index.ts', level: 2, type: 'file' },
+      { name: 'docs', level: 0, type: 'folder' },
+      { name: 'README.md', level: 1, type: 'file' },
+      { name: 'package.json', level: 0, type: 'file' },
+      { name: 'README.md', level: 0, type: 'file' },
+    ],
+    tab: 'README.md',
+    code: [
+      '# user-auth-api',
+      '',
+      'JWT authentication service.',
+      '',
+      'Sin sistema de planificación aún.',
+      'Ejecuta /plan-init para comenzar.',
+    ],
+  },
   steps: [
     {
       command: '/plan-init',

@@ -5,6 +5,25 @@ const scenario: TrainingScenario = {
   difficulty: 'intermediate',
   durationMin: 6,
   commands: ['/release-init', '/release-new', '/release-add', '/release-status'],
+  initial: {
+    files: [
+      { name: '.planning', level: 0, type: 'folder' },
+      { name: 'active', level: 1, type: 'folder' },
+      { name: '002-checkout', level: 2, type: 'folder' },
+      { name: '004-notifications', level: 2, type: 'folder' },
+      { name: 'finished', level: 1, type: 'folder' },
+    ],
+    tab: '01-expansion.md',
+    code: [
+      '# Proyecto con 2 plannings activos',
+      '',
+      'active/002-checkout',
+      'active/004-notifications',
+      '',
+      'Sin releases configurados aún.',
+      'Ejecuta /release-init para comenzar.',
+    ],
+  },
   steps: [
     {
       command: '/release-init',

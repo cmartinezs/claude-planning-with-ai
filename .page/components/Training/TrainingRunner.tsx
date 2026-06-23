@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import TrainingStepList from './TrainingStepList'
 import TrainingWorkspace from './TrainingWorkspace'
-import type { TrainingScenario } from '@/types/training'
+import type { TrainingScenario, WorkspaceState } from '@/types/training'
 
 interface Props {
   scenario: TrainingScenario
@@ -28,37 +28,61 @@ const DIFFICULTY_STARS: Record<string, string> = {
   advanced: '★★★',
 }
 
+const EMPTY_STATE: WorkspaceState = { files: [], tab: '', code: [] }
+
 export default function TrainingRunner({ scenario, meta, onComplete }: Props) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
+  const [executedSteps, setExecutedSteps] = useState<Set<number>>(new Set())
   const [isRunning, setIsRunning] = useState(false)
   const [isFinished, setIsFinished] = useState(false)
 
   const step = scenario.steps[currentStep]
-  const progress = Math.round((completedSteps.size / scenario.steps.length) * 100)
+  const isExecuted = executedSteps.has(currentStep)
+  const isLastStep = currentStep === scenario.steps.length - 1
+  const progress = Math.round((executedSteps.size / scenario.steps.length) * 100)
+
+  // What the workspace editor and file tree show:
+  // - Before executing current step → show previous step's result (or initial state for step 0)
+  // - While running or after executing → show current step's result
+  const viewState: WorkspaceState | undefined = (!isRunning && !isExecuted)
+    ? (currentStep === 0
+        ? (scenario.initial ?? EMPTY_STATE)
+        : scenario.steps[currentStep - 1])
+    : undefined
 
   const handleRun = () => {
-    if (isRunning || completedSteps.has(currentStep)) return
+    if (isRunning || isExecuted) return
     setIsRunning(true)
   }
 
-  const handleComplete = () => {
+  const handleAnimationComplete = () => {
     setIsRunning(false)
-    const next = new Set(completedSteps)
-    next.add(currentStep)
-    setCompletedSteps(next)
+    setExecutedSteps((prev) => new Set(prev).add(currentStep))
+  }
 
-    if (currentStep + 1 >= scenario.steps.length) {
+  const handleNext = () => {
+    if (!isExecuted) return
+    if (isLastStep) {
       setIsFinished(true)
       onComplete?.()
     } else {
-      setTimeout(() => setCurrentStep((s) => s + 1), 600)
+      setCurrentStep((s) => s + 1)
     }
+  }
+
+  const handlePrev = () => {
+    if (currentStep === 0) return
+    setCurrentStep((s) => s - 1)
+  }
+
+  const handleNavigateTo = (index: number) => {
+    setCurrentStep(index)
+    setIsRunning(false)
   }
 
   const handleRestart = () => {
     setCurrentStep(0)
-    setCompletedSteps(new Set())
+    setExecutedSteps(new Set())
     setIsRunning(false)
     setIsFinished(false)
   }
@@ -106,7 +130,8 @@ export default function TrainingRunner({ scenario, meta, onComplete }: Props) {
             <TrainingStepList
               steps={scenario.steps}
               currentStep={currentStep}
-              completedSteps={completedSteps}
+              executedSteps={executedSteps}
+              onNavigate={handleNavigateTo}
             />
           </div>
 
@@ -117,7 +142,7 @@ export default function TrainingRunner({ scenario, meta, onComplete }: Props) {
             <p className="text-sm leading-relaxed text-surface-300">{step.hint}</p>
           </div>
 
-          {completedSteps.has(currentStep) && currentStep + 1 < scenario.steps.length && (
+          {isExecuted && !isLastStep && (
             <div className="rounded-2xl border border-brand-500/20 bg-brand-500/5 p-4">
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-brand-400">
                 {meta.nextLabel}
@@ -131,12 +156,42 @@ export default function TrainingRunner({ scenario, meta, onComplete }: Props) {
         <div className="lg:sticky lg:top-24">
           <TrainingWorkspace
             step={step}
+            viewState={viewState}
             isRunning={isRunning}
-            isDone={completedSteps.has(currentStep)}
+            isExecuted={isExecuted}
             onRun={handleRun}
-            onComplete={handleComplete}
+            onComplete={handleAnimationComplete}
           />
         </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="mt-8 flex items-center justify-between gap-4 border-t border-surface-800 pt-6">
+        <button
+          onClick={handlePrev}
+          disabled={currentStep === 0}
+          className="inline-flex items-center gap-2 rounded-xl border border-surface-700 bg-surface-900/60 px-5 py-2.5 text-sm font-medium text-surface-300 transition-colors hover:border-surface-600 hover:text-surface-100 disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <span aria-hidden="true">←</span>
+          Anterior
+        </button>
+
+        <span className="font-mono text-xs text-surface-600">
+          {executedSteps.size}/{scenario.steps.length} ejecutados
+        </span>
+
+        <button
+          onClick={handleNext}
+          disabled={!isExecuted}
+          className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
+            isLastStep
+              ? 'border-green-500/40 bg-green-500/10 text-green-300 hover:bg-green-500/20'
+              : 'border-brand-500/40 bg-brand-500/10 text-brand-300 hover:bg-brand-500/20'
+          }`}
+        >
+          {isLastStep ? 'Finalizar' : 'Siguiente'}
+          <span aria-hidden="true">{isLastStep ? ' ✓' : ' →'}</span>
+        </button>
       </div>
     </div>
   )

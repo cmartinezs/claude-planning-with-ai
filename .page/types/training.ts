@@ -25,12 +25,20 @@ export interface TrainingStep {
 
 export type Difficulty = 'basic' | 'intermediate' | 'advanced'
 
+export interface WorkspaceState {
+  files: FileEntry[]
+  tab: string
+  code: string[]
+}
+
 export interface TrainingScenario {
   id: string
   difficulty: Difficulty
   durationMin: number
   /** Command badges shown in the catalog card */
   commands: string[]
+  /** Workspace state shown BEFORE the first command runs */
+  initial?: WorkspaceState
   steps: TrainingStep[]
 }
 

@@ -1,17 +1,20 @@
-import { useState } from 'react'
 import TerminalAnimation, { Prompt } from '@/components/TerminalAnimation'
 import CommandInput from './CommandInput'
-import type { TrainingStep } from '@/types/training'
+import type { TrainingStep, WorkspaceState } from '@/types/training'
 
 interface Props {
   step: TrainingStep
+  /** When provided, overrides step.files/tab/code (used to show pre-command state) */
+  viewState?: WorkspaceState
   isRunning: boolean
-  isDone: boolean
+  isExecuted: boolean
   onRun: () => void
   onComplete: () => void
 }
 
-export default function TrainingWorkspace({ step, isRunning, isDone, onRun, onComplete }: Props) {
+export default function TrainingWorkspace({ step, viewState, isRunning, isExecuted, onRun, onComplete }: Props) {
+  const display = viewState ?? { files: step.files, tab: step.tab, code: step.code }
+
   return (
     <div className="relative">
       <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-brand-500/15 via-cyan-500/10 to-transparent blur-2xl" />
@@ -35,11 +38,11 @@ export default function TrainingWorkspace({ step, isRunning, isDone, onRun, onCo
               <div className="mb-2 px-1 text-[11px] font-semibold uppercase text-surface-400">
                 user-auth-api
               </div>
-              {step.files.map((file, i) => (
+              {display.files.map((file, i) => (
                 <div
                   key={i}
                   className={`flex items-center gap-1.5 rounded px-1.5 py-1 text-xs ${
-                    file.name === step.tab
+                    file.name === display.tab
                       ? 'bg-brand-500/10 text-brand-300'
                       : 'text-surface-400'
                   }`}
@@ -51,21 +54,28 @@ export default function TrainingWorkspace({ step, isRunning, isDone, onRun, onCo
                   <span className="truncate">{file.name}</span>
                 </div>
               ))}
+              {display.files.length === 0 && (
+                <p className="px-1 text-[11px] text-surface-600 italic">proyecto vacío</p>
+              )}
             </div>
           </aside>
 
           {/* Editor + terminal */}
           <div className="flex min-w-0 flex-col">
             <div className="flex border-b border-surface-800 bg-surface-900">
-              <div className="border-r border-surface-800 bg-surface-950 px-4 py-2 text-xs font-mono text-surface-300">
-                {step.tab}
-              </div>
+              {display.tab ? (
+                <div className="border-r border-surface-800 bg-surface-950 px-4 py-2 text-xs font-mono text-surface-300">
+                  {display.tab}
+                </div>
+              ) : (
+                <div className="px-4 py-2 text-xs font-mono text-surface-700 italic">sin archivo abierto</div>
+              )}
             </div>
 
             <div className="grid flex-1 grid-rows-[minmax(160px,1fr)_minmax(220px,300px)]">
               {/* Code viewer */}
               <pre className="overflow-hidden bg-surface-950/80 p-5 font-mono text-xs leading-6 text-surface-300">
-                {step.code.map((line, i) => (
+                {display.code.length > 0 ? display.code.map((line, i) => (
                   <div key={i} className="flex gap-4">
                     <span className="w-6 shrink-0 text-right text-surface-700">{i + 1}</span>
                     <span className={
@@ -77,7 +87,9 @@ export default function TrainingWorkspace({ step, isRunning, isDone, onRun, onCo
                       {line || ' '}
                     </span>
                   </div>
-                ))}
+                )) : (
+                  <span className="text-surface-700 italic">ejecuta el comando para ver los cambios</span>
+                )}
               </pre>
 
               {/* Terminal */}
@@ -101,7 +113,7 @@ export default function TrainingWorkspace({ step, isRunning, isDone, onRun, onCo
                   <div className="flex-1 p-4">
                     <Prompt />
                     <span className="font-mono text-sm text-surface-600">
-                      {isDone ? '' : 'esperando comando...'}
+                      {isExecuted ? '' : 'esperando comando...'}
                     </span>
                   </div>
                 )}
@@ -109,7 +121,7 @@ export default function TrainingWorkspace({ step, isRunning, isDone, onRun, onCo
                 <CommandInput
                   suggestion={step.command}
                   onRun={onRun}
-                  disabled={isRunning}
+                  disabled={isRunning || isExecuted}
                 />
               </div>
             </div>

@@ -3,29 +3,32 @@ import type { TrainingStep } from '@/types/training'
 interface Props {
   steps: TrainingStep[]
   currentStep: number
-  completedSteps: Set<number>
+  executedSteps: Set<number>
+  onNavigate: (index: number) => void
 }
 
-export default function TrainingStepList({ steps, currentStep, completedSteps }: Props) {
+export default function TrainingStepList({ steps, currentStep, executedSteps, onNavigate }: Props) {
   return (
     <div className="flex flex-col gap-2 p-4">
       <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-surface-500">
         Pasos
       </p>
       {steps.map((step, i) => {
-        const isDone = completedSteps.has(i)
+        const isDone = executedSteps.has(i)
         const isActive = i === currentStep
-        const isPending = i > currentStep
+        const isNavigable = isDone || isActive
 
         return (
-          <div
+          <button
             key={i}
-            className={`flex items-start gap-3 rounded-xl border p-3 transition-colors ${
+            onClick={() => isNavigable && onNavigate(i)}
+            disabled={!isNavigable}
+            className={`w-full text-left flex items-start gap-3 rounded-xl border p-3 transition-colors ${
               isActive
                 ? 'border-brand-500/30 bg-brand-500/10'
                 : isDone
-                  ? 'border-green-500/20 bg-green-500/5'
-                  : 'border-surface-800 bg-surface-900/40 opacity-50'
+                  ? 'border-green-500/20 bg-green-500/5 hover:border-green-500/40 cursor-pointer'
+                  : 'border-surface-800 bg-surface-900/40 opacity-40 cursor-not-allowed'
             }`}
           >
             <div
@@ -53,7 +56,7 @@ export default function TrainingStepList({ steps, currentStep, completedSteps }:
                 </p>
               )}
             </div>
-          </div>
+          </button>
         )
       })}
     </div>
