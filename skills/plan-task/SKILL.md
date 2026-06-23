@@ -41,7 +41,36 @@ Reference workflows:
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 9. Verify every `Done Criteria` item. If any is unmet, leave the task `IN PROGRESS`, list what is missing, and stop.
 10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
-10b. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If the story area is DO or W this is a silent no-op. Include any files written in the final report.
-11. Report: task completed, files created/changed, test results, doc files written (from step 10b), and the next pending task in the story — or, if all tasks are `DONE`, suggest `/plan-done <planning-id> <story-id>`.
+
+10b. **Conventional commit** — commit the task output:
+
+   a. Derive the **commit type** from the task's `Objective` and `Workflow` field (first match wins):
+
+   | Signal | Type |
+   |--------|------|
+   | Workflow is `GENERATE-DOCUMENT`, or objective contains "document", "write docs", "update docs" | `docs` |
+   | Objective contains "fix", "correct", "resolve", "repair" | `fix` |
+   | Objective contains "refactor", "restructure", "reorganize", "clean" | `refactor` |
+   | Objective contains "test", "spec", "coverage" | `test` |
+   | Objective contains "setup", "configure", "scaffold", "init", "install" | `chore` |
+   | (default) | `feat` |
+
+   b. Derive the **scope** from the story filename: strip the `story-NN-` prefix from `story-NN-<slug>` → scope is `<slug>`.
+
+   c. Derive the **description** from the task filename: strip the `task-NN-` prefix from `task-NN-<slug>` and replace hyphens with spaces → e.g. `task-02-create-user-model` → `create user model`.
+
+   d. Stage only the files listed in the task's `Technical Design → Affected files / components` field, plus any additional files created during implementation. Do **not** use `git add -A` or `git add .`.
+
+   e. Commit:
+   ```bash
+   git commit -m "type(scope): description"
+   ```
+
+   Example: `feat(user-authentication): create user model`
+
+   If there is nothing to commit (e.g., the task only touched `.planning/` files), skip this step silently.
+
+10c. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If the story area is DO or W this is a silent no-op. Include any files written in the final report.
+11. Report: task completed, files created/changed, test results, commit message used (from step 10b), doc files written (from step 10c), and the next pending task in the story — or, if all tasks are `DONE`, suggest `/plan-done <planning-id> <story-id>`.
 
 > Executes exactly ONE task. To run all tasks of a story in order, use `/plan-story <planning-id> <story-id>`.

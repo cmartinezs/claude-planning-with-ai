@@ -31,3 +31,34 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
       - If more stories exist: set next story to `IN PROGRESS`. Report which story is next.
       - If no more stories: execute `MILESTONE-FEEDBACK` → trigger `/plan-archive <planning-id>`.
 5. Update `.planning/active/README.md` to reflect new story statuses.
+
+### Git finalize (conditional)
+
+After step 4b, if no specific task number was given (story fully done):
+
+6. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if absent).
+7. Derive the expected branch name: `story-NN-<slug>` (the story filename without `.md`).
+8. Check whether the current branch matches the story branch:
+   ```bash
+   git rev-parse --abbrev-ref HEAD
+   ```
+   - If the current branch is `<story-branch>`: proceed with push and PR (steps 9–11).
+   - If not: skip git steps entirely and note in the report that the branch was not detected.
+9. Sync with the base branch before pushing:
+   ```bash
+   git fetch origin
+   git rebase origin/<base_branch>
+   ```
+   If the rebase has conflicts: stop, list the conflicting files, and ask the user to resolve them.
+10. Push the story branch:
+    ```bash
+    git push -u origin <branch-name>
+    ```
+11. Open a pull request targeting `<base_branch>`:
+    ```bash
+    gh pr create \
+      --title "<story-NN>: <story-name>" \
+      --body "Closes story <story-id> of planning <planning-id>." \
+      --base <base_branch>
+    ```
+    If `gh` is not available, print the push URL and instruct the user to open the PR manually.
