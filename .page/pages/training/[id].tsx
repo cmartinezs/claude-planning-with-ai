@@ -8,6 +8,9 @@ import scenario01 from '@/data/training/scenario-01-first-planning'
 import scenario02 from '@/data/training/scenario-02-from-epic'
 import scenario03 from '@/data/training/scenario-03-plan-changes'
 import scenario04 from '@/data/training/scenario-04-backlog-first'
+import scenario05 from '@/data/training/scenario-05-release'
+import scenario06 from '@/data/training/scenario-06-autonomous'
+import scenario07 from '@/data/training/scenario-07-recovery'
 import type { TrainingScenario } from '@/types/training'
 
 const SCENARIOS: Record<string, TrainingScenario> = {
@@ -15,6 +18,9 @@ const SCENARIOS: Record<string, TrainingScenario> = {
   'from-epic': scenario02,
   'plan-changes': scenario03,
   'backlog-first': scenario04,
+  'release': scenario05,
+  'autonomous': scenario06,
+  'recovery': scenario07,
 }
 
 const META_ES: Record<string, { title: string; description: string }> = {
@@ -33,6 +39,18 @@ const META_ES: Record<string, { title: string; description: string }> = {
   'backlog-first': {
     title: 'Backlog primero',
     description: 'Enriquece un epic crudo antes de planificar: DoD, gaps y plan-from-epic.',
+  },
+  'release': {
+    title: 'Gestión de release',
+    description: 'Agrupa plannings bajo una versión semántica y rastrea su estado en tiempo real.',
+  },
+  'autonomous': {
+    title: 'Pipeline autónomo',
+    description: 'Describe trabajo en lenguaje natural y deja que el pipeline lo ejecute solo.',
+  },
+  'recovery': {
+    title: 'Recuperación',
+    description: 'Diagnostica y recupera un planning bloqueado con health, validate y rollback.',
   },
 }
 

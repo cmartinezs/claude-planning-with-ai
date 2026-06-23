@@ -77,7 +77,7 @@ const SCENARIOS: ScenarioCard[] = [
     difficulty: 'intermediate',
     durationMin: 6,
     commands: ['/release-init', '/release-new', '/release-add', '/release-status'],
-    available: false,
+    available: true,
   },
   {
     id: 'autonomous',
@@ -86,7 +86,7 @@ const SCENARIOS: ScenarioCard[] = [
     difficulty: 'advanced',
     durationMin: 5,
     commands: ['/plan-run', '/plan-agent-plan', '/plan-agent-execute', '/plan-agent-validate'],
-    available: false,
+    available: true,
   },
   {
     id: 'recovery',
@@ -95,7 +95,7 @@ const SCENARIOS: ScenarioCard[] = [
     difficulty: 'advanced',
     durationMin: 6,
     commands: ['/plan-health', '/plan-validate', '/plan-rollback', '/plan-retry'],
-    available: false,
+    available: true,
   },
 ]
 
