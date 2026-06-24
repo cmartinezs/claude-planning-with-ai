@@ -21,6 +21,12 @@ export interface TrainingStep {
   hint: string
   /** "Siguiente paso" panel — what comes next after this step completes */
   nextHint: string
+  /**
+   * "Antes de continuar" panel — shown after the animation completes when this step
+   * reads files with checklists or done criteria. Instructs the user to open the file
+   * shown in the editor and verify that all checks are satisfied before advancing.
+   */
+  reviewNote?: string
 }
 
 export type Difficulty = 'basic' | 'intermediate' | 'advanced'

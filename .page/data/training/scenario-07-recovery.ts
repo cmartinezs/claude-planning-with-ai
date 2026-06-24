@@ -10,6 +10,7 @@ const scenario: TrainingScenario = {
       command: '/plan-health',
       hint: 'Llevas días sin abrir el proyecto. Algo está mal: story-02 de 006-reporting nunca terminó y no hay commits desde hace 3 días. Ejecuta un scan global de salud antes de tocar nada.',
       nextHint: '006-reporting está bloqueado. Valida específicamente ese planning para ver qué archivos están mal.',
+      reviewNote: 'Revisa story-02-charts.md en el editor. Observa los marcadores ⚠ y los campos inconsistentes. Anota qué es exactamente lo que está mal — esa información la necesitarás en el siguiente paso para hacer el rollback correcto.',
       output: [
         '  ⟳ Escaneando todos los plannings...',
         '',
@@ -55,6 +56,7 @@ const scenario: TrainingScenario = {
       command: '/plan-validate 006-reporting',
       hint: '/plan-validate verifica la integridad estructural del planning: archivos, estados, traceabilidad y coherencia con git. Identifica exactamente qué está roto.',
       nextHint: 'story-02 está en estado corrupto: task-01 dice DONE pero no hay commit. El remedio es hacer rollback de story-02 a TODO.',
+      reviewNote: 'Revisa story-02-charts.md en el editor. Los errores que listó el terminal (task-01 DONE sin commit, rama sin push, done criteria sin marcar) son exactamente los ítems que ves marcados con ✗ o ⚠. Entender qué está roto es clave para elegir la corrección adecuada.',
       output: [
         '  Validando 006-reporting...',
         '',

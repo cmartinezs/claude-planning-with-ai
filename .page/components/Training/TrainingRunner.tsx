@@ -142,6 +142,15 @@ export default function TrainingRunner({ scenario, meta, onComplete }: Props) {
             <p className="text-sm leading-relaxed text-surface-300">{step.hint}</p>
           </div>
 
+          {isExecuted && step.reviewNote && (
+            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-amber-400">
+                ⚠ Antes de continuar
+              </p>
+              <p className="text-sm leading-relaxed text-surface-300">{step.reviewNote}</p>
+            </div>
+          )}
+
           {isExecuted && !isLastStep && (
             <div className="rounded-2xl border border-brand-500/20 bg-brand-500/5 p-4">
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-brand-400">

@@ -10,6 +10,7 @@ const scenario: TrainingScenario = {
       command: '/plan-status',
       hint: 'Tu planning 003-inventory-api lleva varios días en ejecución. El cliente acaba de cambiar el alcance. Primero revisa el estado actual antes de hacer ajustes.',
       nextHint: 'Tienes 2 stories DONE y 2 pendientes. El cliente quiere agregar 2 requisitos nuevos: exportación CSV y alertas de stock.',
+      reviewNote: 'Revisa la tabla de stories en 01-expansion.md. Confirma que el estado que muestra el sistema (DONE / IN PROGRESS / TODO) refleja correctamente lo que sabes del proyecto. Cualquier discrepancia debe corregirse antes de hacer ajustes al planning.',
       output: [
         '  Planning with AI — Estado actual',
         '',

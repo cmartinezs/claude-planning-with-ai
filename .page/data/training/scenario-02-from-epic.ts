@@ -10,6 +10,7 @@ const scenario: TrainingScenario = {
       command: '/us-status docs/product/epic-checkout/',
       hint: 'Tienes un epic de checkout con 3 user stories. Antes de planificar, revisa cuáles están listas para ejecutar y cuáles necesitan más detalle.',
       nextHint: 'Story-03 no tiene Definition of Done. Enriquécela antes de generar el planning.',
+      reviewNote: 'Revisa 03-payment.md en el editor. Confirma qué secciones están ausentes — el terminal las listó con ✗. Esas son exactamente las secciones que /us-enrich agregará en el siguiente paso.',
       output: [
         '  Enrichment status — docs/product/epic-checkout/',
         '',
@@ -176,6 +177,7 @@ const scenario: TrainingScenario = {
       command: '/plan-task 002-checkout story-01 task-01',
       hint: 'Ejecuta la primera tarea atómica. /plan-task sigue el diseño técnico, implementa, corre los tests y hace un commit convencional.',
       nextHint: 'task-01 lista con commit. Ejecuta task-02 para continuar la story.',
+      reviewNote: 'Revisa task-01-cart-model.md en el editor. Verifica que los done criteria están marcados con [x] y que el status dice DONE. Si algún criterio quedó sin marcar, la tarea no está realmente completa.',
       output: [
         '  ⟳ Verificando readiness...',
         '  ✓ Dependencias OK · Atomicidad OK',
@@ -220,6 +222,7 @@ const scenario: TrainingScenario = {
       command: '/plan-task 002-checkout story-01 task-02',
       hint: 'El modelo está listo. Ahora implementa los endpoints CRUD de /cart. /plan-task hará otro commit convencional al terminar.',
       nextHint: '2 tareas completadas, 1 pendiente. Cuando termines task-03, usa /plan-done para cerrar la story.',
+      reviewNote: 'Revisa story-01-cart.md en el editor. Confirma que la tabla de tasks muestra task-01 y task-02 en DONE. Solo task-03 debe quedar en TODO — si la tabla no refleja eso, hay una inconsistencia.',
       output: [
         '  ⟳ Ejecutando task-02: Endpoints CRUD /cart...',
         '  ✓ src/cart/cart.controller.ts creado',
@@ -260,6 +263,7 @@ const scenario: TrainingScenario = {
       command: '/plan-done 002-checkout story-01',
       hint: 'Imaginemos que task-03 también está completa. /plan-done verifica los done criteria, pushea la rama y abre el PR.',
       nextHint: '¡Entrenamiento completado! Viste el flujo desde un epic existente hasta tareas atómicas con commits por cada una.',
+      reviewNote: 'Revisa la tabla en 01-expansion.md — story-01 debe aparecer como DONE. Abre también story-01-cart.md y verifica que los done criteria de la story están todos marcados con [x]. En un proyecto real, esta es la verificación manual que complementa la automática.',
       output: [
         '  ✓ story-01 verificada: 3/3 tareas DONE',
         '  ✓ Done criteria del epic satisfechos',

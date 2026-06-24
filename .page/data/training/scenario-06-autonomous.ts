@@ -139,6 +139,7 @@ const scenario: TrainingScenario = {
       command: '/plan-agent-validate 005-pdf-reports',
       hint: 'La fase de validación verifica que todos los done criteria estén marcados, que no haya scope creep, y archiva el planning moviéndolo a finished/.',
       nextHint: 'Planning archivado. Usa /plan-status para ver el resumen final.',
+      reviewNote: 'Revisa TRACEABILITY.md en el editor. Verifica que los done criteria de las 3 stories aparecen listados y que el pipeline los marcó como cumplidos. Este archivo es el registro permanente de lo que se construyó y sus compromisos de calidad.',
       output: [
         '  [plan-agent-validate] 005-pdf-reports',
         '',

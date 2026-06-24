@@ -136,6 +136,7 @@ const scenario: TrainingScenario = {
       command: '/us-status docs/product/epic-notifications/',
       hint: 'El epic creció a 4 stories. Antes de convertirlo en planning, verifica qué stories están listas y cuáles todavía necesitan enriquecimiento.',
       nextHint: 'Stories 2–4 necesitan enriquecimiento, pero podemos planificar ahora y enriquecer en paralelo. /plan-from-epic es flexible.',
+      reviewNote: 'Revisa 02-push-notifications.md en el editor — observa qué secciones faltan (DoD, Technical Notes). En un proyecto real deberías enriquecer todas las stories antes de planificar, o al menos documentar conscientemente que planificarás con done criteria parciales.',
       output: [
         '  Enrichment status — epic-notifications/',
         '',

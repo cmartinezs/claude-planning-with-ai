@@ -147,6 +147,7 @@ const scenario: TrainingScenario = {
       command: '/plan-story 001-user-auth story-01',
       hint: 'La primera story está lista para ejecutarse. /plan-story creará una rama git, ejecutará las tareas y hará un commit por cada una.',
       nextHint: 'Story-01 completada, rama pusheada y PR abierto. Márcala como DONE para avanzar al siguiente.',
+      reviewNote: 'Revisa el archivo story-01-registro.md en el editor. Verifica que los done criteria están todos marcados con [x] — si alguno está sin marcar, el issue debe resolverse antes de ejecutar /plan-done.',
       output: [
         '  ⟳ Git pre-flight...',
         '  ✓ Sincronizado con origin/main',
@@ -208,6 +209,7 @@ const scenario: TrainingScenario = {
       command: '/plan-done 001-user-auth story-01',
       hint: 'La story fue ejecutada. Ahora márcala oficialmente como DONE para que el sistema registre el avance y active la siguiente.',
       nextHint: '¡Story-01 cerrada! Usa /plan-status para ver el estado completo del planning antes de continuar.',
+      reviewNote: 'Revisa la tabla en 01-expansion.md — story-01 debe aparecer como DONE. Si el terminal indicó algún done criteria sin cumplir, vuelve a story-01-registro.md y resuélvelo antes de continuar.',
       output: [
         '  ✓ story-01 verificada: todos los done criteria OK',
         '  ✓ story-01 → DONE en el índice',
