@@ -63,7 +63,11 @@ Before executing any story work:
      e. Mark the task as done (`[x]`) in the story file.
 7. After all tasks: execute `[EXECUTE-STORY]` to verify done criteria are met.
    - If `BLOCKED`: list unmet criteria and stop.
-   - If `DONE`: set story status to `DONE` in the story file.
+   - If `DONE`: before setting the status, present the full `## Done Criteria` section of the story file to the user and ask explicitly:
+
+     > "All tasks are complete. Please review the story's done criteria above and confirm that each one is satisfied in the actual codebase. Reply with **confirmed** to mark this story DONE, or indicate which criteria still need work."
+
+   Wait for user confirmation before setting story status to `DONE` in the story file.
 7b. Invoke `/doc-story <planning-id> <story-id>`. If the story area is DO or W this is a silent no-op. Include any files written in the final report.
 
 ### Git finalize

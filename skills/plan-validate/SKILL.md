@@ -70,4 +70,11 @@ End with a global summary: `N plannings validated — X clean, Y with warnings, 
 
 11. **Suggest fixes.** For each FAIL, suggest the command that fixes it (e.g. status mismatch → `/plan-done NNN-slug story-NN`; missing story file → `/plan-enrich-story NNN-slug story-NN`; malformed atomized story → `/plan-task-validate NNN-slug story-NN`). Do not apply any fix.
 
+12. **File review prompt.** After the report, list every file referenced in a FAIL or WARN finding and ask the user to verify them directly:
+
+    > "Before running any fix command, open and inspect the following files to confirm the issues reported above:
+    > - `<file-path>` — <what to look for>
+    > …
+    > Verifying the files directly avoids applying fixes to already-resolved issues or misdiagnosed problems."
+
 > This command is read-only. It does not modify any files.

@@ -25,7 +25,16 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
    a. Mark all tasks `[x]` in the story file.
    b. Execute `[EXECUTE-STORY]` — verify done criteria are satisfied.
       - If `BLOCKED`: report unmet criteria, do NOT advance.
-      - If `DONE`: set story status to `DONE` in the story file.
+      - If `DONE`: present the full `## Done Criteria` section of the story file to the user and ask explicitly:
+
+        > "The system verified the done criteria automatically. Please open the story file and confirm each criterion below is truly satisfied in the codebase before this story is marked DONE:"
+
+        List every criterion with its current `[x]` / `[ ]` state. Then ask:
+
+        > "Reply with **confirmed** to finalize, or indicate which criteria still need work."
+
+        Do not advance until the user confirms.
+      - After confirmation: set story status to `DONE` in the story file.
    c. Execute `[CHECK-TRACEABILITY]` — ensure all terms from this story are recorded.
    d. Execute `[NEXT-STORY]` to identify the next pending story.
       - If more stories exist: set next story to `IN PROGRESS`. Report which story is next.

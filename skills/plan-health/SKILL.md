@@ -73,4 +73,11 @@ Warnings (no immediate action required):
 
 5. If all checks PASS, report: "✅ Planning system is healthy — no issues found."
 
+6. **File review prompt.** If any FAIL or WARN was reported, list every file or directory referenced and ask the user to open them before taking action:
+
+   > "Before running any corrective command, open and inspect the files flagged above:
+   > - `<file-or-dir-path>` — <what to look for (e.g. missing story file, stale status, orphaned folder)>
+   > …
+   > Confirm the issue is still present — some anomalies self-resolve when a parallel command was run recently."
+
 > Read-only. Does not modify any files. To fix structural issues found, use the appropriate skill (e.g., `/plan-validate NNN-slug` for detailed per-planning checks).

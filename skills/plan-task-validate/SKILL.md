@@ -52,4 +52,11 @@ End with a global summary: `N tasks audited — X clean, Y with warnings, Z with
 
 7. **Suggest fixes.** For each finding, suggest the command or edit that resolves it (e.g. status mismatch → update the index row; non-atomic task → split it and re-run `/plan-atomize` review; missing tests → fill the `Unit Tests` table before `/plan-task`). Do not apply any fix.
 
+8. **File review prompt.** After the report, list every task file and story index referenced in a FAIL or WARN and ask the user to inspect them:
+
+   > "Before applying any fix, open and verify the following files directly — the report above may not capture every detail visible in the source:
+   > - `<task-file-path>` — check `## Done Criteria` (all `[x]`?) and `## Unit Tests` (table populated?)
+   > …
+   > Confirm the issues are still present before modifying or re-running the skill."
+
 > This command is read-only. It does not modify any files.

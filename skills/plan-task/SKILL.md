@@ -40,6 +40,13 @@ Reference workflows:
 7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the output is consistent with `docs/` contracts.
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 9. Verify every `Done Criteria` item. If any is unmet, leave the task `IN PROGRESS`, list what is missing, and stop.
+
+9b. **Manual review checkpoint** — before marking the task DONE, present the full `## Done Criteria` section to the user exactly as it appears in the task file. Then ask explicitly:
+
+   > "Please review each criterion above and confirm that all of them are satisfied in the actual codebase (not just in the task file). Reply with **confirmed** to mark this task DONE, or indicate which criteria need further work."
+
+   Do not proceed to step 10 until the user confirms.
+
 10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
 
 10b. **Conventional commit** — commit the task output:
