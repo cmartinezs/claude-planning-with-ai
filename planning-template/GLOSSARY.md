@@ -83,6 +83,11 @@ A task or inconsistency that cannot be resolved in the current story but is docu
 
 ---
 
+### STANDBY
+A story status meaning execution was intentionally interrupted to allow a context switch. The story retains all its progress and can be resumed by re-running `/plan-story`. Different from `BLOCKED` (which means the story cannot proceed due to an unresolved external dependency) and from `IN PROGRESS` (which means execution is actively happening). Set by `[CHECK-PLANNING-CONTEXT]` and `[CHECK-STORY-CONTEXT]` when the user chooses to stabilize the current work before switching context.
+
+---
+
 ### Bypass
 A mechanism to skip the Fundamental Rule check and execute without a planning entry. Uses `--no-plan` (asks for confirmation) or `--no-plan-force` (executes directly). Should be used sparingly.
 

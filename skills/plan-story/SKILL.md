@@ -23,6 +23,11 @@ Reference workflows:
 
 Before executing any story work:
 
+0. **Story context check:** Execute `[CHECK-STORY-CONTEXT]`.
+   - If **ABORT**: stop immediately; report that the user chose to stay on the current story branch.
+   - If **STASHED**, **COMMITTED**, **COMMITTED_PUSHED**, or **STANDBY**: continue to step 1.
+   - If **OK** (no conflicting story branch): continue to step 1.
+
 1. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if file or key is absent).
 2. Derive the branch name from the story filename: the story file is `story-NN-<slug>.md` → branch name is `story-NN-<slug>` (the filename without `.md`).
 3. Check for an existing local branch:

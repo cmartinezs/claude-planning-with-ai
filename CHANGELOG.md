@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.4.0] — 2026-06-25
+
+### Added
+
+- `[CHECK-PLANNING-CONTEXT]` sub-workflow — validates planning execution context before starting a new planning run; detects in-progress stories across all active plannings, reports full git state (modified, untracked, staged, unpushed commits, stashes), and offers 4 alternatives: Abort / Inspect / Stabilize (commit WIP + optional push + mark STANDBY + return to base branch) / Proceed anyway (requires typing `CONFIRMAR PROCEDER`)
+- `[CHECK-STORY-CONTEXT]` sub-workflow — validates story execution context before switching story branches; detects if the current branch is an in-progress story, reports git state, and offers 5 alternatives: Abort / Stash (asks whether to include untracked files) / Commit WIP / Commit + Push WIP / Commit + Push + mark STANDBY
+- `STANDBY` story status — new lifecycle status for a story that was intentionally paused to allow a context switch; resumable by re-running `/plan-story`; documented in `GLOSSARY.md`
+
+### Changed
+
+- `/plan-run` — executes `[CHECK-PLANNING-CONTEXT]` at step 2b before building the execution plan
+- `/plan-agent-execute` — executes `[CHECK-PLANNING-CONTEXT]` at step 0 before locating the active planning
+- `/plan-story` — executes `[CHECK-STORY-CONTEXT]` at step 0 of the Git pre-flight before any branch operation
+
 ## [2.3.0] — 2026-06-23
 
 ### Added

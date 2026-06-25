@@ -13,6 +13,11 @@ Atomize and execute all pending stories in a planning. Independent stories run i
 
 ## Steps
 
+0. **Planning context check:** Execute `[CHECK-PLANNING-CONTEXT]`.
+   - If **ABORT**: stop immediately; do not modify anything.
+   - If **INSPECT**: the sub-workflow loops internally until the user makes a definitive choice.
+   - If **STABILIZED** or **PROCEED**: continue to step 1.
+
 1. Locate `.planning/active/$ARGUMENTS/`. If not found, stop: "Planning not found in active state — run `/plan-agent-plan` first."
 
 2. Read all story files under `.planning/active/$ARGUMENTS/02-deepening/*.md`. Collect for each story:

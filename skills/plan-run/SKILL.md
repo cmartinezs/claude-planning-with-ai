@@ -31,6 +31,11 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
    | `.planning/active/NNN-slug/` with all stories DONE | READY TO CLOSE |
    | `.planning/finished/NNN-slug/` | COMPLETED — nothing to do |
 
+2b. **Planning context check:** Execute `[CHECK-PLANNING-CONTEXT]`.
+   - If **ABORT**: stop immediately; do not modify anything.
+   - If **INSPECT**: the sub-workflow loops internally until the user makes a definitive choice.
+   - If **STABILIZED** or **PROCEED**: continue to step 3.
+
 3. **Build the execution plan.** Determine which phases need to run:
 
    | Phase | Agent | Runs when |
