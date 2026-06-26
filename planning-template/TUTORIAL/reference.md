@@ -210,6 +210,9 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |
 | Solo la ejecución paralela de stories | `/plan-agent-execute NNN-slug` |
 | Solo la validación y cierre autónomo | `/plan-agent-validate NNN-slug` |
+| Iniciar planificación con otra en curso → pausa automática | detección automática en `/plan-run` y `/plan-agent-execute` |
+| Cambiar de story con otra en progreso → pausa automática | detección automática en `/plan-story` |
+| Retomar una story en STANDBY | `/plan-story NNN-slug story-NN` |
 
 ---
 

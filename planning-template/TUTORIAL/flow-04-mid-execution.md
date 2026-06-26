@@ -229,4 +229,102 @@ Si el trabajo es netamente técnico (deuda técnica, refactor, fix de infraestru
 
 ---
 
+## Cambiar de contexto sin perder el trabajo
+
+El plugin detecta automáticamente cuando intentas cambiar de contexto con trabajo en curso y te presenta alternativas seguras antes de tocar nada.
+
+Hay dos situaciones que lo activan:
+
+### Situación E — Iniciar una planificación mientras otra está en progreso
+
+Planning `001-auth-api` tiene story-01 en `IN PROGRESS`. Decides ejecutar una planificación diferente:
+
+```
+/plan-run 002-user-dashboard
+```
+
+El plugin detecta el conflicto, inspecciona el estado git de la rama activa y muestra:
+
+```
+⚠️  Planning context conflict detected
+
+In-progress work:
+  Planning : 001-auth-api
+  Story    : story-01 — Authentication endpoints
+  Branch   : story-01-authentication
+
+Git state on story-01-authentication:
+  Modified / staged : 3 files
+  Untracked         : 1 file
+  Unpushed commits  : 0
+  Stashes           : 0
+
+Choose how to proceed:
+
+  A) Abort          — stay on the current planning
+  B) Inspect        — show full `git diff` and story file contents; choose again afterwards
+  C) Stabilize      — commit pending work as WIP, mark stories STANDBY, return to base branch
+  D) Proceed anyway — requires typing CONFIRMAR PROCEDER
+```
+
+Si eliges **C (Estabilizar)**:
+1. El plugin hace `git add -u` + commit con prefijo `WIP:`
+2. Pregunta si quieres hacer push de la rama
+3. Marca story-01 con status `STANDBY` en su archivo
+4. Vuelve a la rama base
+5. Continúa con la ejecución de `002-user-dashboard`
+
+### Situación F — Cambiar de story mientras hay otra en progreso
+
+Estás en la rama `story-01-authentication` (story `IN PROGRESS`). Intentas ejecutar otra story del mismo u otro planning:
+
+```
+/plan-story 002-payments story-02
+```
+
+El plugin detecta el contexto y muestra:
+
+```
+⚠️  Story context conflict detected
+
+Current story : story-01 — Authentication endpoints
+Branch        : story-01-authentication
+Status        : IN PROGRESS
+
+Git state:
+  Staged              : 0 files
+  Modified (tracked)  : 4 files
+  Untracked           : 2 files
+  Unpushed commits    : 1
+  Existing stashes    : 0
+
+Choose how to proceed:
+
+  A) Abort              — stay on this story branch
+  B) Stash              — stash pending changes, then switch
+  C) Commit WIP         — commit tracked changes as WIP, then switch
+  D) Commit + Push WIP  — commit and push to remote, then switch
+  E) Commit + Push + STANDBY — D plus mark this story as STANDBY
+```
+
+La opción **B (Stash)** pregunta adicionalmente si incluir los archivos no trackeados:
+```
+Include untracked files in the stash? (yes/no)
+```
+Si respondes `no`, esos archivos quedan en el working tree y se advierten antes de cambiar de rama.
+
+La opción **E** es la más segura cuando no planeas retomar la historia pronto: deja el trabajo guardado, pusheado y el sistema en un estado documentado.
+
+### Retomar una historia en STANDBY
+
+Una historia en `STANDBY` es completamente recuperable. Simplemente vuelve a ejecutarla:
+
+```
+/plan-story 001-auth-api story-01
+```
+
+El pre-flight detecta que la rama ya existe, pregunta si retomar en ella, y la historia continúa desde donde se detuvo — todas las tareas ya completadas siguen marcadas como `DONE`.
+
+---
+
 > [← Tutorial](README.md)

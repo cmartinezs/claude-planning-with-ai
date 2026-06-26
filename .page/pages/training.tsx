@@ -98,6 +98,15 @@ const SCENARIOS: ScenarioCard[] = [
     commands: ['/plan-health', '/plan-validate', '/plan-rollback', '/plan-retry'],
     available: true,
   },
+  {
+    id: 'context-switch',
+    title: 'Cambio de contexto',
+    description: 'Cambia de story de forma segura: detección automática de conflicto, pausa con STANDBY y reanudación sin perder progreso.',
+    difficulty: 'intermediate',
+    durationMin: 5,
+    commands: ['/plan-status', '/plan-story'],
+    available: true,
+  },
 ]
 
 type Filter = 'all' | Difficulty
@@ -114,7 +123,7 @@ export default function TrainingCatalogPage() {
     <>
       <Head>
         <title>Entrenamientos — Planning with AI</title>
-        <meta name="description" content="Practica el plugin con escenarios reales paso a paso. 7 entrenamientos que cubren el ciclo de vida completo." />
+        <meta name="description" content="Practica el plugin con escenarios reales paso a paso. 8 entrenamientos que cubren el ciclo de vida completo." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 

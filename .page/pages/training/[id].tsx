@@ -13,6 +13,7 @@ import scenario04 from '@/data/training/scenario-04-backlog-first'
 import scenario05 from '@/data/training/scenario-05-release'
 import scenario06 from '@/data/training/scenario-06-autonomous'
 import scenario07 from '@/data/training/scenario-07-recovery'
+import scenario08 from '@/data/training/scenario-08-context-switch'
 import type { TrainingScenario } from '@/types/training'
 
 const SCENARIOS: Record<string, TrainingScenario> = {
@@ -23,6 +24,7 @@ const SCENARIOS: Record<string, TrainingScenario> = {
   'release': scenario05,
   'autonomous': scenario06,
   'recovery': scenario07,
+  'context-switch': scenario08,
 }
 
 const META_ES: Record<string, { title: string; description: string }> = {
@@ -53,6 +55,10 @@ const META_ES: Record<string, { title: string; description: string }> = {
   'recovery': {
     title: 'Recuperación',
     description: 'Diagnostica y recupera un planning bloqueado con health, validate y rollback.',
+  },
+  'context-switch': {
+    title: 'Cambio de contexto',
+    description: 'Cambia de story de forma segura: el plugin detecta el conflicto, pausa con STANDBY y permite reanudar sin perder progreso.',
   },
 }
 

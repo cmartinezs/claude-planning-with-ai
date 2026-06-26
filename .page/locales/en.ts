@@ -60,7 +60,7 @@ const en = {
       },
       {
         title: 'Mid-plan adjustments',
-        description: 'Enrich, split or add scopes without losing current progress.',
+        description: 'Enrich, split, or add stories without losing progress. When switching planning or story context, the plugin detects git conflicts, offers safe alternatives (stash, WIP commit, STANDBY), and protects work in progress.',
       },
       {
         title: 'Automatic archiving',
@@ -123,7 +123,7 @@ const en = {
       },
       {
         title: 'Training',
-        description: '7 interactive scenarios to practice the plugin step by step, from basic to advanced.',
+        description: '8 interactive scenarios to practice the plugin step by step, from basic to advanced.',
         href: '/training',
         linkLabel: 'Go to training',
         iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
