@@ -20,15 +20,15 @@ const tutorialsPage = {
       when:
         'Úsalo cuando ya hay un epic con stories definidas y quieres convertirlo en un planning ejecutable.',
       outcome:
-        'Un planning activo donde cada story del epic queda representada como un scope con criterios de cierre heredados.',
+        'Un planning activo donde cada story del epic queda representada como una story con criterios de cierre heredados.',
       steps: [
         'Revisar el epic y sus stories actuales.',
         'Enriquecer las stories que estén delgadas o sin Definition of Done.',
         'Detectar gaps del epic y agregar stories faltantes si corresponde.',
         'Crear el planning activo desde el container de stories.',
-        'Ejecutar scopes, cerrar avances y archivar al terminar.',
+        'Ejecutar stories, cerrar avances y archivar al terminar.',
       ],
-      commands: ['/us-status', '/us-enrich', '/epic-enrich', '/plan-from-epic', '/plan-scope', '/plan-done', '/plan-archive'],
+      commands: ['/us-status', '/us-enrich', '/epic-enrich', '/plan-from-epic', '/plan-story', '/plan-done', '/plan-archive'],
       source: 'planning-template/TUTORIAL/flow-01-epic.md',
     },
     {
@@ -37,15 +37,15 @@ const tutorialsPage = {
       when:
         'Úsalo para trabajo transversal, técnico o de infraestructura que no pertenece a una user story de producto.',
       outcome:
-        'Una idea inicial se transforma en scopes ejecutables dentro de .planning/active/.',
+        'Una idea inicial se transforma en stories ejecutables dentro de .planning/active/.',
       steps: [
         'Capturar la idea en modo interactivo o como plantilla en blanco.',
         'Crear el planning desde el documento de idea o desde un intent inline.',
-        'Expandir la idea para producir scopes, dependencias y criterios de éxito.',
-        'Atomizar scopes si necesitas tareas técnicas más pequeñas.',
-        'Ejecutar y cerrar cada scope.',
+        'Expandir la idea para producir stories, dependencias y criterios de éxito.',
+        'Atomizar stories si necesitas tareas técnicas más pequeñas.',
+        'Ejecutar y cerrar cada story.',
       ],
-      commands: ['/plan-template', '/plan-new', '/plan-expand', '/plan-atomize', '/plan-task', '/plan-scope', '/plan-done'],
+      commands: ['/plan-template', '/plan-new', '/plan-expand', '/plan-atomize', '/plan-task', '/plan-story', '/plan-done'],
       source: 'planning-template/TUTORIAL/flow-02-general.md',
     },
     {
@@ -74,12 +74,12 @@ const tutorialsPage = {
         'El planning activo se adapta sin perder trazabilidad ni forzar trabajo obsoleto.',
       steps: [
         'Determinar si el cambio es solo de ejecución o también debe quedar en backlog de producto.',
-        'Agregar scopes nuevos al planning activo.',
-        'Profundizar scopes incompletos antes de ejecutarlos.',
-        'Dividir scopes demasiado amplios.',
-        'Saltar, revertir o reintentar scopes según el tipo de cambio.',
+        'Agregar stories nuevas al planning activo.',
+        'Profundizar stories incompletas antes de ejecutarlas.',
+        'Dividir stories demasiado amplias.',
+        'Saltar, revertir o reintentar stories según el tipo de cambio.',
       ],
-      commands: ['/plan-enrich-epic', '/plan-enrich-story', '/plan-split-story', '/plan-scope-skip', '/plan-rollback', '/plan-retry'],
+      commands: ['/plan-enrich-epic', '/plan-enrich-story', '/plan-split-story', '/plan-story-skip', '/plan-rollback', '/plan-retry'],
       source: 'planning-template/TUTORIAL/flow-04-mid-execution.md',
     },
     {
@@ -94,7 +94,7 @@ const tutorialsPage = {
         'Revisar el plan de ejecución propuesto.',
         'Confirmar una sola vez.',
         'Dejar que el agente de planificación cree o expanda.',
-        'Dejar que el agente de ejecución atomice y corra scopes, y que el agente de cierre valide y archive.',
+        'Dejar que el agente de ejecución atomice y corra stories, y que el agente de cierre valide y archive.',
       ],
       commands: ['/plan-run', '/plan-agent-plan', '/plan-agent-execute', '/plan-agent-validate'],
       source: 'planning-template/TUTORIAL/flow-05-autonomous.md',

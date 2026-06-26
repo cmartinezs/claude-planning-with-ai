@@ -55,7 +55,7 @@ const commandsPage = {
           description: 'Crea una nueva entrada de planning en estado INITIAL.',
           details: [
             'Acepta una captura inline rápida o un documento de idea enriquecido.',
-            'Crea los archivos base del planning sin expandir todavía los scopes.',
+            'Crea los archivos base del planning sin expandir todavía las stories.',
             'Requiere que .planning/ exista previamente.',
           ],
           source: 'skills/plan-new/SKILL.md',
@@ -105,7 +105,7 @@ const commandsPage = {
           description: 'Muestra el estado de enriquecimiento de las stories de un container.',
           details: [
             'Detecta si cada story tiene DoD, notas técnicas y dependencias.',
-            'Indica si ya está vinculada a un scope activo de planning.',
+            'Indica si ya está vinculada a una story activa del planning.',
             'Sirve para preparar backlog antes de planificar.',
           ],
           source: 'skills/us-status/SKILL.md',
@@ -126,8 +126,8 @@ const commandsPage = {
           usage: '/plan-from-epic <NNN> <path/to/container> [--filter field=value]',
           description: 'Genera un planning activo completo desde un container de stories.',
           details: [
-            'Convierte cada story en un scope ejecutable.',
-            'Hereda criterios de aceptación y Definition of Done como done criteria del scope.',
+            'Convierte cada story en una story ejecutable.',
+            'Hereda criterios de aceptación y Definition of Done como done criteria de la story.',
             'Actúa como puente entre backlog de producto y ejecución técnica.',
           ],
           source: 'skills/plan-from-epic/SKILL.md',
@@ -136,38 +136,38 @@ const commandsPage = {
     },
     {
       title: 'Expansión y preparación',
-      description: 'Comandos para convertir una idea inicial en scopes y tareas listas para ejecutar.',
+      description: 'Comandos para convertir una idea inicial en stories y tareas listas para ejecutar.',
       commands: [
         {
           name: '/plan-expand',
           usage: '/plan-expand <NNN-slug>',
           description: 'Avanza un planning desde INITIAL a EXPANSION.',
           details: [
-            'Completa 01-expansion.md con scopes, dependencias y criterios de éxito.',
-            'Crea archivos de scope en 02-deepening/.',
+            'Completa 01-expansion.md con stories, dependencias y criterios de éxito.',
+            'Crea archivos de story en 02-deepening/.',
             'Mueve el planning a active/ y actualiza índices.',
           ],
           source: 'skills/plan-expand/SKILL.md',
         },
         {
           name: '/plan-atomize',
-          usage: '/plan-atomize <NNN-slug> [scope-NN]',
-          description: 'Descompone un scope en tareas atómicas.',
+          usage: '/plan-atomize <NNN-slug> [story-NN]',
+          description: 'Descompone una story en tareas atómicas.',
           details: [
             'Crea un archivo por tarea con diseño técnico, pasos de implementación, tests y done criteria.',
-            'Puede aplicarse a un scope específico o a todo el planning.',
+            'Puede aplicarse a una story específica o a todo el planning.',
             'Se usa después de expandir y antes de ejecutar cuando se necesita más granularidad.',
           ],
           source: 'skills/plan-atomize/SKILL.md',
         },
         {
           name: '/plan-task-validate',
-          usage: '/plan-task-validate <NNN-slug> [scope-NN] [task-NN]',
+          usage: '/plan-task-validate <NNN-slug> [story-NN] [task-NN]',
           description: 'Audita tareas atómicas contra el checklist de atomicidad.',
           details: [
             'Es de solo lectura.',
-            'Valida una tarea, un scope o todos los scopes atomizados.',
-            'Compara tareas con el índice del scope y criterios de atomicidad.',
+            'Valida una tarea, una story o todas las stories atomizadas.',
+            'Compara tareas con el índice de la story y criterios de atomicidad.',
           ],
           source: 'skills/plan-task-validate/SKILL.md',
         },
@@ -175,11 +175,11 @@ const commandsPage = {
     },
     {
       title: 'Ejecución y cierre',
-      description: 'Comandos centrales para ejecutar scopes, cerrar tareas y archivar trabajo terminado.',
+      description: 'Comandos centrales para ejecutar stories, cerrar tareas y archivar trabajo terminado.',
       commands: [
         {
           name: '/plan-task',
-          usage: '/plan-task <NNN-slug> <scope-NN> <task-NN>',
+          usage: '/plan-task <NNN-slug> <story-NN> <task-NN>',
           description: 'Ejecuta una tarea atómica individual.',
           details: [
             'Sigue el diseño técnico de la tarea y aplica implementación y tests.',
@@ -201,12 +201,12 @@ const commandsPage = {
         },
         {
           name: '/plan-done',
-          usage: '/plan-done <NNN-slug> <scope-NN> [task-N]',
-          description: 'Marca una tarea o todo un scope como terminado.',
+          usage: '/plan-done <NNN-slug> <story-NN> [task-N]',
+          description: 'Marca una tarea o toda una story como terminada.',
           details: [
             'Verifica criterios de completitud antes de avanzar.',
-            'Al cerrar un scope completo: hace push y abre PR si la rama del scope está activa.',
-            'Avanza el planning cuando todos los scopes están completos.',
+            'Al cerrar una story completa: hace push y abre PR si la rama de la story está activa.',
+            'Avanza el planning cuando todas las stories están completas.',
           ],
           source: 'skills/plan-done/SKILL.md',
         },
@@ -215,7 +215,7 @@ const commandsPage = {
           usage: '/plan-validate [NNN-slug]',
           description: 'Valida la integridad estructural de uno o todos los plannings.',
           details: [
-            'Revisa ubicación de archivos, consistencia de scopes, workflows, dependencias y done criteria.',
+            'Revisa ubicación de archivos, consistencia de stories, workflows, dependencias y done criteria.',
             'Incluye validaciones sobre archivos de tareas atomizadas.',
             'Es una auditoría previa útil antes de cerrar o archivar.',
           ],
@@ -241,43 +241,43 @@ const commandsPage = {
         {
           name: '/plan-enrich-epic',
           usage: '/plan-enrich-epic <NNN-slug>',
-          description: 'Agrega nuevos scopes a un planning activo.',
+          description: 'Agrega nuevas stories a un planning activo.',
           details: [
             'Se usa cuando aparece cobertura faltante después de la expansión inicial.',
             'Funciona sobre plannings en EXPANSION o DEEPENING.',
-            'Mantiene la coherencia de índices y archivos de scope.',
+            'Mantiene la coherencia de índices y archivos de story.',
           ],
           source: 'skills/plan-enrich-epic/SKILL.md',
         },
         {
           name: '/plan-enrich-story',
-          usage: '/plan-enrich-story <NNN-slug> <scope-NN>',
-          description: 'Profundiza un scope underspecified, ambiguo o incompleto.',
+          usage: '/plan-enrich-story <NNN-slug> <story-NN>',
+          description: 'Profundiza una story underspecified, ambigua o incompleta.',
           details: [
-            'No cambia el estado del scope.',
+            'No cambia el estado de la story.',
             'Agrega detalle suficiente para poder ejecutar con menor incertidumbre.',
-            'Sirve cuando el scope existe pero no tiene criterios o contexto suficiente.',
+            'Sirve cuando la story existe pero no tiene criterios o contexto suficiente.',
           ],
           source: 'skills/plan-enrich-story/SKILL.md',
         },
         {
           name: '/plan-split-story',
-          usage: '/plan-split-story <NNN-slug> <scope-NN>',
-          description: 'Divide un scope demasiado grande en scopes más pequeños.',
+          usage: '/plan-split-story <NNN-slug> <story-NN>',
+          description: 'Divide una story demasiado grande en stories más pequeñas.',
           details: [
-            'Reemplaza el scope original por dos o más scopes enfocados.',
+            'Reemplaza la story original por dos o más stories enfocadas.',
             'Actualiza 01-expansion.md y los archivos bajo 02-deepening/.',
-            'Es útil cuando un scope mezcla responsabilidades o excede un tamaño ejecutable.',
+            'Es útil cuando una story mezcla responsabilidades o excede un tamaño ejecutable.',
           ],
           source: 'skills/plan-split-story/SKILL.md',
         },
         {
           name: '/plan-merge',
-          usage: '/plan-merge <NNN-source> <scope-NN> <NNN-target>',
-          description: 'Mueve un scope desde un planning activo a otro.',
+          usage: '/plan-merge <NNN-source> <story-NN> <NNN-target>',
+          description: 'Mueve una story desde un planning activo a otro.',
           details: [
             'Actualiza ambos archivos 01-expansion.md.',
-            'Relocaliza el archivo de scope.',
+            'Relocaliza el archivo de story.',
             'Preserva carpetas de tareas atomizadas cuando existen.',
           ],
           source: 'skills/plan-merge/SKILL.md',
@@ -295,21 +295,21 @@ const commandsPage = {
         },
         {
           name: '/plan-rollback',
-          usage: '/plan-rollback <NNN-slug> <scope-NN>',
-          description: 'Revierte un scope de DONE a TODO.',
+          usage: '/plan-rollback <NNN-slug> <story-NN>',
+          description: 'Revierte una story de DONE a TODO.',
           details: [
             'Se usa cuando una ejecución dejó el código en mal estado y debe repetirse.',
             'Puede remover carpeta de tareas atomizadas asociada.',
-            'Prepara el scope para re-ejecución controlada.',
+            'Prepara la story para re-ejecución controlada.',
           ],
           source: 'skills/plan-rollback/SKILL.md',
         },
         {
           name: '/plan-retry',
           usage: '/plan-retry <NNN-slug>',
-          description: 'Reintenta todos los scopes BLOCKED de un planning.',
+          description: 'Reintenta todas las stories BLOCKED de un planning.',
           details: [
-            'Resetea scopes bloqueados a TODO.',
+            'Resetea stories bloqueadas a TODO.',
             'Re-ejecuta plan-story para retomarlos.',
             'Debe usarse después de resolver el bloqueo externo o técnico.',
           ],
@@ -326,7 +326,7 @@ const commandsPage = {
           usage: '/plan-status',
           description: 'Muestra el estado actual de todos los plannings.',
           details: [
-            'Lista plannings activos y sus scopes.',
+            'Lista plannings activos y sus stories.',
             'Ayuda a decidir el siguiente comando a ejecutar.',
             'Opera sobre el sistema .planning/.',
           ],
@@ -359,7 +359,7 @@ const commandsPage = {
           usage: '/plan-report <NNN-slug>',
           description: 'Genera un resumen ejecutivo del planning.',
           details: [
-            'Incluye objetivo, avance de scopes, decisiones técnicas, duración y siguientes pasos.',
+            'Incluye objetivo, avance de stories, decisiones técnicas, duración y siguientes pasos.',
             'Sirve para comunicar estado fuera del equipo técnico.',
             'Resume también preguntas abiertas cuando existen.',
           ],
@@ -382,7 +382,7 @@ const commandsPage = {
           description: 'Exporta un planning como documento formateado.',
           details: [
             'Puede generar descripción de PR, lista de tickets o markdown standalone.',
-            'Incluye scopes, done criteria, preguntas abiertas y referencias.',
+            'Incluye stories, done criteria, preguntas abiertas y referencias.',
             'Es de solo lectura sobre el planning.',
           ],
           source: 'skills/plan-export/SKILL.md',
@@ -392,7 +392,7 @@ const commandsPage = {
           usage: '/plan-clone <NNN-source-slug> <NNN-target-slug>',
           description: 'Clona un planning con un nuevo ID.',
           details: [
-            'Copia la estructura de scopes.',
+            'Copia la estructura de stories.',
             'Resetea todos los estados a TODO.',
             'Sirve para repetir un patrón probado en otro contexto.',
           ],
@@ -406,10 +406,10 @@ const commandsPage = {
       commands: [
         {
           name: '/doc-generate',
-          usage: '/doc-generate <NNN-slug> [<scope-NN> [<task-NN>]]',
+          usage: '/doc-generate <NNN-slug> [<story-NN> [<task-NN>]]',
           description: 'Genera documentación desde artefactos de planning.',
           details: [
-            'Puede trabajar a nivel tarea, scope o planning.',
+            'Puede trabajar a nivel tarea, story o planning.',
             'Produce inline docs, ADRs, changelogs o guías de usuario según área y nivel.',
             'Detecta el área afectada antes de decidir el tipo de documentación.',
           ],
@@ -417,12 +417,12 @@ const commandsPage = {
         },
         {
           name: '/doc-task',
-          usage: '/doc-task <NNN-slug> <scope-NN> <task-NN>',
+          usage: '/doc-task <NNN-slug> <story-NN> <task-NN>',
           description: 'Genera documentación para una tarea atómica completada.',
           details: [
             'Wrapper delgado sobre doc-generate.',
             'Se invoca automáticamente desde plan-task cuando corresponde.',
-            'Produce documentación inline o ADR según el área del scope.',
+            'Produce documentación inline o ADR según el área de la story.',
           ],
           source: 'skills/doc-task/SKILL.md',
         },
@@ -529,9 +529,9 @@ const commandsPage = {
         {
           name: '/plan-agent-execute',
           usage: '/plan-agent-execute <NNN-slug>',
-          description: 'Agente de ejecución de scopes pendientes.',
+          description: 'Agente de ejecución de stories pendientes.',
           details: [
-            'Atomiza y ejecuta scopes independientes en paralelo usando subagentes.',
+            'Atomiza y ejecuta stories independientes en paralelo usando subagentes.',
             'Respeta orden de dependencias.',
             'Se enfoca en avanzar el trabajo pendiente de un planning.',
           ],
@@ -543,7 +543,7 @@ const commandsPage = {
           description: 'Agente de validación y cierre.',
           details: [
             'Ejecuta plan-validate.',
-            'Marca done y archiva si todos los scopes pasan.',
+            'Marca done y archiva si todas las stories pasan.',
             'Se detiene sin archivar si encuentra problemas.',
           ],
           source: 'skills/plan-agent-validate/SKILL.md',

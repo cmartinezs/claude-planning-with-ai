@@ -20,15 +20,15 @@ const tutorialsPage = {
       when:
         'Use this when an epic already has defined stories and you want to turn it into an executable planning.',
       outcome:
-        'An active planning where each epic story becomes a scope with inherited closure criteria.',
+        'An active planning where each epic story becomes a story with inherited closure criteria.',
       steps: [
         'Review the epic and its current stories.',
         'Enrich stories that are thin or missing a Definition of Done.',
         'Detect epic gaps and add missing stories when needed.',
         'Create the active planning from the story container.',
-        'Execute scopes, close progress, and archive when finished.',
+        'Execute stories, close progress, and archive when finished.',
       ],
-      commands: ['/us-status', '/us-enrich', '/epic-enrich', '/plan-from-epic', '/plan-scope', '/plan-done', '/plan-archive'],
+      commands: ['/us-status', '/us-enrich', '/epic-enrich', '/plan-from-epic', '/plan-story', '/plan-done', '/plan-archive'],
       source: 'planning-template/TUTORIAL/flow-01-epic.md',
     },
     {
@@ -37,15 +37,15 @@ const tutorialsPage = {
       when:
         'Use this for transversal, technical, or infrastructure work that does not belong to a product user story.',
       outcome:
-        'An initial idea turns into executable scopes inside .planning/active/.',
+        'An initial idea turns into executable stories inside .planning/active/.',
       steps: [
         'Capture the idea in interactive mode or as a blank template.',
         'Create the planning from the idea document or an inline intent.',
-        'Expand the idea to produce scopes, dependencies, and success criteria.',
-        'Atomize scopes if you need smaller technical tasks.',
-        'Execute and close each scope.',
+        'Expand the idea to produce stories, dependencies, and success criteria.',
+        'Atomize stories if you need smaller technical tasks.',
+        'Execute and close each story.',
       ],
-      commands: ['/plan-template', '/plan-new', '/plan-expand', '/plan-atomize', '/plan-task', '/plan-scope', '/plan-done'],
+      commands: ['/plan-template', '/plan-new', '/plan-expand', '/plan-atomize', '/plan-task', '/plan-story', '/plan-done'],
       source: 'planning-template/TUTORIAL/flow-02-general.md',
     },
     {
@@ -69,17 +69,17 @@ const tutorialsPage = {
       id: 'flow-d',
       title: 'Flow D - Adjust during execution',
       when:
-        'Use this when a planning is already active and new work, ambiguity, oversizing, or scope changes appear.',
+        'Use this when a planning is already active and new work, ambiguity, oversizing, or story changes appear.',
       outcome:
         'The active planning adapts without losing traceability or forcing obsolete work.',
       steps: [
         'Determine whether the change is execution-only or also needs product backlog tracking.',
-        'Add new scopes to the active planning.',
-        'Deepen incomplete scopes before executing them.',
-        'Split oversized scopes.',
-        'Skip, roll back, or retry scopes depending on the change.',
+        'Add new stories to the active planning.',
+        'Deepen incomplete stories before executing them.',
+        'Split oversized stories.',
+        'Skip, roll back, or retry stories depending on the change.',
       ],
-      commands: ['/plan-enrich-epic', '/plan-enrich-story', '/plan-split-story', '/plan-scope-skip', '/plan-rollback', '/plan-retry'],
+      commands: ['/plan-enrich-epic', '/plan-enrich-story', '/plan-split-story', '/plan-story-skip', '/plan-rollback', '/plan-retry'],
       source: 'planning-template/TUTORIAL/flow-04-mid-execution.md',
     },
     {
@@ -94,7 +94,7 @@ const tutorialsPage = {
         'Review the proposed execution plan.',
         'Confirm once.',
         'Let the planning agent create or expand.',
-        'Let the execution agent atomize and run scopes, and the closure agent validate and archive.',
+        'Let the execution agent atomize and run stories, and the closure agent validate and archive.',
       ],
       commands: ['/plan-run', '/plan-agent-plan', '/plan-agent-execute', '/plan-agent-validate'],
       source: 'planning-template/TUTORIAL/flow-05-autonomous.md',
