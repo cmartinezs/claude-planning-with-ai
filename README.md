@@ -12,7 +12,7 @@
 **Structured lifecycle planning for software projects**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.3.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-2.4.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
 [![Platform](https://img.shields.io/badge/Claude%20Code-plugin-7C3AED?style=flat-square)](https://claude.ai/code)
 [![Storage](https://img.shields.io/badge/storage-plain%20markdown-6B7280?style=flat-square)](planning-template/)
 [![Author](https://img.shields.io/badge/author-cmartinezs-0EA5E9?style=flat-square)](https://cmartinezs.github.io)
@@ -61,17 +61,17 @@ claude plugin update claude-planning-with-ai@cmartinezs
 
 ```bash
 /plan-new 001-user-auth -- Implement JWT authentication
-/plan-expand  001-user-auth          # INITIAL → EXPANSION (identify scopes)
-/plan-atomize 001-user-auth scope-01 # optional: atomic tasks (design + impl + unit tests)
-/plan-task    001-user-auth scope-01 task-01 # execute one atomic task
-/plan-scope   001-user-auth scope-01 # DEEPENING (execute scope tasks)
-/plan-done    001-user-auth scope-01 # mark scope complete
-/plan-archive 001-user-auth          # audit + move to finished/
+/plan-expand  001-user-auth           # INITIAL → EXPANSION (identify stories)
+/plan-atomize 001-user-auth story-01  # optional: atomic tasks (design + impl + unit tests)
+/plan-task    001-user-auth story-01 task-01  # execute one atomic task
+/plan-story   001-user-auth story-01  # DEEPENING (execute story tasks)
+/plan-done    001-user-auth story-01  # mark story complete
+/plan-archive 001-user-auth           # audit + move to finished/
 ```
 
 Or generate a planning directly from existing stories:
 ```bash
-/plan-from-epic 001 path/to/epic/   # 1 story = 1 scope
+/plan-from-epic 001 path/to/epic/   # 1 user story = 1 planning story
 ```
 
 ---
@@ -79,11 +79,11 @@ Or generate a planning directly from existing stories:
 ## Why this plugin
 
 - **Lifecycle enforcement** — INITIAL → EXPANSION → DEEPENING → COMPLETED. No skipping.
-- **Area-aware traceability** — every scope records which directories it touches (`AP`, `WB`, `IN`…).
+- **Area-aware traceability** — every story records which directories it touches (`AP`, `WB`, `IN`…).
 - **Auto-configured for your project** — `/plan-init` discovers your structure; you confirm.
 - **Backlog bridge** — convert existing epics/stories into executable plannings in one command.
-- **Atomic task decomposition** — `/plan-atomize` turns a scope into session-sized tasks, each with technical design, implementation steps, and unit tests.
-- **Mid-execution adjustments** — enrich, split, or deepen scopes without losing history.
+- **Atomic task decomposition** — `/plan-atomize` turns a story into session-sized tasks, each with technical design, implementation steps, and unit tests.
+- **Mid-execution adjustments** — enrich, split, or deepen stories without losing history. Switching context triggers git-state validation and safe alternatives (stash, WIP commit, STANDBY).
 - **Self-checking** — `/plan-validate` audits structure, dependencies, and workflow references at any time.
 - **Pure markdown** — no lock-in, readable in any editor, version-controlled with your code.
 
@@ -94,7 +94,7 @@ Or generate a planning directly from existing stories:
 | Group | Commands |
 |-------|----------|
 | Init | `/plan-init` · `--blank` · `--force` |
-| Lifecycle | `/plan-new` · `/plan-expand` · `/plan-scope` · `/plan-done` · `/plan-archive` |
+| Lifecycle | `/plan-new` · `/plan-expand` · `/plan-story` · `/plan-done` · `/plan-archive` |
 | Atomic tasks | `/plan-atomize` · `/plan-task` · `/plan-task-validate` |
 | Status / ideas | `/plan-status` · `/plan-validate` · `/plan-template` |
 | Backlog | `/us-new` · `/us-enrich` · `/epic-enrich` · `/plan-from-epic` |
