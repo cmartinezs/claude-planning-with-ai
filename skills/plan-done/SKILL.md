@@ -45,7 +45,8 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
 
 After step 4b, if no specific task number was given (story fully done):
 
-6. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if absent).
+6. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if absent) and `execution.requires_git` (default: `true`).
+   - If `execution.requires_git` is `false`, skip steps 7–11 and note in the report that push and PR creation are disabled by `.planning/config.yml`.
 7. Derive the expected branch name: `story-NN-<slug>` (the story filename without `.md`).
 8. Check whether the current branch matches the story branch:
    ```bash

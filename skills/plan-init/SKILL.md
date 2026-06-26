@@ -209,6 +209,19 @@ Replace the `<!-- AREAS-TABLE -->` placeholder table with the project's actual a
 
 ### 8 — Git configuration
 
+Ask the user which project mode should be written to `.planning/config.yml`:
+
+```
+Project mode [software]:
+  software      Source code, services, apps, infrastructure, automation
+  general       General project delivery
+  documentation Docs, guides, content, knowledge bases
+  research      Discovery, analysis, experiments
+  operations    Process, support, rollout, coordination
+```
+
+Accept Enter as `software`. If the user selects `general`, `documentation`, `research`, or `operations`, set `execution.requires_tests: false`. For `general`, `research`, and `operations`, set `execution.requires_git: false` unless the user explicitly asks to keep git required.
+
 Detect the project's default remote branch:
 ```bash
 git remote show origin 2>/dev/null | grep "HEAD branch" | awk '{print $NF}'
@@ -230,11 +243,11 @@ git:
   base_branch: <confirmed-value>
 
 project:
-  type: software      # software | general | documentation | research | operations
+  type: <confirmed-project-mode>      # software | general | documentation | research | operations
 
 execution:
-  requires_git: true
-  requires_tests: true
+  requires_git: <true-or-false>
+  requires_tests: <true-or-false>
 
 docs:
   output_dir: docs

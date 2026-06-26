@@ -23,20 +23,22 @@ Reference workflows:
 
 Before executing any story work:
 
-0. **Story context check:** Execute `[CHECK-STORY-CONTEXT]`.
+0. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if file or key is absent) and `execution.requires_git` (default: `true`).
+   - If `execution.requires_git` is `false`, skip the remaining Git pre-flight steps and continue directly to story execution.
+
+0a. **Story context check:** If `execution.requires_git` is `true`, execute `[CHECK-STORY-CONTEXT]`.
    - If **ABORT**: stop immediately; report that the user chose to stay on the current story branch.
    - If **STASHED**, **COMMITTED**, **COMMITTED_PUSHED**, or **STANDBY**: continue to step 1.
    - If **OK** (no conflicting story branch): continue to step 1.
 
-1. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if file or key is absent).
-2. Derive the branch name from the story filename: the story file is `story-NN-<slug>.md` → branch name is `story-NN-<slug>` (the filename without `.md`).
-3. Check for an existing local branch:
+1. Derive the branch name from the story filename: the story file is `story-NN-<slug>.md` → branch name is `story-NN-<slug>` (the filename without `.md`).
+2. Check for an existing local branch:
    ```bash
    git branch --list <branch-name>
    ```
    - If the branch already exists: ask whether to resume on it (`git checkout <branch-name>`) or abort. Do not recreate it.
    - If it does not exist: proceed.
-4. Sync the base branch and create the story branch:
+3. Sync the base branch and create the story branch:
    ```bash
    git fetch origin
    git checkout <base_branch>
@@ -79,17 +81,19 @@ Before executing any story work:
 
 After the story is marked DONE:
 
-8. Sync with the base branch before pushing:
+8. If `execution.requires_git` is `false`, skip Git finalize and report that branch, push, and PR creation were disabled by `.planning/config.yml`.
+
+9. Sync with the base branch before pushing:
    ```bash
    git fetch origin
    git rebase origin/<base_branch>
    ```
    If the rebase has conflicts: stop, list the conflicting files, and ask the user to resolve them before continuing.
-9. Push the story branch:
-   ```bash
-   git push -u origin <branch-name>
-   ```
-10. Open a pull request targeting `<base_branch>`:
+10. Push the story branch:
+    ```bash
+    git push -u origin <branch-name>
+    ```
+11. Open a pull request targeting `<base_branch>`:
     ```bash
     gh pr create \
       --title "<story-NN>: <story-name>" \
@@ -98,7 +102,7 @@ After the story is marked DONE:
     ```
     If `gh` is not available, print the push URL and instruct the user to open the PR manually.
 
-11. Report: story completed, N tasks done, done criteria satisfied, doc files written (from step 7b), branch `<branch-name>` pushed, PR URL.
+12. Report: story completed, N tasks done, done criteria satisfied, doc files written (from step 7b), branch `<branch-name>` pushed, PR URL when git is enabled.
 
 > To find the next story, use `/plan-status`, then run `/plan-story <planning-id> <next-story-id>`.
 > To decompose a story into atomic task files before executing it, use `/plan-atomize <planning-id> <story-id>`. To execute a single atomic task, use `/plan-task`.

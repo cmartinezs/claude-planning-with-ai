@@ -18,8 +18,13 @@ A transversal work unit within a planning. Defined during the EXPANSION phase an
 
 ---
 
+### Work Item / Deliverable
+The general-project equivalent of a user story. In software projects, the planning item is usually a user story or technical story. In research, documentation, operations, or business projects, the same planning layer can represent a deliverable, work package, decision, experiment, or action group.
+
+---
+
 ### Atomic Task
-The smallest executable unit of work, produced by decomposing a story with `/plan-atomize` (the `ATOMIZE-STORY` workflow). Lives as one file per task under `02-deepening/story-NN-name/`, and the story's task table becomes its index. Every atomic task must satisfy the atomicity requirements verified by `[CHECK-ATOMICITY]`: a single verifiable deliverable, independent executability (or explicit dependencies), a technical design, concrete implementation steps, a unit test plan, binary done criteria, a workflow reference from the catalog, and a size that fits one work session.
+The smallest executable unit of work, produced by decomposing a story with `/plan-atomize` (the `ATOMIZE-STORY` workflow). Lives as one file per task under `02-deepening/story-NN-name/`, and the story's task table becomes its index. Every atomic task must satisfy the atomicity requirements verified by `[CHECK-ATOMICITY]`: a single verifiable deliverable, independent executability (or explicit dependencies), a technical design or execution approach, concrete implementation steps, verification evidence, binary done criteria, a workflow reference from the catalog, and a size that fits one work session.
 
 ---
 
@@ -50,6 +55,35 @@ The third phase. One file per story under `02-deepening/`. Each file specifies d
 
 ### COMPLETED
 The final state of a planning. All stories are done, all traceability is updated, and the planning is archived in `finished/`. Documents are not modified after this point.
+
+---
+
+### Story Statuses
+Valid story statuses are:
+
+| Status | Meaning | Closable? |
+|--------|---------|-----------|
+| `TODO` | Story is defined but not started. | No |
+| `IN PROGRESS` | Story execution has started and is actively being worked. | No |
+| `DONE` | Story done criteria were verified and the story is complete. | Yes |
+| `BLOCKED` | Story cannot proceed because of an unresolved dependency, missing information, failing validation, or external blocker. | No |
+| `SKIPPED` | Story is intentionally no longer applicable. Must include a skipped reason. | Yes |
+| `STANDBY` | Story was intentionally paused to allow context switching while preserving progress. | No |
+
+`SUPERSEDED` applies to a planning, not to an individual story. Use it when a planning is replaced by a newer planning via `SUPERSEDE-PLANNING`.
+
+---
+
+### Project Modes
+The planning system defaults to `software`, but `.planning/config.yml` can adapt behavior:
+
+| Mode | Use when | Verification expectation |
+|------|----------|--------------------------|
+| `software` | Source code, services, apps, infrastructure, automation | Tests, build checks, linting, runtime checks |
+| `general` | General project delivery | Evidence checklist, manual validation, stakeholder confirmation |
+| `documentation` | Docs, guides, content, knowledge bases | Review, links, rendered output, publication checks |
+| `research` | Discovery, analysis, experiments | Notes, sources, decisions, reproducible evidence |
+| `operations` | Process, support, rollout, coordination | Runbooks, approvals, checklists, handoff evidence |
 
 ---
 

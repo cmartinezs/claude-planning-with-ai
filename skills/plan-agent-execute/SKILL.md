@@ -13,7 +13,7 @@ Atomize and execute all pending stories in a planning. Independent stories run i
 
 ## Steps
 
-0. **Planning context check:** Execute `[CHECK-PLANNING-CONTEXT]`.
+0. **Planning context check:** Read `.planning/config.yml` if it exists and extract `execution.requires_git` (default: `true`). If `execution.requires_git` is `true`, execute `[CHECK-PLANNING-CONTEXT]`. If `execution.requires_git` is `false`, skip this check and continue to step 1.
    - If **ABORT**: stop immediately; do not modify anything.
    - If **INSPECT**: the sub-workflow loops internally until the user makes a definitive choice.
    - If **STABILIZED** or **PROCEED**: continue to step 1.

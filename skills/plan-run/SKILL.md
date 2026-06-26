@@ -1,11 +1,11 @@
 ---
 name: plan-run
-description: Run a planning end-to-end from the current state — detects where the planning is, shows a full execution plan, asks for one confirmation, then delegates to phase agents autonomously.
+description: Run a planning end-to-end from the current state — detects where the planning is, shows a full execution plan, asks for one confirmation, then delegates to phase agents autonomously except for critical checkpoints.
 argument-hint: [NNN-slug | "description"]
 allowed-tools: [Read, Bash, Glob]
 ---
 
-Orchestrate a complete planning run. Detects state, confirms once, then delegates to `/plan-agent-plan`, `/plan-agent-execute`, and `/plan-agent-validate` without further interruptions.
+Orchestrate a complete planning run. Detects state, confirms once, then delegates to `/plan-agent-plan`, `/plan-agent-execute`, and `/plan-agent-validate` with only critical checkpoints such as blockers, git state, or configured manual verification.
 
 ## Arguments
 
@@ -31,7 +31,7 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
    | `.planning/active/NNN-slug/` with all stories DONE | READY TO CLOSE |
    | `.planning/finished/NNN-slug/` | COMPLETED — nothing to do |
 
-2b. **Planning context check:** Execute `[CHECK-PLANNING-CONTEXT]`.
+2b. **Planning context check:** Read `.planning/config.yml` if it exists and extract `execution.requires_git` (default: `true`). If `execution.requires_git` is `true`, execute `[CHECK-PLANNING-CONTEXT]`. If `execution.requires_git` is `false`, skip this check and continue to step 3.
    - If **ABORT**: stop immediately; do not modify anything.
    - If **INSPECT**: the sub-workflow loops internally until the user makes a definitive choice.
    - If **STABILIZED** or **PROCEED**: continue to step 3.

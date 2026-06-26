@@ -26,6 +26,11 @@ Reference workflows:
    - If the story subfolder does not exist: create it, then generate `<task-id>-slug.md` from `_template/02-deepening/task-NN-name.md` filling all sections using the story file, `00-initial.md`, and `01-expansion.md` as context. Update the story's `## Tasks` table to link the task name to its new file. Then continue with the newly created file.
    - If the subfolder exists but this specific task file is missing: generate it the same way and update the story table link. Then continue.
 3. Read the task file completely: objective, technical design, implementation steps, verification (or legacy Unit Tests), done criteria, workflow, dependencies.
+3b. Read `.planning/config.yml` if it exists. Extract:
+   - `project.type` (default `software`)
+   - `execution.requires_tests` (default `true`)
+   - `execution.requires_git` (default `true`)
+   - `docs.output_dir` (default `docs`)
 4. **Readiness checks** (stop and report if any fails):
    a. Task status must not be `DONE`.
    b. Every task in `Depends On` must have status `DONE` in its own file. List the pending ones otherwise.
@@ -35,8 +40,8 @@ Reference workflows:
 6. **Execute the task**, governed by its `Workflow`:
    a. Follow the `Technical Design` as written. If reality contradicts the design, update the design section first, stating why — then proceed.
    b. Apply the `Implementation Steps` in order, announcing each one.
-   c. Run the checks listed in the `Verification` table. For code tasks, write and run the listed unit tests at their specified locations. For non-code tasks, collect the stated manual or documentary evidence.
-   d. Run the project's relevant validation command when applicable. All listed checks must pass; include the run output or evidence summary in the report.
+   c. Run the checks listed in the `Verification` table. If `execution.requires_tests` is `true`, write and run the listed unit tests for code tasks. If it is `false`, collect the stated manual, documentary, approval, or reproducibility evidence appropriate to `project.type`.
+   d. Run the project's relevant validation command when applicable. If `execution.requires_tests` is `false` and no automated validation exists, do not invent a test runner; include the evidence summary in the report instead.
 7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the output is consistent with `docs/` contracts.
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 9. Verify every `Done Criteria` item. If any is unmet, leave the task `IN PROGRESS`, list what is missing, and stop.
@@ -49,7 +54,9 @@ Reference workflows:
 
 10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
 
-10b. **Conventional commit** — commit the task output:
+10b. **Conventional commit** — commit the task output only when `execution.requires_git` is `true`:
+
+   If `execution.requires_git` is `false`, skip this step and report that git commit was disabled by `.planning/config.yml`.
 
    a. Derive the **commit type** from the task's `Objective` and `Workflow` field (first match wins):
 

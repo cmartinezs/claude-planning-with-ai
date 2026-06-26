@@ -25,7 +25,10 @@ Reference workflows:
    - If one token → **plan mode**: planning id only; discover all story files under `.planning/active/<planning-id>/02-deepening/*.md` and build the work list (exclude stories whose status is `DONE` and stories whose matching directory already contains task files).
    - If the work list is empty (plan mode), report "nothing to atomize" and stop.
 
-2. Read `00-initial.md` and `01-expansion.md` to establish planning context (done once even in plan mode).
+2. Read `00-initial.md`, `01-expansion.md`, and `.planning/config.yml` to establish planning context (done once even in plan mode). Extract:
+   - `project.type` (default `software`)
+   - `execution.requires_tests` (default `true`)
+   - `execution.requires_git` (default `true`)
 
 3. **For each story in the work list**, execute the following sub-steps:
 
@@ -50,7 +53,7 @@ Reference workflows:
       - `Objective` — the single deliverable.
       - `Technical Design` — approach, affected files, interfaces, design notes.
       - `Implementation Steps` — ordered, naming real files or components.
-      - `Verification` — unit tests for code changes, or concrete manual/evidence checks for non-code work.
+      - `Verification` — if `execution.requires_tests` is `true`, include unit or automated tests for code changes; otherwise include concrete manual/evidence checks appropriate to `project.type`.
       - `Done Criteria` — binary, verifiable conditions.
       - Header fields: `Status: TODO`, `Workflow` (from the catalog), `Depends On`.
    c. Rewrite the story's `## Tasks` table as an index: each task name becomes a link to its task file (`[Task name](<story-id>-<name>/task-NN-slug.md)`), keeping `Workflow`, `Status`, and `Output` columns in sync with the task files.
