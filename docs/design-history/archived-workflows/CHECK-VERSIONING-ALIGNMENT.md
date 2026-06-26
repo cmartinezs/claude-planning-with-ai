@@ -1,6 +1,8 @@
 # [CHECK-VERSIONING-ALIGNMENT]
 
-> [← README](README.md)
+> Archived from `planning-template/WORKFLOWS/04-SUB-WORKFLOWS/`.
+>
+> This workflow is preserved as design history only. It assumes legacy Phase 5, Phase 8, and Phase 11 document links and is not part of the installed planning template.
 
 Verifies that the versioning strategy defined in Phase 5 is consistently referenced in Phase 8 (Deployment) and Phase 11 (Feedback).
 
@@ -16,12 +18,4 @@ Verifies that the versioning strategy defined in Phase 5 is consistently referen
    - Retrospective or feedback templates reference version milestones.
 4. Open Phase 6 dev workflow (`commits/`, `pull-requests/`) and verify:
    - Release commit types or PR labels align with versioning conventions.
-5. Return: `OK` if aligned; `MISALIGNMENT` + what differs if not.
-
----
-
-**Called by:** [`GENERATE-DOCUMENT`](../02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md) (Phase 8) · [`REVIEW-COHERENCE`](../02-EXECUTION-WORKFLOWS/REVIEW-COHERENCE.md)
-
----
-
-> [← README](README.md)
+5. Return: `OK` if aligned; `MISALIGNMENT` + what differs.

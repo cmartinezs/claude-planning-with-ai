@@ -1,8 +1,10 @@
 # [CHECK-PHASE5-CHAIN]
 
-> [← README](README.md)
+> Archived from `planning-template/WORKFLOWS/04-SUB-WORKFLOWS/`.
+>
+> This workflow is preserved as design history only. It assumes a legacy Phase 5 planning artifact chain and is not part of the installed planning template.
 
-Verifies that the five Phase 5 planning artifacts form a consistent, internally linked chain: Roadmap → Epics → Use Cases → Milestones → Issue Mapping.
+Verifies that the five Phase 5 planning artifacts form a consistent, internally linked chain: Roadmap -> Epics -> Use Cases -> Milestones -> Issue Mapping.
 
 ---
 
@@ -16,13 +18,3 @@ Verifies that the five Phase 5 planning artifacts form a consistent, internally 
 6. Verify that the Versioning Strategy (`TEMPLATE-016`) is referenced in at least one Milestone or Epic.
 7. Check that no technology names appear anywhere in these documents (`[CHECK-AGNOSTIC-BOUNDARY]`).
 8. Return: `OK` if all links and rules pass; `CHAIN-BREAK` + which link is broken if not.
-
----
-
-**Called by:** [`GENERATE-DOCUMENT`](../02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md) (Phase 5) · [`REVIEW-COHERENCE`](../02-EXECUTION-WORKFLOWS/REVIEW-COHERENCE.md)
-
-**Uses:** [`[CHECK-AGNOSTIC-BOUNDARY]`](CHECK-AGNOSTIC-BOUNDARY.md)
-
----
-
-> [← README](README.md)

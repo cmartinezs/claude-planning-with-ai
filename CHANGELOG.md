@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Refreshed public docs and metadata to align with the current story-based command model (`/plan-story`, `story-NN`) and remove active references to the old `/plan-scope` workflow.
 - Updated command reference coverage for the current 44 commands, including agents, documentation, release, recovery, and maintenance commands.
 - Added general-project language to the user guide and planning task template so non-software work can use verification evidence instead of only unit-test language.
+- Archived legacy SDLC-specific sub-workflows from the installed planning template and marked `docs/superpowers/` as historical design material.
 
 ## [2.4.0] — 2026-06-25
 

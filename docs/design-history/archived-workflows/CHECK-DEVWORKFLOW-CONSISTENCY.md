@@ -1,6 +1,8 @@
 # [CHECK-DEVWORKFLOW-CONSISTENCY]
 
-> [← README](README.md)
+> Archived from `planning-template/WORKFLOWS/04-SUB-WORKFLOWS/`.
+>
+> This workflow is preserved as design history only. It assumes a legacy `06-development/workflow/` document structure and is not part of the installed planning template.
 
 Verifies that the four dev workflow templates in `06-development/workflow/` are mutually consistent.
 
@@ -15,11 +17,3 @@ Verifies that the four dev workflow templates in `06-development/workflow/` are 
 5. Verify that CI/CD environment names (`dev`, `staging`, `prod` or equivalents) are used consistently across all four files.
 6. Verify that all navigation links in these files are correct (no broken `[text](path)` references).
 7. Return: `OK` if consistent; `INCONSISTENCY` + list if not.
-
----
-
-**Called by:** [`GENERATE-DOCUMENT`](../02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md) (Phase 6 workflow area) · [`REVIEW-COHERENCE`](../02-EXECUTION-WORKFLOWS/REVIEW-COHERENCE.md)
-
----
-
-> [← README](README.md)
