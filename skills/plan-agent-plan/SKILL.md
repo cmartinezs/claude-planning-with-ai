@@ -28,7 +28,7 @@ Execute the planning phase: create (if mode is from-scratch) and expand a planni
 
 5. Verify the planning is now in `.planning/active/<NNN-slug>/` with `01-expansion.md` and at least one `02-deepening/story-NN-*.md` file.
 
-6. Optionally invoke `/plan-enrich-epic <NNN-slug>` if any created story file is missing an `Objective` or has fewer than two tasks in its task table — this indicates an underspecified scope.
+6. Optionally invoke `/plan-enrich-epic <NNN-slug>` if any created story file is missing an `Objective` or has fewer than two tasks in its task table — this indicates an underspecified story.
 
 7. Report: planning ID, number of stories created, list of story names.
 

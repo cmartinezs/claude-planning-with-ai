@@ -35,7 +35,7 @@
 
 ---
 
-## Unit Tests
+## Verification
 
 > *If the task produces no code (config, assets, docs), list manual verifications instead.*
 
@@ -48,9 +48,9 @@
 ## Done Criteria
 
 - [ ] [Deliverable exists and is verifiable: specific and binary]
-- [ ] All unit tests listed above pass
+- [ ] All verification checks listed above pass
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
-- [ ] No scope creep: the task satisfies `[CHECK-ATOMICITY]`
+- [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`
 
 ---
 

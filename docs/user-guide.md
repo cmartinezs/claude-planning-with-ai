@@ -1,263 +1,259 @@
 # Planning with AI — User Guide
 
-A complete reference for using the planning system in your project.
-
----
+A practical reference for using the planning system in a project. The plugin is optimized for software repositories, but the same markdown workflow can be adapted to documentation, research, operations, or other project work.
 
 ## Concepts
 
 ### Planning
-A self-contained unit of work tracked by the system. Each planning has a lifecycle, its own folder, and a traceability matrix. One planning = one initiative (a feature, a refactor, a migration, an epic).
 
-### Scope
-A transversal work unit inside a planning. Maps to one area of your project (a service, a module, a directory). Each scope has its own tasks, done criteria, and status.
+A self-contained initiative tracked by the system. A planning has its own folder, lifecycle files, stories, traceability, and optional generated documentation. One planning can represent a feature, refactor, migration, release slice, research effort, operational change, or documentation initiative.
 
-### Atomic task
-The smallest executable unit of work, produced by decomposing a scope with `/plan-atomize`. One file per task under `02-deepening/scope-NN-name/`, each containing its own technical design, implementation steps, unit test plan, and binary done criteria — granular enough to be implemented directly in a single session.
+### Story
+
+The executable unit inside a planning. In software projects this is usually a user story or technical story. In general projects, treat it as a deliverable or work package with clear done criteria.
+
+Each story lives under `02-deepening/story-NN-name.md`, has its own tasks, status, dependencies, repository/project area impact, and done criteria.
+
+### Atomic Task
+
+The smallest executable unit of work, produced by `/plan-atomize`. One task file lives under `02-deepening/story-NN-name/task-NN-name.md` and contains objective, technical design or approach, implementation steps, verification, and binary done criteria.
+
+For software, verification usually means unit tests or the project test runner. For non-software work, use concrete evidence such as a reviewed document, approved checklist, published asset, signed decision, or reproducible manual validation.
 
 ### Area
-A distinct surface of your project that the traceability matrix tracks. Configured once during `/plan-init`. Examples: `AP` for `api/`, `WB` for `web/`, `IN` for `infra/`. Every scope declares which areas it touches.
 
-### Lifecycle phases
+A distinct surface of the project tracked by the traceability matrix. `/plan-init` detects repository areas such as `AP` for `api/`, `WB` for `web/`, or `IN` for `infra/`. In general projects, areas can represent teams, workstreams, deliverables, departments, or folders.
+
+### Lifecycle Phases
 
 | Phase | Location | What it means |
 |-------|----------|---------------|
-| **INITIAL** | `.planning/NNN-slug/` | Idea captured — intent, motivation, rough scope |
-| **EXPANSION** | `.planning/active/NNN-slug/` | Scopes identified, dependencies mapped, area impact documented |
-| **DEEPENING** | `.planning/active/NNN-slug/02-deepening/` | Tasks defined per scope; execution happens here |
-| **COMPLETED** | `.planning/finished/NNN-slug/` | All scopes done, traceability updated, archived |
+| **INITIAL** | `.planning/NNN-slug/` | Idea captured: intent, why, rough overall scope |
+| **EXPANSION** | `.planning/active/NNN-slug/` | Stories identified, dependencies mapped, area impact documented |
+| **DEEPENING** | `.planning/active/NNN-slug/02-deepening/` | Stories and tasks are detailed and executed |
+| **COMPLETED** | `.planning/finished/NNN-slug/` | All stories are done or intentionally skipped, traceability is updated, and the planning is archived |
 
 ### Traceability
-Each planning records which terms, decisions, and concepts were introduced and which areas they affect. This produces a matrix that makes it easy to understand the blast radius of any change.
 
----
+Each planning records which terms, decisions, and concepts were introduced and which areas they affect. This makes the impact of a change easier to understand later.
 
-## Setting up a project
+## Setting Up A Project
 
-Run once, from the root of your project:
+Run once from the root of your project:
 
-```
+```text
 /plan-init
 ```
 
-The plugin will:
-1. Scan your top-level directories
-2. Propose area codes based on detected stacks
-3. Ask you to confirm or adjust
-4. Generate area files and pre-fill all traceability headers
+The plugin will scan top-level directories, propose area codes, ask you to confirm or adjust them, generate area guidance files, and pre-fill traceability headers.
 
-If you prefer manual setup:
+For manual or non-standard setup:
 
-```
+```text
 /plan-init --blank
 ```
 
-This creates the `.planning/` structure with placeholder tables that you fill in by hand.
-
----
+This creates the `.planning/` structure with placeholder tables you can fill manually.
 
 ## Workflows
 
-### Flow A — Starting from an existing epic / story container
+### Flow A — Existing Epic Or Story Container
 
-Use this when you already have user stories written somewhere (a directory of markdown files, a single doc with sections, etc.).
+Use this when you already have user stories or requirements in markdown.
 
-```
-# Enrich stories that are missing DoD or Technical Notes
+```text
+# Check and enrich the product backlog
+/us-status docs/epics/epic-05/
 /us-enrich docs/epics/epic-05/01-checkout.md
-
-# Detect gaps and add missing stories
 /epic-enrich docs/epics/epic-05/
 
-# Generate the execution planning from the container
+# Generate execution planning from the container
 /plan-from-epic 001 docs/epics/epic-05/
 
-# Execute scope by scope
-/plan-scope 001-checkout scope-01
-/plan-done  001-checkout scope-01
-/plan-scope 001-checkout scope-02
-/plan-done  001-checkout scope-02
+# Execute story by story
+/plan-story 001-checkout story-01
+/plan-done  001-checkout story-01
+/plan-story 001-checkout story-02
+/plan-done  001-checkout story-02
 
-# Archive when all scopes are done
+# Validate and archive when stories are complete
+/plan-validate 001-checkout
 /plan-archive 001-checkout
 ```
 
-**When to use:** you have a product backlog already defined and want to bridge it to an execution plan without rewriting everything.
+Use this when a product backlog already exists and you want to bridge it into executable planning without rewriting it.
 
-### Flow B — Starting from scratch
+### Flow B — Starting From Scratch
 
 Use this when you have an idea but no stories yet.
 
-```
+```text
 # Option 1: quick capture
 /plan-new 002-payment-gateway -- Integrate Stripe for subscription billing
 
-# Option 2: rich capture (interactive)
+# Option 2: rich capture
 /plan-template payment-gateway
-# ... Claude asks questions and creates .planning/ideas/payment-gateway.md
 /plan-new 002-payment-gateway @.planning/ideas/payment-gateway.md
 
-# Expand the idea into scopes
+# Expand the idea into planning stories
 /plan-expand 002-payment-gateway
 
-# Optional: decompose a scope into atomic tasks (design + implementation + unit tests per task)
-/plan-atomize 002-payment-gateway scope-01
-/plan-task    002-payment-gateway scope-01 task-01
+# Optional: decompose one story into atomic tasks
+/plan-atomize 002-payment-gateway story-01
+/plan-task    002-payment-gateway story-01 task-01
 
-# Execute (runs atomic tasks in order if the scope was atomized)
-/plan-scope 002-payment-gateway scope-01
-/plan-done  002-payment-gateway scope-01
-...
+# Execute all tasks in a story
+/plan-story 002-payment-gateway story-01
+/plan-done  002-payment-gateway story-01
+
+# Close
+/plan-validate 002-payment-gateway
 /plan-archive 002-payment-gateway
 ```
 
-**When to use:** greenfield initiative with no existing stories.
+### Flow C — Backlog Refinement Only
 
-### Flow C — Backlog refinement only (no execution yet)
+Use this when you want to improve the backlog before committing to execution.
 
-Use this when you want to enrich the backlog before committing to an execution plan.
-
-```
-# Add a new story
+```text
 /us-new docs/epics/epic-03/
-
-# Enrich it
 /us-enrich docs/epics/epic-03/07-new-story.md
-
-# Detect coverage gaps
+/us-split docs/epics/epic-03/07-new-story.md
 /epic-enrich docs/epics/epic-03/
+/us-status docs/epics/epic-03/
 ```
 
-No planning is created. Stories are enriched in place and ready for a future `/plan-from-epic`.
+No planning is created. Stories are enriched in place and can later feed `/plan-from-epic`.
 
-### Flow D — Mid-execution adjustments
+### Flow D — Mid-Execution Adjustments
 
 Use these when a planning is already active and reality has changed.
 
-```
-# Add new scopes discovered after expansion
+```text
+# Add new planning stories discovered after expansion
 /plan-enrich-epic 001-checkout
 
-# Deepen a scope that turned out to be underspecified
-/plan-enrich-story 001-checkout scope-04
+# Deepen a story that is underspecified
+/plan-enrich-story 001-checkout story-04
 
-# Split a scope that is too large to execute as a unit
-/plan-split-story 001-checkout scope-02
+# Split a story that is too large to execute as one unit
+/plan-split-story 001-checkout story-02
+
+# Skip a story that no longer applies
+/plan-story-skip 001-checkout story-06 -- requirement dropped from MVP
 ```
 
----
+### Flow E — Autonomous Pipeline
 
-## Command reference
+Use this when the planning is clear enough for a guided autonomous run.
 
-### Initialization
+```text
+/plan-run "Export reporting data as CSV"
+```
 
-| Command | Flags | Description |
-|---------|-------|-------------|
-| `/plan-init` | `--blank`, `--force` | Initialize `.planning/` and configure areas |
+`/plan-run` delegates to `/plan-agent-plan`, `/plan-agent-execute`, and `/plan-agent-validate`. It is autonomous except for critical checkpoints such as git state, blockers, or explicit user confirmation required by a called skill.
+
+## Command Reference
+
+### Setup
+
+| Command | Argument | Description |
+|---------|----------|-------------|
+| `/plan-init` | `[--blank] [--force]` | Initialize `.planning/` and configure areas |
+| `/plan-git-config` | `[--base-branch <branch>]` | View or update planning git config |
 
 ### Backlog
 
 | Command | Argument | Description |
 |---------|----------|-------------|
 | `/us-new` | `path/to/container [--interactive\|--blank]` | Add a new user story |
-| `/us-enrich` | `path/to/story.md` or story ID | Enrich with DoD, Technical Notes, Dependencies, Complexity |
+| `/us-enrich` | `path/to/story.md` or story ID | Enrich with DoD, notes, dependencies, complexity |
+| `/us-split` | `path/to/story.md` | Split an oversized user story |
+| `/us-status` | `path/to/container` | Show story readiness and enrichment status |
 | `/epic-enrich` | `path/to/container` | Detect gaps and add missing stories |
 
-### Bridge
-
-| Command | Argument | Description |
-|---------|----------|-------------|
-| `/plan-from-epic` | `NNN path/to/container [--filter field=value]` | Generate a full planning from a story container |
-
-### Lifecycle
+### Planning And Execution
 
 | Command | Argument | Description |
 |---------|----------|-------------|
 | `/plan-template` | `[slug] [--interactive\|--blank]` | Generate an idea document |
 | `/plan-new` | `NNN-slug -- intent` or `NNN-slug @path.md` | Create a planning in INITIAL |
-| `/plan-status` | — | Show all plannings and scope statuses |
-| `/plan-validate` | `[NNN-slug]` | Check structural integrity of one or all plannings (read-only) |
-| `/plan-expand` | `NNN-slug` | Advance INITIAL → EXPANSION |
-| `/plan-atomize` | `NNN-slug scope-NN` | Decompose a scope into atomic task files |
-| `/plan-task` | `NNN-slug scope-NN task-NN` | Execute a single atomic task |
-| `/plan-task-validate` | `NNN-slug [scope-NN] [task-NN]` | Audit atomic tasks against the atomicity checklist (read-only) |
-| `/plan-scope` | `NNN-slug scope-NN` | Execute all tasks in a scope |
-| `/plan-done` | `NNN-slug scope-NN [task-N]` | Mark a scope (or single task) done |
+| `/plan-from-epic` | `NNN path/to/container [--filter field=value]` | Generate a planning from a story container |
+| `/plan-expand` | `NNN-slug` | Advance INITIAL -> EXPANSION |
+| `/plan-atomize` | `NNN-slug [story-NN]` | Decompose stories into atomic task files |
+| `/plan-task` | `NNN-slug story-NN task-NN` | Execute a single atomic task |
+| `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` | Audit atomic tasks |
+| `/plan-story` | `NNN-slug story-NN` | Execute all tasks in a story |
+| `/plan-done` | `NNN-slug story-NN [task-N]` | Mark a task or story done |
+| `/plan-validate` | `[NNN-slug]` | Check structural integrity |
 | `/plan-archive` | `NNN-slug` | Audit and archive to `finished/` |
 
-### Mid-execution
+### Automation, Maintenance, Docs, Releases
 
-| Command | Argument | Description |
-|---------|----------|-------------|
-| `/plan-enrich-epic` | `NNN-slug` | Add new scopes to an active planning |
-| `/plan-enrich-story` | `NNN-slug scope-NN` | Deepen an underspecified scope |
-| `/plan-split-story` | `NNN-slug scope-NN` | Split an oversized scope into two or more |
+See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/release-*`, `/plan-health`, `/plan-report`, `/plan-export`, recovery commands, and history/status utilities.
 
----
+## Common Patterns
 
-## Common patterns
+### Filtering Stories By Priority
 
-### Filtering stories by priority
-
-```
+```text
 /plan-from-epic 003 docs/epics/epic-07/ --filter priority=P0
 ```
 
-Only P0 stories generate scopes. The rest are ignored for now.
+Only matching source stories generate planning stories.
 
-### Decomposing a scope into atomic tasks
+### Decomposing A Story Into Atomic Tasks
 
-```
-/plan-atomize 001-checkout scope-02
-/plan-task    001-checkout scope-02 task-01
-```
-
-When a scope's tasks are too coarse to implement directly, `/plan-atomize` proposes a breakdown into atomic tasks — one file each under `02-deepening/scope-02-*/`, with technical design, implementation steps, unit tests, and binary done criteria. Execute them one at a time with `/plan-task`, or all in dependency order with `/plan-scope`. Audit the breakdown anytime with `/plan-task-validate` (read-only).
-
-### Marking a single task done (not the whole scope)
-
-```
-/plan-done 001-checkout scope-02 task-3
+```text
+/plan-atomize 001-checkout story-02
+/plan-task    001-checkout story-02 task-01
 ```
 
-Useful when you want to record partial progress without closing the scope.
+Use atomization when a story's task list hides design decisions or is too coarse to execute directly.
 
-### Check current state at any time
+### Marking One Task Done
 
+```text
+/plan-done 001-checkout story-02 task-03
 ```
+
+Useful for recording partial progress without closing the whole story.
+
+### Checking Current State
+
+```text
 /plan-status
 ```
 
-Shows all plannings (INITIAL, active, completed) and the status of each scope.
+Shows plannings and story statuses.
 
-### Validate structure before archiving
+### Validating Before Archive
 
-```
+```text
 /plan-validate 001-checkout
 ```
 
-Read-only structural audit: file locations per state, scope table ↔ scope file consistency, workflow IDs against the catalog, dependency references, done criteria, and atomized task folders. Run it without arguments to validate every planning. Fix any FAIL it reports before `/plan-archive`.
+This read-only audit checks file locations, story consistency, workflow IDs, dependencies, done criteria, and atomized task folders.
 
----
+## General Projects
 
-## Working with areas
+The default language is software-oriented, but the workflow also works for non-software projects:
 
-Areas are defined once at `/plan-init` time. They become the columns of the traceability matrix — each scope records which areas it touches (`✅` impacted, `N/A` not applicable, blank = not evaluated yet).
+| Software term | General project equivalent |
+|---------------|----------------------------|
+| Planning | Initiative |
+| Story | Deliverable or work package |
+| Atomic task | Action item |
+| Unit tests | Verification evidence |
+| Repository area | Project area, team, folder, or workstream |
 
-If you add a new directory to your project and want it tracked:
-
-1. Create `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/AREA-<CODE>-<dir>.md` (copy from `AREA-EXAMPLE.md`)
-2. Add a row to the area table in `.planning/GUIDE.md`
-3. Add the column to `.planning/TRACEABILITY-GLOBAL.md` and `.planning/_template/TRACEABILITY.md`
-
----
+For non-software projects, use `/plan-init --blank` if automatic repository area detection is not useful, then define areas manually in `.planning/GUIDE.md`, `.planning/TRACEABILITY-GLOBAL.md`, and area guidance files.
 
 ## Tips
 
-- **One planning per initiative.** Don't create a planning for a task that takes 30 minutes. Use plannings for work that spans multiple sessions or areas.
-- **Enrich before generating.** Running `/us-enrich` on stories before `/plan-from-epic` produces richer scopes with better done criteria.
-- **Atomize when tasks hide design decisions.** If a scope row says "implement validation" and you can't start typing from it, `/plan-atomize` forces the design, tests, and steps to be decided before execution.
-- **`/plan-status` is your dashboard.** Check it at the start of every session to orient yourself.
-- **`/plan-validate` before `/plan-archive`.** A clean validation report means the audit will pass without surprises. It's read-only, so run it as often as you like.
-- **Residuals are not failures.** If something can't be resolved in the current scope, record it as a residual (it moves to the next planning). The system is designed for this.
-- **`finished/` is read-only.** Never edit archived plannings. If you need to continue the work, create a new planning that references the archived one.
+- **One planning per initiative.** Avoid creating plannings for trivial one-off tasks.
+- **Enrich before generating.** `/us-enrich` improves source stories before `/plan-from-epic`.
+- **Atomize when tasks hide design decisions.** `/plan-atomize` forces approach, steps, verification, and done criteria to be explicit.
+- **Use `/plan-status` as the dashboard.** Check it at the start of each session.
+- **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
+- **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

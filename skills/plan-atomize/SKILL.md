@@ -1,6 +1,6 @@
 ---
 name: plan-atomize
-description: Decompose a story into atomic tasks — one file per task with technical design, implementation steps, unit tests, and done criteria. Run after /plan-expand, before executing the story.
+description: Decompose a story into atomic tasks — one file per task with technical design, implementation steps, verification, and done criteria. Run after /plan-expand, before executing the story.
 argument-hint: <NNN-slug> [story-NN]  (e.g. 001-user-auth-api story-01 or just 001-user-auth-api)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
@@ -50,7 +50,7 @@ Reference workflows:
       - `Objective` — the single deliverable.
       - `Technical Design` — approach, affected files, interfaces, design notes.
       - `Implementation Steps` — ordered, naming real files or components.
-      - `Unit Tests` — cases, expected results, test file locations.
+      - `Verification` — unit tests for code changes, or concrete manual/evidence checks for non-code work.
       - `Done Criteria` — binary, verifiable conditions.
       - Header fields: `Status: TODO`, `Workflow` (from the catalog), `Depends On`.
    c. Rewrite the story's `## Tasks` table as an index: each task name becomes a link to its task file (`[Task name](<story-id>-<name>/task-NN-slug.md)`), keeping `Workflow`, `Status`, and `Output` columns in sync with the task files.

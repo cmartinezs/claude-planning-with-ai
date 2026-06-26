@@ -228,6 +228,16 @@ Write (or overwrite) `.planning/config.yml`:
 
 git:
   base_branch: <confirmed-value>
+
+project:
+  type: software      # software | general | documentation | research | operations
+
+execution:
+  requires_git: true
+  requires_tests: true
+
+docs:
+  output_dir: docs
 ```
 
 ### 9 — Report

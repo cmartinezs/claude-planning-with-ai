@@ -143,10 +143,10 @@ Todos los comandos disponibles con su sintaxis exacta.
 # Agregar stories nuevos al planning
 /plan-enrich-epic NNN-slug
 
-# Profundizar una story incompleto o ambiguo (no cambia su status)
+# Profundizar una story incompleta o ambigua (no cambia su status)
 /plan-enrich-story NNN-slug story-NN
 
-# Dividir una story demasiado amplio en varios (solo en TODO o IN PROGRESS)
+# Dividir una story demasiado amplia en varias (solo en TODO o IN PROGRESS)
 /plan-split-story NNN-slug story-NN
 ```
 
@@ -204,7 +204,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Trabajo nuevo apareció durante ejecución | `/plan-enrich-epic NNN-slug` |
 | Story del planning está mal especificado | `/plan-enrich-story NNN-slug story-NN` |
 | Story del planning es demasiado grande | `/plan-split-story NNN-slug story-NN` |
-| Story nueva + scope nuevo coordinados | `/us-new` → `/plan-enrich-epic` |
+| Story nueva de backlog + story nueva de planning coordinadas | `/us-new` → `/plan-enrich-epic` |
 | Cerrar el planning | `/plan-archive NNN-slug` |
 | Ejecutar todo el ciclo sin intervención | `/plan-run NNN-slug` |
 | Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |

@@ -42,7 +42,7 @@ Split `$ARGUMENTS` on whitespace:
 
 ### T1. Locate task file
 
-Find `.planning/active/<planning-id>/02-deepening/<story-id>-*/<task-id>-*.md`. If not found, stop and report. Read the file completely: Objective, Technical Design, Implementation Steps, Unit Tests, Done Criteria.
+Find `.planning/active/<planning-id>/02-deepening/<story-id>-*/<task-id>-*.md`. If not found, stop and report. Read the file completely: Objective, Technical Design, Implementation Steps, Verification (or legacy Unit Tests), Done Criteria.
 
 ### T2. Determine area
 

@@ -1,57 +1,105 @@
 # Planning with AI — Command Reference
 
-Full command listing with flags, arguments, and the structure installed by `/plan-init`.
+Full command listing with arguments and the structure installed by `/plan-init`.
 
 ---
 
 ## Commands
 
-### Project initialization (run once per project)
+### Setup
 
 | Command | What it does |
 |---------|-------------|
-| `/plan-init` | Creates `.planning/` structure and **discovers project areas interactively** |
-| `/plan-init --blank` | Same, but skips area discovery (leave placeholders for manual editing) |
-| `/plan-init --force` | Reinitializes system files without touching active plannings or area config |
+| `/plan-init [--blank] [--force]` | Creates `.planning/`, installs templates/workflows/tutorials, discovers project areas, and writes config |
+| `/plan-git-config [--base-branch <branch>]` | Shows or updates the planning system git base branch |
 
-### Product backlog layer (works on any story container)
-
-| Command | What it does |
-|---------|-------------|
-| `/us-new path/to/container/` | Add a new story to a directory or markdown file |
-| `/us-enrich path/to/story.md` | Add DoD, Technical Notes, Dependencies, Complexity |
-| `/epic-enrich path/to/container/` | Detect gaps and add new stories |
-
-### Bridge: product → execution
+### Product Backlog
 
 | Command | What it does |
 |---------|-------------|
-| `/plan-from-epic NNN path/to/container/` | Generate a full planning from a story container (1 story = 1 scope) |
+| `/us-new <path/to/container> [--interactive\|--blank]` | Adds a new user story to a directory or markdown file |
+| `/us-enrich <path/to/story.md \| story-id>` | Adds DoD, Technical Notes, Dependencies, and Complexity |
+| `/us-split <path/to/story.md>` | Splits an oversized user story into focused stories |
+| `/us-status <path/to/container>` | Shows enrichment/readiness status for stories in a container |
+| `/epic-enrich <path/to/container>` | Detects coverage gaps and adds missing stories |
 
-### Planning lifecycle
-
-| Command | What it does |
-|---------|-------------|
-| `/plan-template slug` | Generate an idea document interactively |
-| `/plan-new NNN-slug -- intent` | Create a planning in INITIAL state |
-| `/plan-new NNN-slug @path.md` | Create a planning from an idea document |
-| `/plan-status` | Show all active plannings and their scopes |
-| `/plan-validate [NNN-slug]` | Check structural integrity (file locations, scope consistency, workflow IDs, dependencies) |
-| `/plan-expand NNN-slug` | Advance INITIAL → EXPANSION |
-| `/plan-atomize NNN-slug scope-NN` | Decompose a scope into atomic task files (technical design + implementation + unit tests) |
-| `/plan-task NNN-slug scope-NN task-NN` | Execute a single atomic task end to end |
-| `/plan-task-validate NNN-slug [scope-NN] [task-NN]` | Audit atomic tasks against the atomicity checklist (read-only) |
-| `/plan-scope NNN-slug scope-NN` | Execute all tasks in a scope |
-| `/plan-done NNN-slug scope-NN` | Mark a scope complete and advance |
-| `/plan-archive NNN-slug` | Audit and archive to `finished/` |
-
-### Mid-execution adjustments
+### Product To Execution Bridge
 
 | Command | What it does |
 |---------|-------------|
-| `/plan-enrich-epic NNN-slug` | Add new scopes to an active planning |
-| `/plan-enrich-story NNN-slug scope-NN` | Deepen an underspecified scope |
-| `/plan-split-story NNN-slug scope-NN` | Split an oversized scope |
+| `/plan-from-epic <NNN> <path/to/container> [--filter field=value]` | Generates a full active planning from a story container; one source story becomes one planning story |
+
+### Planning Lifecycle
+
+| Command | What it does |
+|---------|-------------|
+| `/plan-template [slug] [--interactive\|--blank]` | Generates an idea document in `.planning/ideas/` |
+| `/plan-new <NNN-slug> -- <intent>` | Creates a planning in INITIAL state from inline intent |
+| `/plan-new <NNN-slug> @<path.md>` | Creates a planning in INITIAL state from an idea document |
+| `/plan-expand <NNN-slug>` | Advances INITIAL -> EXPANSION and creates planning stories |
+| `/plan-status` | Shows all plannings and story statuses |
+| `/plan-validate [NNN-slug]` | Checks structural integrity for one or all plannings |
+| `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done |
+| `/plan-archive <NNN-slug>` | Audits and moves a completed planning to `finished/` |
+
+### Execution
+
+| Command | What it does |
+|---------|-------------|
+| `/plan-atomize <NNN-slug> [story-NN]` | Decomposes one story or all pending stories into atomic task files |
+| `/plan-task <NNN-slug> <story-NN> <task-NN>` | Executes one atomic task end to end |
+| `/plan-task-validate <NNN-slug> [story-NN] [task-NN]` | Audits atomic tasks against the atomicity checklist |
+| `/plan-story <NNN-slug> <story-NN>` | Executes all tasks in a story |
+
+### Mid-Execution Adjustments
+
+| Command | What it does |
+|---------|-------------|
+| `/plan-enrich-epic <NNN-slug>` | Adds new stories to an active planning |
+| `/plan-enrich-story <NNN-slug> <story-NN>` | Deepens an underspecified planning story |
+| `/plan-split-story <NNN-slug> <story-NN>` | Splits an oversized planning story |
+| `/plan-story-skip <NNN-slug> <story-NN> -- <reason>` | Marks a no-longer-applicable story as SKIPPED |
+| `/plan-merge <source-planning> <target-planning> <story-NN>` | Moves a story between active plannings |
+
+### Automation Agents
+
+| Command | What it does |
+|---------|-------------|
+| `/plan-run [NNN-slug \| "description"]` | Orchestrates planning, execution, validation, and archive from the current state |
+| `/plan-agent-plan <NNN-slug \| "description">` | Runs the planning phase autonomously |
+| `/plan-agent-execute <NNN-slug>` | Executes pending stories using dependency batches and subagents |
+| `/plan-agent-validate <NNN-slug>` | Validates, closes, and archives a ready planning |
+
+### Documentation
+
+| Command | What it does |
+|---------|-------------|
+| `/doc-generate <NNN-slug> [story-NN] [task-NN]` | Generates task, story, or planning-level documentation |
+| `/doc-task <NNN-slug> <story-NN> <task-NN>` | Thin wrapper for task-level documentation |
+| `/doc-story <NNN-slug> <story-NN>` | Thin wrapper for story-level documentation |
+
+### Release Planning
+
+| Command | What it does |
+|---------|-------------|
+| `/release-init` | Initializes optional `.releases/` release planning |
+| `/release-new <version> -- <purpose>` | Creates a release in DRAFT status |
+| `/release-add <version> <planning-id...>` | Adds plannings to a release |
+| `/release-remove <version> <planning-id>` | Removes a planning from a release |
+| `/release-status [version] [--mark-*]` | Shows or updates release status |
+
+### Maintenance And Recovery
+
+| Command | What it does |
+|---------|-------------|
+| `/plan-health` | Scans the whole `.planning/` system for anomalies |
+| `/plan-report <NNN-slug>` | Generates an executive planning summary |
+| `/plan-history <NNN-slug>` | Shows status transitions from git history |
+| `/plan-standup <NNN-slug>` | Generates standup text |
+| `/plan-export <NNN-slug> --format <format>` | Exports a planning as PR text, ticket list, or markdown summary |
+| `/plan-clone <source-id> <target-id>` | Clones a planning structure into a fresh ID |
+| `/plan-retry <NNN-slug>` | Retries BLOCKED stories after blockers are resolved |
+| `/plan-rollback <NNN-slug> <story-NN>` | Reverts story planning state from DONE to TODO |
 
 ---
 
@@ -62,7 +110,7 @@ When you run `/plan-init`, the plugin scans your project's top-level directories
 - One `AREA-<CODE>-<dir>.md` file per area in `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/`
 - Pre-filled traceability matrix columns in `GUIDE.md`, `TRACEABILITY-GLOBAL.md`, and `_template/TRACEABILITY.md`
 
-Areas are the columns of the traceability matrix — every planning scope tracks which areas it touches. If your project structure changes, update the area files and matrix headers manually.
+Areas are the columns of the traceability matrix. Every planning story records which areas it touches. If your project structure changes, update the area files and matrix headers manually.
 
 ### Area code mapping
 
@@ -91,7 +139,7 @@ Areas are the columns of the traceability matrix — every planning scope tracks
 │   ├── 00-initial.md
 │   ├── 01-expansion.md
 │   ├── 02-deepening/
-│   │   ├── scope-NN-name.md
+│   │   ├── story-NN-name.md
 │   │   └── task-NN-name.md    ← atomic task blueprint (used by /plan-atomize)
 │   └── TRACEABILITY.md     ← columns filled in by plan-init
 ├── WORKFLOWS/

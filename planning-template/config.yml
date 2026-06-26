@@ -3,3 +3,13 @@
 
 git:
   base_branch: main   # Branch to branch from and target for pull requests
+
+project:
+  type: software      # software | general | documentation | research | operations
+
+execution:
+  requires_git: true
+  requires_tests: true
+
+docs:
+  output_dir: docs

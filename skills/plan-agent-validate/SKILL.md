@@ -22,8 +22,10 @@ Validate structural integrity, close all stories, and archive a completed planni
      - If all **PASS**: continue.
 
 3. Read all story files under `.planning/active/$ARGUMENTS/02-deepening/*.md` and check statuses:
-   - If any story is not `DONE`: list the non-DONE stories and stop — the planning is not ready to close.
-   - If all stories are `DONE`: continue.
+   - `DONE` and `SKIPPED` are closable states.
+   - `TODO`, `IN PROGRESS`, `BLOCKED`, and `STANDBY` are not closable.
+   - If any story is not closable: list the story and status, then stop — the planning is not ready to close.
+   - If all stories are closable: continue.
 
 4. Invoke `/plan-done $ARGUMENTS` (without story argument — marks the full planning done).
 

@@ -54,7 +54,7 @@ The `@` prefix signals a file path. The file is read in full and its content is 
 3. **Mode B only:** Read the idea document at the given path. Extract from it:
    - `Intent` — from an explicit Intent section, or from the document title/first paragraph.
    - `Why` — from a Why, Motivation, Problem, or Context section (use as-is).
-   - `Approximate Scope` — from any Scope, Areas, or Repos section.
+   - `Approximate Scope` — from any overall scope, areas, workstreams, or repos section.
    - `Open Questions` — from any Questions or Unknowns section.
    - `Requested by` — from a metadata field if present, otherwise `"human"`.
    If a section is not found in the document, leave that field as the template placeholder.

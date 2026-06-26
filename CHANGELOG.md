@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Refreshed public docs and metadata to align with the current story-based command model (`/plan-story`, `story-NN`) and remove active references to the old `/plan-scope` workflow.
+- Updated command reference coverage for the current 44 commands, including agents, documentation, release, recovery, and maintenance commands.
+- Added general-project language to the user guide and planning task template so non-software work can use verification evidence instead of only unit-test language.
+
 ## [2.4.0] — 2026-06-25
 
 ### Added
@@ -165,7 +171,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.0.0...v2.1.0

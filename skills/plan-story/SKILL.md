@@ -2,7 +2,7 @@
 name: plan-story
 description: Execute all tasks within a story, following the GENERATE-DOCUMENT workflow for each task.
 argument-hint: <NNN-slug> <story-NN>  (e.g. 001-user-auth-api story-01)
-allowed-tools: [Read, Write, Bash, Glob]
+allowed-tools: [Read, Write, Edit, Bash, Glob]
 ---
 
 Execute all tasks within a story, following the GENERATE-DOCUMENT workflow for each task.
@@ -100,5 +100,5 @@ After the story is marked DONE:
 
 11. Report: story completed, N tasks done, done criteria satisfied, doc files written (from step 7b), branch `<branch-name>` pushed, PR URL.
 
-> To advance to the next story, use `/plan-advance <planning-id>`.
+> To find the next story, use `/plan-status`, then run `/plan-story <planning-id> <next-story-id>`.
 > To decompose a story into atomic task files before executing it, use `/plan-atomize <planning-id> <story-id>`. To execute a single atomic task, use `/plan-task`.

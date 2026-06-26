@@ -93,12 +93,16 @@ Or generate a planning directly from existing stories:
 
 | Group | Commands |
 |-------|----------|
-| Init | `/plan-init` · `--blank` · `--force` |
+| Init | `/plan-init` · `--blank` · `--force` · `/plan-git-config` |
 | Lifecycle | `/plan-new` · `/plan-expand` · `/plan-story` · `/plan-done` · `/plan-archive` |
 | Atomic tasks | `/plan-atomize` · `/plan-task` · `/plan-task-validate` |
-| Status / ideas | `/plan-status` · `/plan-validate` · `/plan-template` |
-| Backlog | `/us-new` · `/us-enrich` · `/epic-enrich` · `/plan-from-epic` |
-| Adjust | `/plan-enrich-epic` · `/plan-enrich-story` · `/plan-split-story` |
+| Status / ideas | `/plan-status` · `/plan-validate` · `/plan-template` · `/plan-health` |
+| Backlog | `/us-new` · `/us-enrich` · `/us-split` · `/us-status` · `/epic-enrich` · `/plan-from-epic` |
+| Adjust | `/plan-enrich-epic` · `/plan-enrich-story` · `/plan-split-story` · `/plan-story-skip` · `/plan-merge` |
+| Automation | `/plan-run` · `/plan-agent-plan` · `/plan-agent-execute` · `/plan-agent-validate` |
+| Docs | `/doc-generate` · `/doc-task` · `/doc-story` |
+| Releases | `/release-init` · `/release-new` · `/release-add` · `/release-remove` · `/release-status` |
+| Recovery / reports | `/plan-retry` · `/plan-rollback` · `/plan-standup` · `/plan-report` · `/plan-history` · `/plan-clone` · `/plan-export` |
 
 Full flag reference → [`docs/reference.md`](docs/reference.md)
 
