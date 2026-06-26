@@ -2,6 +2,8 @@
 
 Full command listing with arguments and the structure installed by `/plan-init`.
 
+Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
+
 ---
 
 ## Commands
@@ -100,6 +102,36 @@ Full command listing with arguments and the structure installed by `/plan-init`.
 | `/plan-clone <source-id> <target-id>` | Clones a planning structure into a fresh ID |
 | `/plan-retry <NNN-slug>` | Retries BLOCKED stories after blockers are resolved |
 | `/plan-rollback <NNN-slug> <story-NN>` | Reverts story planning state from DONE to TODO |
+
+---
+
+## Choosing Similar Commands
+
+Some commands intentionally overlap because they operate at different layers.
+
+| If the work is in... | Use | Why |
+|----------------------|-----|-----|
+| Product backlog or story files outside `.planning/` | `/us-enrich` | Adds execution-ready details to source stories before planning |
+| Active planning story under `.planning/active/` | `/plan-enrich-story` | Improves an execution story without touching the product backlog |
+| Product backlog container with missing coverage | `/epic-enrich` | Detects gaps and creates new source stories |
+| Active planning with newly discovered execution work | `/plan-enrich-epic` | Adds new planning stories; compatibility name for "add story to planning" |
+| Backlog story is too broad | `/us-split` | Splits source story files and keeps backlog references |
+| Planning story is too broad | `/plan-split-story` | Splits execution stories and updates planning indexes/dependencies |
+| Whole `.planning/` system may be inconsistent | `/plan-health` | Global scan across active, initial, finished, indexes, and stale state |
+| One planning needs a structural audit | `/plan-validate` | Detailed read-only validation for a specific planning or all plannings |
+
+## Communication Outputs
+
+| Need | Command | Audience |
+|------|---------|----------|
+| Daily update | `/plan-standup` | Team sync |
+| Executive or handoff summary | `/plan-report` | Stakeholders, maintainers |
+| PR/ticket/markdown artifact | `/plan-export` | GitHub, Jira, Linear, external docs |
+| Release readiness and transitions | `/release-status` | Release owners |
+
+## Documentation Commands
+
+`/doc-generate` owns the documentation generation logic. `/doc-task` and `/doc-story` are thin wrappers used for ergonomic manual invocation and automatic calls from `/plan-task` and `/plan-story`.
 
 ---
 

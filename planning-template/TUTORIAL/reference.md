@@ -216,6 +216,21 @@ Nada se ejecuta sin estar dentro de un planning activo.
 
 ---
 
+## Comandos parecidos: cuál usar
+
+| Si estás trabajando en... | Usa | No usa |
+|---------------------------|-----|--------|
+| Backlog o stories fuente | `/us-enrich`, `/us-split`, `/epic-enrich` | `/plan-enrich-story`, `/plan-split-story` |
+| Planning activo en `.planning/active/` | `/plan-enrich-story`, `/plan-split-story`, `/plan-enrich-epic` | `/us-enrich`, `/us-split` |
+| Chequeo global de `.planning/` | `/plan-health` | `/plan-validate` |
+| Auditoría detallada de un planning | `/plan-validate NNN-slug` | `/plan-health` |
+| Comunicación diaria | `/plan-standup` | `/plan-report` |
+| Resumen ejecutivo | `/plan-report` | `/plan-standup` |
+| Artefacto externo para PR/tickets/docs | `/plan-export` | `/plan-report` |
+| Estado de una entrega/version | `/release-status` | `/plan-status` |
+
+---
+
 ## Formatos de argumento
 
 | Comando | Formato |

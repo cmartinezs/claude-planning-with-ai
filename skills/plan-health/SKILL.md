@@ -7,6 +7,8 @@ allowed-tools: [Read, Bash, Glob]
 
 Full-system health check of the `.planning/` directory. Detects cross-planning anomalies and stale state that `/plan-validate` does not catch.
 
+Use `/plan-health` when the whole planning system may be inconsistent. Use `/plan-validate [NNN-slug]` when one planning needs a detailed structural audit.
+
 ## Arguments
 
 `$ARGUMENTS` — none. Always scans the entire `.planning/` system from the current directory.

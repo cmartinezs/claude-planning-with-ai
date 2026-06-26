@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Updated command reference coverage for the current 44 commands, including agents, documentation, release, recovery, and maintenance commands.
 - Added general-project language to the user guide and planning task template so non-software work can use verification evidence instead of only unit-test language.
 - Archived legacy SDLC-specific sub-workflows from the installed planning template and marked `docs/superpowers/` as historical design material.
+- Documented intentional command overlaps by layer/audience and added `docs/commands.yml` as the canonical command inventory for docs synchronization.
 
 ## [2.4.0] — 2026-06-25
 

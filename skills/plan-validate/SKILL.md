@@ -7,6 +7,8 @@ allowed-tools: [Read, Bash, Glob]
 
 Validate the structural integrity of plannings in `.planning/`. Read-only: report findings, never modify files.
 
+Use `/plan-validate [NNN-slug]` for a detailed structural audit of one planning, or all plannings if no argument is provided. Use `/plan-health` first when you suspect cross-planning, index, duplicate, or stale-state issues across the entire `.planning/` system.
+
 If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, validate every planning found in `.planning/`, `.planning/active/`, and `.planning/finished/`.
 
 ## Steps

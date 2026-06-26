@@ -143,6 +143,8 @@ Use these when a planning is already active and reality has changed.
 /plan-story-skip 001-checkout story-06 -- requirement dropped from MVP
 ```
 
+Use backlog-layer commands (`/us-*`, `/epic-enrich`) before a story becomes part of `.planning/`. Use planning-layer commands (`/plan-enrich-*`, `/plan-split-story`) after the work is already represented in `.planning/active/`.
+
 ### Flow E — Autonomous Pipeline
 
 Use this when the planning is clear enough for a guided autonomous run.
@@ -191,6 +193,28 @@ Use this when the planning is clear enough for a guided autonomous run.
 ### Automation, Maintenance, Docs, Releases
 
 See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/release-*`, `/plan-health`, `/plan-report`, `/plan-export`, recovery commands, and history/status utilities.
+
+## Choosing Similar Commands
+
+| Situation | Command |
+|-----------|---------|
+| A source backlog story is missing DoD, notes, dependencies, or complexity | `/us-enrich` |
+| A planning story is ambiguous or not executable enough | `/plan-enrich-story` |
+| A source backlog container is missing stories | `/epic-enrich` |
+| An active planning needs more stories | `/plan-enrich-epic` |
+| A source backlog story is too broad | `/us-split` |
+| An active planning story is too broad | `/plan-split-story` |
+| You want to scan the entire `.planning/` system | `/plan-health` |
+| You want a detailed audit of a planning | `/plan-validate` |
+
+## Communication Outputs
+
+| Need | Command | Output shape |
+|------|---------|--------------|
+| Daily sync | `/plan-standup` | Yesterday / today / blockers |
+| Stakeholder summary | `/plan-report` | Objective, progress, decisions, next steps |
+| External artifact | `/plan-export` | PR description, ticket list, markdown |
+| Release readiness | `/release-status` | Release table, planning statuses, transition suggestions |
 
 ## Common Patterns
 

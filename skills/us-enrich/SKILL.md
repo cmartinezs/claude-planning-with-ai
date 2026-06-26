@@ -9,6 +9,8 @@ Enrich a user story (or any story-shaped document) by adding execution-relevant 
 
 Works with any markdown file that has a narrative statement + acceptance criteria — regardless of project structure, naming conventions, or ID format.
 
+Layer boundary: this command enriches source backlog stories outside `.planning/`. If the story already lives in `.planning/active/<planning-id>/02-deepening/`, use `/plan-enrich-story` instead.
+
 ## Arguments
 
 `$ARGUMENTS` — any of:
@@ -57,6 +59,13 @@ Look for an "epic container" around the story:
 ### 4 — Propose enrichments
 
 For each missing section, infer a **proposed value** from the story content + any epic context found, and present it to the user for confirmation. Wait for approval before writing. If the user provides different content, use theirs.
+
+Shared enrichment checklist:
+- Objective or narrative is unambiguous.
+- Done criteria are specific, binary, and verifiable.
+- Affected areas or implementation notes are explicit.
+- Dependencies on stories, systems, decisions, or teams are recorded.
+- Complexity/risk is visible enough to plan execution.
 
 Inference rules:
 - **Definition of Done** — derive from the criteria bullets, making each verifiable: add persistence, UI state, agent log, approval event requirements as applicable. Reference the epic DoD if available.

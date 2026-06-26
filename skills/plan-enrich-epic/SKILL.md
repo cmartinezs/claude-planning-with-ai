@@ -1,11 +1,13 @@
 ---
 name: plan-enrich-epic
-description: Extend an active planning by adding new stories (user stories) to it. Use when a planning already in EXPANSION or DEEPENING phase needs more story coverage discovered after the initial expansion.
+description: Extend an active planning by adding new planning stories. Compatibility name for "add story to planning"; does not edit a product epic container.
 argument-hint: the planning id to enrich (e.g. `001-user-auth-api`)
 allowed-tools: [Read, Write, Bash, Glob]
 ---
 
-Extend an active planning by adding new stories (user stories) to it. Use when a planning already in EXPANSION or DEEPENING phase needs more story coverage discovered after the initial expansion.
+Extend an active planning by adding new planning stories to it. Use when a planning already in EXPANSION or DEEPENING phase needs more story coverage discovered after the initial expansion.
+
+Layer boundary: this command edits `.planning/active/<planning-id>/`. If the product/backlog epic needs more source stories before planning, use `/epic-enrich` instead.
 
 Reference workflows:
 - `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/CREATE-PLANNING.md` (steps 4–7, story creation)

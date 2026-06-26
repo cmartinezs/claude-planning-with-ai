@@ -1,0 +1,180 @@
+# Canonical command inventory for docs and landing-page synchronization.
+# Keep this file aligned with skills/<command>/SKILL.md.
+
+commands:
+  - name: doc-generate
+    category: documentation
+    source: skills/doc-generate/SKILL.md
+    summary: Generate task, story, or planning-level documentation.
+  - name: doc-story
+    category: documentation
+    source: skills/doc-story/SKILL.md
+    summary: Wrapper for story-level documentation generation.
+  - name: doc-task
+    category: documentation
+    source: skills/doc-task/SKILL.md
+    summary: Wrapper for task-level documentation generation.
+  - name: epic-enrich
+    category: backlog
+    source: skills/epic-enrich/SKILL.md
+    summary: Add missing stories to a source story container.
+  - name: plan-agent-execute
+    category: automation
+    source: skills/plan-agent-execute/SKILL.md
+    summary: Execute pending planning stories in dependency batches.
+  - name: plan-agent-plan
+    category: automation
+    source: skills/plan-agent-plan/SKILL.md
+    summary: Run the planning phase autonomously.
+  - name: plan-agent-validate
+    category: automation
+    source: skills/plan-agent-validate/SKILL.md
+    summary: Validate, close, and archive a ready planning.
+  - name: plan-archive
+    category: lifecycle
+    source: skills/plan-archive/SKILL.md
+    summary: Audit and archive a completed planning.
+  - name: plan-atomize
+    category: execution
+    source: skills/plan-atomize/SKILL.md
+    summary: Decompose stories into atomic task files.
+  - name: plan-clone
+    category: recovery
+    source: skills/plan-clone/SKILL.md
+    summary: Clone a planning structure into a fresh ID.
+  - name: plan-done
+    category: lifecycle
+    source: skills/plan-done/SKILL.md
+    summary: Mark a task or story done.
+  - name: plan-enrich-epic
+    category: adjustment
+    source: skills/plan-enrich-epic/SKILL.md
+    summary: Add new stories to an active planning.
+  - name: plan-enrich-story
+    category: adjustment
+    source: skills/plan-enrich-story/SKILL.md
+    summary: Deepen an underspecified active planning story.
+  - name: plan-expand
+    category: lifecycle
+    source: skills/plan-expand/SKILL.md
+    summary: Advance a planning from INITIAL to EXPANSION.
+  - name: plan-export
+    category: communication
+    source: skills/plan-export/SKILL.md
+    summary: Export a planning as PR text, tickets, or markdown.
+  - name: plan-from-epic
+    category: bridge
+    source: skills/plan-from-epic/SKILL.md
+    summary: Generate an active planning from source stories.
+  - name: plan-git-config
+    category: setup
+    source: skills/plan-git-config/SKILL.md
+    summary: View or update planning git configuration.
+  - name: plan-health
+    category: maintenance
+    source: skills/plan-health/SKILL.md
+    summary: Scan the entire planning system for anomalies.
+  - name: plan-history
+    category: communication
+    source: skills/plan-history/SKILL.md
+    summary: Show planning status transitions from git history.
+  - name: plan-init
+    category: setup
+    source: skills/plan-init/SKILL.md
+    summary: Initialize the planning system in a project.
+  - name: plan-merge
+    category: adjustment
+    source: skills/plan-merge/SKILL.md
+    summary: Move a story between active plannings.
+  - name: plan-new
+    category: lifecycle
+    source: skills/plan-new/SKILL.md
+    summary: Create a planning in INITIAL state.
+  - name: plan-report
+    category: communication
+    source: skills/plan-report/SKILL.md
+    summary: Generate an executive planning summary.
+  - name: plan-retry
+    category: recovery
+    source: skills/plan-retry/SKILL.md
+    summary: Retry BLOCKED stories after blockers are resolved.
+  - name: plan-rollback
+    category: recovery
+    source: skills/plan-rollback/SKILL.md
+    summary: Revert story planning state from DONE to TODO.
+  - name: plan-run
+    category: automation
+    source: skills/plan-run/SKILL.md
+    summary: Run a planning end to end from the current state.
+  - name: plan-split-story
+    category: adjustment
+    source: skills/plan-split-story/SKILL.md
+    summary: Split an active planning story.
+  - name: plan-standup
+    category: communication
+    source: skills/plan-standup/SKILL.md
+    summary: Generate a daily planning update.
+  - name: plan-status
+    category: status
+    source: skills/plan-status/SKILL.md
+    summary: Show current planning states.
+  - name: plan-story
+    category: execution
+    source: skills/plan-story/SKILL.md
+    summary: Execute all tasks in a story.
+  - name: plan-story-skip
+    category: adjustment
+    source: skills/plan-story-skip/SKILL.md
+    summary: Mark a story as intentionally skipped.
+  - name: plan-task
+    category: execution
+    source: skills/plan-task/SKILL.md
+    summary: Execute a single atomic task.
+  - name: plan-task-validate
+    category: execution
+    source: skills/plan-task-validate/SKILL.md
+    summary: Audit atomic tasks.
+  - name: plan-template
+    category: lifecycle
+    source: skills/plan-template/SKILL.md
+    summary: Generate an idea document for plan-new.
+  - name: plan-validate
+    category: maintenance
+    source: skills/plan-validate/SKILL.md
+    summary: Validate planning structure.
+  - name: release-add
+    category: release
+    source: skills/release-add/SKILL.md
+    summary: Add plannings to a release.
+  - name: release-init
+    category: release
+    source: skills/release-init/SKILL.md
+    summary: Initialize release planning.
+  - name: release-new
+    category: release
+    source: skills/release-new/SKILL.md
+    summary: Create a new release file.
+  - name: release-remove
+    category: release
+    source: skills/release-remove/SKILL.md
+    summary: Remove a planning from a release.
+  - name: release-status
+    category: release
+    source: skills/release-status/SKILL.md
+    summary: Show or update release status.
+  - name: us-enrich
+    category: backlog
+    source: skills/us-enrich/SKILL.md
+    summary: Enrich a source story before planning.
+  - name: us-new
+    category: backlog
+    source: skills/us-new/SKILL.md
+    summary: Add a new source story to a container.
+  - name: us-split
+    category: backlog
+    source: skills/us-split/SKILL.md
+    summary: Split a source backlog story.
+  - name: us-status
+    category: backlog
+    source: skills/us-status/SKILL.md
+    summary: Show source story enrichment status.

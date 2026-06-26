@@ -138,8 +138,8 @@ Show the current state of all plannings.
 1. Create `skills/<command-name>/SKILL.md` with the frontmatter and step instructions.
 2. Test the skill by invoking `/<command-name>` in a Claude Code session.
 3. If the skill references workflows, check that the workflow files exist in `planning-template/WORKFLOWS/`.
-4. Update `README.md` command tables and `planning-template/TUTORIAL/reference.md`.
-5. Update the landing page `Commands.tsx` if the command is user-facing.
+4. Update `docs/commands.yml`, then update `README.md`, `docs/reference.md`, and `planning-template/TUTORIAL/reference.md` from that inventory.
+5. Update the landing page command locale files if the command is user-facing.
 
 ### Naming conventions
 
@@ -287,6 +287,7 @@ The static export in `.page/out/` can be served from any static host. The site i
 
 ### When changing a skill
 
+- Update `docs/commands.yml` if the command name, category, source path, or summary changes
 - Update `README.md` command tables
 - Update `docs/reference.md` if the command is public
 - Update `planning-template/TUTORIAL/reference.md`

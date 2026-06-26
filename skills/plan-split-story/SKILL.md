@@ -7,6 +7,8 @@ allowed-tools: [Read, Write, Bash, Glob]
 
 Split a story (user story) that is too large or covers multiple concerns into two or more smaller, focused stories. The original story is replaced by the new ones in both `01-expansion.md` and `02-deepening/`.
 
+Layer boundary: this command edits an active planning. If the oversized story exists only in the product backlog, use `/us-split` instead.
+
 Reference workflows:
 - `.planning/WORKFLOWS/02-EXECUTION-WORKFLOWS/EXPAND-ELEMENT.md`
 - `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md`

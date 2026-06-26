@@ -106,6 +106,19 @@ Or generate a planning directly from existing stories:
 
 Full flag reference → [`docs/reference.md`](docs/reference.md)
 
+### Similar commands
+
+| Need | Use |
+|------|-----|
+| Enrich a backlog story before planning | `/us-enrich` |
+| Enrich a story already inside `.planning/active/` | `/plan-enrich-story` |
+| Add missing stories to a product backlog container | `/epic-enrich` |
+| Add missing stories to an active planning | `/plan-enrich-epic` |
+| Split a backlog story | `/us-split` |
+| Split an active planning story | `/plan-split-story` |
+| Check the whole `.planning/` system | `/plan-health` |
+| Validate one planning in detail | `/plan-validate` |
+
 ---
 
 ## Docs

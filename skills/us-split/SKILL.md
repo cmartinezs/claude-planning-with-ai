@@ -7,6 +7,8 @@ allowed-tools: [Read, Write, Bash, Glob]
 
 Split an oversized or mixed-concern user story into two focused stories. The counterpart of `/plan-split-story` at the product backlog layer.
 
+Layer boundary: this command edits source backlog story files. If the story has already been copied into an active planning, use `/plan-split-story` for the planning story and then decide whether the backlog also needs `/us-split`.
+
 ## Arguments
 
 `$ARGUMENTS` — path to the story file to split (e.g. `docs/product/user-stories/epic-01-auth/03-teacher-login.md`)

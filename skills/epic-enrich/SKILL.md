@@ -7,6 +7,8 @@ allowed-tools: [Read, Write, Bash, Glob]
 
 Add new stories to an existing story container. Reads the current content, identifies gaps in coverage, and guides the addition of new stories. Works with any directory of story files or single document with story sections.
 
+Layer boundary: this command edits the product/backlog container. If the missing work belongs to an already active planning, use `/plan-enrich-epic` instead.
+
 ## Arguments
 
 `$ARGUMENTS` — path to the story container:
