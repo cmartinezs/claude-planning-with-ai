@@ -20,7 +20,8 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
 
 2. **Build the workflow catalog.** Read `.planning/WORKFLOWS/README.md` and list every workflow ID defined there (main workflows and sub-workflows). This is the valid set for task `Workflow` columns.
 
-3. **For each planning, check location ↔ state coherence:**
+3. **For each planning, read configuration and check location ↔ state coherence:**
+   - Read `.planning/config.yml` if it exists. Extract `project.type` (default `software`), `execution.requires_git` (default `true`), and `software.smoke_tests_file` (default `SMOKE-TESTS.md` when `project.type: software`).
    a. A planning at `.planning/NNN-slug/` must contain only `00-initial.md` artifacts (INITIAL state). If it has `01-expansion.md` or `02-deepening/`, flag **FAIL**: it should have been moved to `active/`.
    b. A planning in `active/` must contain `00-initial.md` and `01-expansion.md`.
    c. A planning in `finished/` must contain all lifecycle files and have every story marked `DONE` or `SKIPPED`.
@@ -51,9 +52,10 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
    b. Task numbers must be unique and sequential starting at `task-01`.
    c. Every task `Depends On` must reference an existing task in the same story, with no cycles. Violations are a **FAIL**.
    d. Each task file must contain `## Objective`, `## Technical Design`, `## Implementation Steps`, either `## Verification` or the legacy `## Unit Tests`, and `## Done Criteria`. Missing sections are a **FAIL**.
-   e. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.
-   f. Index status must match each task file's `> **Status:**` line. Mismatch is a **FAIL**.
-   g. A task `DONE` with unchecked Done Criteria is a **FAIL**. For deep atomicity auditing, point to `/plan-task-validate`.
+   e. If `project.type: software`, each task file must contain `### Software Smoke Test Check`, and its `## Done Criteria` must include smoke-test verification and human developer code review. Missing smoke/review criteria are a **FAIL**.
+   f. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.
+   g. Index status must match each task file's `> **Status:**` line. Mismatch is a **FAIL**.
+   h. A task `DONE` with unchecked Done Criteria is a **FAIL**. For deep atomicity auditing, point to `/plan-task-validate`.
 
 8. **Check dependency order:** a story with status `IN PROGRESS`, `DONE`, or `STANDBY` whose `Depends On` stories are not all `DONE` or `SKIPPED` is a **WARN** (dependency executed out of order).
 

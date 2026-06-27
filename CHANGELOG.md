@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Training workspace now uses a direct custom splitter for Explorer/Main and Editor/Terminal so panel boundaries resize reliably and the reset action restores the intended layout.
+- Software task execution now uses a stack-specific smoke test plan before completion: read or infer `.planning/SMOKE-TESTS.md`, run the supporting services, build/start the app, verify connectivity or schema checks, run smoke checks, and wait for human developer code review before marking DONE or committing.
+- Added `/plan-smoke-config` and `.planning/SMOKE-TESTS.md` to configure stack-specific smoke tests from questions, manual input, or repository inference.
+- Updated task templates, atomization, task validation, story completion, and user docs to enforce smoke-test evidence and post-verification human review before git add/commit/push/PR.
+
+## [3.2.0] — 2026-06-27
+
+### Changed
+
+- Training workspace resize behavior was reworked to use a custom IDE-style splitter for the Explorer, Editor, and Terminal panes.
+
+## [3.1.0] — 2026-06-27
+
+### Added
+
+- `/plan-smoke-config` — setup command that generates or updates `.planning/SMOKE-TESTS.md` with stack-specific smoke test instructions.
+- `.planning/SMOKE-TESTS.md` template — project-level smoke-test plan file copied by `/plan-init` and used by task/story execution.
+
+### Changed
+
+- Software task execution no longer assumes a compose-backed local runtime as the universal default; smoke tests are now stack-specific and can be generated, written manually, or inferred from the repository.
+- Updated task templates, atomicity checks, story execution, and planning documentation to use `Software Smoke Test Check` instead of the previous local-runtime assumption.
+- Public docs and landing command inventories now include `/plan-smoke-config` and the 48-command reference.
+
 ## [3.0.0] — 2026-06-26
 
 ### Added
@@ -193,7 +219,9 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.2.0...HEAD
+[3.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.1.0...v3.2.0
+[3.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.4.0...v3.0.0
 [2.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.2.0...v2.3.0

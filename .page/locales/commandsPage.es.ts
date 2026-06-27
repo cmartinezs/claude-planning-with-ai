@@ -39,6 +39,17 @@ const commandsPage = {
           source: 'skills/plan-git-config/SKILL.md',
         },
         {
+          name: '/plan-smoke-config',
+          usage: '/plan-smoke-config [--blank]',
+          description: 'Configura o genera un smoke test plan específico del stack para proyectos software.',
+          details: [
+            'Escribe el plan de smoke tests en .planning/SMOKE-TESTS.md por defecto.',
+            'Puede hacer preguntas guiadas, prellenar desde inferencia del repositorio o crear un esqueleto vacío.',
+            'Documenta el arranque, dependencias, migraciones y smoke checks necesarios antes del code review humano.',
+          ],
+          source: 'skills/plan-smoke-config/SKILL.md',
+        },
+        {
           name: '/plan-template',
           usage: '/plan-template [slug] [--interactive | --blank]',
           description: 'Genera un documento de idea listo para alimentar /plan-new.',
@@ -331,17 +342,6 @@ const commandsPage = {
             'Opera sobre el sistema .planning/.',
           ],
           source: 'skills/plan-status/SKILL.md',
-        },
-        {
-          name: '/plan-next',
-          usage: '/plan-next [NNN-slug]',
-          description: 'Recomienda el siguiente comando más seguro.',
-          details: [
-            'Lee estado actual, bloqueos, dependencias, modo de proyecto y nivel de autonomía.',
-            'Devuelve un comando recomendado con hallazgos de soporte y alternativas.',
-            'Es de solo lectura y sirve cuando varios comandos podrían aplicar.',
-          ],
-          source: 'skills/plan-next/SKILL.md',
         },
         {
           name: '/plan-health',

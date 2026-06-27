@@ -4,7 +4,7 @@ const scenario: TrainingScenario = {
   id: 'advisory-audit',
   difficulty: 'intermediate',
   durationMin: 6,
-  commands: ['/plan-next', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
+  commands: ['/plan-status', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
   initial: {
     files: [
       { name: '.planning', level: 0, type: 'folder' },
@@ -36,24 +36,20 @@ const scenario: TrainingScenario = {
   },
   steps: [
     {
-      command: '/plan-next 009-docs-refresh',
-      hint: 'Tienes un planning de documentación a medio camino. No quieres ejecutar al azar: primero pide una recomendación basada en estado, riesgos, dependencias y modo de proyecto.',
-      nextHint: 'El siguiente paso recomendado es revisar métricas y riesgo antes de tocar docs. Genera un reporte con --metrics.',
+      command: '/plan-status 009-docs-refresh',
+      hint: 'Tienes un planning de documentación a medio camino. Primero inspecciona el estado para confirmar qué está hecho y qué falta antes de tocar docs.',
+      nextHint: 'Con el estado claro, el siguiente paso es revisar métricas y riesgo antes de regenerar documentación. Genera un reporte con --metrics.',
       output: [
-        '  ⟳ Analizando 009-docs-refresh...',
+        '  ⟳ Consultando estado de 009-docs-refresh...',
         '',
         '  Project type : documentation',
         '  Autonomy     : assisted',
         '  Stories      : 1 DONE · 1 TODO',
         '  Risks        : 1 HIGH abierto',
         '',
-        '  Recommended next action:',
+        '  Suggested follow-up:',
         '  ➜ /plan-report 009-docs-refresh --metrics',
-        '',
-        '  Why:',
-        '  · Hay cambios de comandos que afectan docs públicas',
-        '  · story-02 tiene riesgo H y external issue GH-43',
-        '  · Conviene revisar cobertura antes de regenerar documentación',
+        '  ➜ /plan-health',
       ],
       files: [
         { name: '.planning', level: 0, type: 'folder' },
@@ -181,7 +177,7 @@ const scenario: TrainingScenario = {
       ],
       files: [
         { name: 'skills', level: 0, type: 'folder' },
-        { name: 'plan-next', level: 1, type: 'folder' },
+        { name: 'plan-status', level: 1, type: 'folder' },
         { name: 'plan-audit-docs', level: 1, type: 'folder' },
         { name: 'plan-doctor', level: 1, type: 'folder' },
         { name: 'docs', level: 0, type: 'folder' },
@@ -195,7 +191,7 @@ const scenario: TrainingScenario = {
         '  project_modes: [software, general, documentation, research, operations]',
         '',
         'commands:',
-        '  - name: plan-next',
+        '  - name: plan-status',
         '  - name: plan-audit-docs',
         '  - name: plan-doctor',
         '',

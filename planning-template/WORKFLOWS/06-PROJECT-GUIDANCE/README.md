@@ -10,7 +10,7 @@ Use these notes when the planning is not primarily software delivery. They compl
 
 | `project.type` | Primary output | Verification style | Suggested terminology |
 |----------------|----------------|--------------------|-----------------------|
-| `software` | Code, infrastructure, services, automations | Tests, build, lint, review | story / task |
+| `software` | Code, infrastructure, services, automations | Tests, build, stack-specific smoke tests, connectivity or schema checks, human code review | story / task |
 | `documentation` | Guides, references, changelogs, ADRs | Link checks, freshness, peer review | deliverable / section |
 | `research` | Findings, experiments, recommendations | Evidence, citations, reproducibility | experiment / finding |
 | `operations` | Process changes, rollout plans, support runbooks | Dry runs, signoff, operational metrics | workstream / action |
@@ -47,7 +47,7 @@ execution:
    - rollout checklist completed
    - evidence attached or linked
 
-4. Use `/plan-next` to decide the next command and `/plan-audit-docs` when documentation is the main artifact.
+4. Use `/plan-status` to inspect the current state and `/plan-audit-docs` when documentation is the main artifact.
 
 ---
 

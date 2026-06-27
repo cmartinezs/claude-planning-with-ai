@@ -44,12 +44,26 @@
 |---|-------------|----------------|
 | 1 | [What is checked] | [Exact steps to confirm it passes] |
 
+### Software Smoke Test Check
+
+> *Required when `.planning/config.yml` has `project.type: software`. Use `.planning/SMOKE-TESTS.md` when it exists. If it does not exist, infer the smoke plan from the repository stack signals, write the inferred commands here before running them, and keep the checks as small and non-destructive as possible.*
+
+| # | Check | How to validate |
+|---|-------|----------------|
+| 1 | Supporting services are ready | Start the services required by the smoke plan and confirm they are healthy |
+| 2 | App compiles and starts | Run the normal local build/start command for the stack |
+| 3 | Connectivity or schema validation succeeds | Confirm the app can reach its dependencies and that schema/bootstrap checks pass |
+| 4 | Changed surface responds correctly | Run the smallest endpoint/API/CLI checks that prove the task did not break startup |
+| 5 | No startup regressions are visible | Confirm logs and smoke output do not show new startup, migration, or boot failures |
+
 ---
 
 ## Done Criteria
 
 - [ ] [Deliverable exists and is verifiable: specific and binary]
 - [ ] All verification checks listed above pass
+- [ ] For software projects, smoke test plan passes: supporting services, app startup, connectivity or schema checks, and changed-surface smoke checks
+- [ ] Human developer code review completed; requested corrections, if any, were implemented and re-reviewed
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
 - [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`
 

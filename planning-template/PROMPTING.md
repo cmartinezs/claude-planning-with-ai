@@ -168,7 +168,7 @@ Constraints:
 Done when:
   - Risk values are consistent across expansion, story, and task files
   - Mitigations are concrete
-  - /plan-next recommends an execution command or a validation command
+  - /plan-status reports the current planning state so you can choose an execution or validation command
 ```
 
 ---

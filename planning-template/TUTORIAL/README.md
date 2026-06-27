@@ -13,6 +13,7 @@ Guías por escenario real. Cada archivo cubre una situación concreta de princip
 | Quiero planificar la implementación de un epic | [→ Flujo A](flow-01-epic.md) |
 | Tengo trabajo transversal que no pertenece a ningún epic | [→ Flujo B](flow-02-general.md) |
 | Quiero refinar el backlog sin ejecutar nada todavía | [→ Flujo C](flow-03-backlog.md) |
+| Necesito definir smoke tests del proyecto antes del code review | [→ Flujo G](flow-06-smoke-config.md) |
 | El planning ya está activo y necesito ajustarlo | [→ Flujo D](flow-04-mid-execution.md) |
 | Quiero ejecutar un planning de punta a punta sin intervención | [→ Flujo E](flow-05-autonomous.md) |
 | Solo quiero la referencia rápida de comandos | [→ Referencia](reference.md) |
@@ -69,11 +70,11 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-status` | Estado de todos los plannings |
 | `/plan-expand NNN-slug` | INITIAL → EXPANSION (solo flujo general) |
 | `/plan-git-config [--base-branch <branch>]` | Configura la rama base git (para proyectos ya inicializados) |
-| `/plan-atomize NNN-slug story-NN` | Descompone una story en tareas atómicas (diseño + implementación + tests) |
-| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una sola tarea atómica y hace commit con formato convencional |
+| `/plan-atomize NNN-slug story-NN` | Descompone una story en tareas atómicas (diseño + implementación + verificación) |
+| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una tarea; en software valida el smoke test plan del proyecto, espera code review humano y recién después hace commit |
 | `/plan-task-validate NNN-slug [story-NN]` | Audita tareas atómicas contra el checklist de atomicidad |
-| `/plan-story NNN-slug story-NN` | Ejecuta todas las tareas de una story — crea rama, comitea por tarea, pushea y abre PR |
-| `/plan-done NNN-slug story-NN` | Marca story completo, pushea y abre PR si la rama está activa |
+| `/plan-story NNN-slug story-NN` | Ejecuta todas las tareas de una story — crea rama, comitea tareas aprobadas, espera revisión final, pushea y abre PR |
+| `/plan-done NNN-slug story-NN` | Marca story completo tras revisión humana, pushea y abre PR si la rama está activa |
 | `/plan-done NNN-slug story-NN task-N` | Marca una tarea específica |
 | `/plan-archive NNN-slug` | Audita y archiva a `finished/` |
 

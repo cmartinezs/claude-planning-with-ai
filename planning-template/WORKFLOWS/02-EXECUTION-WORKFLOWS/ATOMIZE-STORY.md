@@ -2,7 +2,7 @@
 
 > [← README](README.md)
 
-Decompose a story in DEEPENING into **atomic tasks**: granular, directly implementable units, each with its own technical design, implementation steps, unit test plan, and done criteria.
+Decompose a story in DEEPENING into **atomic tasks**: granular, directly implementable units, each with its own technical design, implementation steps, verification plan, and done criteria.
 
 ---
 
@@ -23,7 +23,7 @@ A story's task table describes *what* must happen but the rows are too coarse to
    - Repeat until every candidate returns `PASS`.
 5. Order the tasks so every `Depends On` reference points only to a lower-numbered task.
 6. Create the folder `02-deepening/story-NN-name/` (same name as the story file, without `.md`).
-7. For each task, create `task-NN-slug.md` from the template (`_template/02-deepening/task-NN-name.md`), filling **all** sections: Objective, Technical Design, Implementation Steps, Unit Tests, Done Criteria, Workflow, Depends On.
+7. For each task, create `task-NN-slug.md` from the template (`_template/02-deepening/task-NN-name.md`), filling **all** sections: Objective, Technical Design, Implementation Steps, Verification, Done Criteria, Workflow, Depends On. For software projects, include the Software Smoke Test Check and human developer review criteria.
 8. Rewrite the story's `## Tasks` table as an **index**: each row's task name becomes a link to its task file. Keep the `Workflow`, `Status`, and `Output` columns in sync with the task files.
 9. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced by the decomposition.
 

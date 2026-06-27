@@ -14,6 +14,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 |---------|-------------|
 | `/plan-init [--blank] [--force]` | Creates `.planning/`, installs templates/workflows/tutorials, discovers project areas, and writes config |
 | `/plan-git-config [--base-branch <branch>]` | Shows or updates the planning system git base branch |
+| `/plan-smoke-config [--blank]` | Generates or updates `.planning/SMOKE-TESTS.md` with stack-specific smoke test instructions |
 
 ### Product Backlog
 
@@ -40,7 +41,6 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-new <NNN-slug> @<path.md>` | Creates a planning in INITIAL state from an idea document |
 | `/plan-expand <NNN-slug>` | Advances INITIAL -> EXPANSION and creates planning stories |
 | `/plan-status` | Shows all plannings and story statuses |
-| `/plan-next [NNN-slug]` | Recommends the next safest planning action |
 | `/plan-validate [NNN-slug]` | Checks structural integrity for one or all plannings |
 | `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done |
 | `/plan-archive <NNN-slug>` | Audits and moves a completed planning to `finished/` |
@@ -122,7 +122,7 @@ Some commands intentionally overlap because they operate at different layers.
 | Planning story is too broad | `/plan-split-story` | Splits execution stories and updates planning indexes/dependencies |
 | Whole `.planning/` system may be inconsistent | `/plan-health` | Global scan across active, initial, finished, indexes, and stale state |
 | One planning needs a structural audit | `/plan-validate` | Detailed read-only validation for a specific planning or all plannings |
-| You are unsure what to run next | `/plan-next` | Read-only recommendation based on state, blockers, dependencies, project mode, and autonomy |
+| You want to inspect current planning state | `/plan-status` | Read-only status overview before deciding the next command |
 | The plugin checkout itself may be inconsistent | `/plan-doctor` | Checks command inventory, skill metadata, template integrity, and legacy drift |
 
 ## Communication Outputs
@@ -180,6 +180,7 @@ Areas are the columns of the traceability matrix. Every planning story records w
 │   │   ├── story-NN-name.md
 │   │   └── task-NN-name.md    ← atomic task blueprint (used by /plan-atomize)
 │   └── TRACEABILITY.md     ← columns filled in by plan-init
+├── SMOKE-TESTS.md          ← stack-specific smoke test plan (generated or manual)
 ├── WORKFLOWS/
 │   ├── 01-PLANNING-WORKFLOWS/
 │   ├── 02-EXECUTION-WORKFLOWS/

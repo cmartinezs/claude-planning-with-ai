@@ -2,13 +2,13 @@ const tutorialsPage = {
   meta: {
     title: 'Tutoriales - Planning with AI',
     description:
-      'Tutoriales por escenario para usar Planning with AI en Claude Code: epics, backlog, ejecución, ajustes y agentes autónomos.',
+      'Tutoriales por escenario para usar Planning with AI en Claude Code: epics, backlog, smoke tests, ejecución, ajustes y agentes autónomos.',
   },
   back: 'Volver al landing',
   eyebrow: 'Guías por escenario',
   title: 'Tutoriales disponibles para cada flujo real de planning',
   intro:
-    'Los tutoriales del template quedan visibles como rutas de trabajo: desde un epic existente, desde cero, refinamiento de backlog, ajustes en mitad de ejecución y pipeline autónomo con agentes.',
+    'Los tutoriales del template quedan visibles como rutas de trabajo: desde un epic existente, desde cero, refinamiento de backlog, configuración de smoke tests, ajustes en mitad de ejecución y pipeline autónomo con agentes.',
   commandsLink: 'Ver comandos',
   sourceLink: 'Ver fuentes en GitHub',
   whenLabel: 'Cuándo usarlo',
@@ -101,19 +101,35 @@ const tutorialsPage = {
     },
     {
       id: 'flow-f',
-      title: 'Flujo F - Decisión, auditoría docs y salud del plugin',
+      title: 'Flujo F - Revisión de estado, auditoría docs y salud del plugin',
       when:
-        'Úsalo cuando el planning cambió documentación, podrían aplicar varios comandos siguientes o mantienes el plugin.',
+        'Úsalo cuando el planning cambió documentación, podrían aplicar varios comandos o mantienes el plugin.',
       outcome:
-        'Una siguiente acción más segura, reporte con métricas, documentación auditada y checkout del plugin verificado.',
+        'Una revisión de estado clara, reporte con métricas, documentación auditada y checkout del plugin verificado.',
       steps: [
-        'Pedir la siguiente acción más segura antes de ejecutar más trabajo.',
+        'Revisar el estado actual antes de ejecutar más trabajo.',
         'Generar métricas para revisar completitud, riesgos y cobertura de issues externos.',
         'Auditar docs generadas por frescura, links, trazabilidad y referencias faltantes.',
         'Ejecutar el doctor del plugin cuando el inventario de comandos o la plantilla podrían haberse desalineado.',
       ],
-      commands: ['/plan-next', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
+      commands: ['/plan-status', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
       source: 'planning-template/TUTORIAL/reference.md',
+    },
+    {
+      id: 'flow-g',
+      title: 'Flujo G - Configurar smoke tests',
+      when:
+        'Úsalo cuando termina una tarea del proyecto y necesitas un plan de smoke tests que considere el stack antes del code review humano.',
+      outcome:
+        'Un archivo `.planning/SMOKE-TESTS.md` concreto con orden de arranque, checks de conectividad, validaciones de migración y criterios de revisión.',
+      steps: [
+        'Inspeccionar el stack del repositorio y los servicios de soporte.',
+        'Dejar que Claude infiera o pregunte los comandos de smoke test cuando el stack sea ambiguo.',
+        'Registrar el orden de ejecución y los checks de validación en `.planning/SMOKE-TESTS.md`.',
+        'Revisar el archivo antes de pasar a code review humano.',
+      ],
+      commands: ['/plan-smoke-config'],
+      source: 'planning-template/TUTORIAL/flow-06-smoke-config.md',
     },
     {
       id: 'reference',
@@ -126,9 +142,9 @@ const tutorialsPage = {
         'Ubicar si estás trabajando en backlog de producto o en .planning/.',
         'Elegir el comando según la fase del ciclo de vida.',
         'Verificar argumentos esperados antes de ejecutarlo.',
-        'Consultar /plan-next cuando no esté clara la siguiente acción, o /plan-health cuando todo el sistema pueda estar inconsistente.',
+        'Consultar /plan-status cuando no esté claro el estado actual, o /plan-health cuando todo el sistema pueda estar inconsistente.',
       ],
-      commands: ['/us-new', '/us-enrich', '/plan-from-epic', '/plan-new', '/plan-expand', '/plan-next', '/plan-health', '/plan-run'],
+      commands: ['/us-new', '/us-enrich', '/plan-from-epic', '/plan-new', '/plan-expand', '/plan-status', '/plan-health', '/plan-run', '/plan-smoke-config'],
       source: 'planning-template/TUTORIAL/reference.md',
     },
   ],

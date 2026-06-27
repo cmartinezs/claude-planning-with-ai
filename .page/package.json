@@ -1,6 +1,6 @@
 {
   "name": "claude-planning-with-ai",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,9 +10,11 @@
     "verify": "node scripts/verify.js"
   },
   "dependencies": {
+    "dockview-react": "^7.0.2",
     "next": "^14.2.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-resizable-panels": "^4.11.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

@@ -37,15 +37,15 @@
 2. Podría vivir como skill o script de mantenimiento del repo.
 3. Diferente de `/plan-health`, porque revisaría el plugin instalado o el repo del plugin, no una `.planning/` de usuario.
 
-## 4. Comando `/plan-next`
+## 4. Comando `/plan-status`
 
-1. Mostrar la siguiente acción recomendada.
-2. Resolvería la necesidad que hoy aparece como `/plan-advance` inexistente.
+1. Mostrar el estado actual antes de elegir la siguiente acción.
+2. Resolvería la necesidad de inspeccionar un planning sin asumir un comando recomendando que no siempre existe en la versión estable.
 3. Ejemplos:
-   - planning en INITIAL -> `/plan-expand`
-   - story TODO con tareas faltantes -> `/plan-atomize`
-   - task pendiente -> `/plan-task`
-   - todas DONE -> `/plan-validate` y `/plan-archive`
+   - planning en INITIAL -> revisar `00-initial.md` y pasar a `/plan-expand`
+   - story TODO con tareas faltantes -> revisar `01-expansion.md` y pasar a `/plan-atomize`
+   - task pendiente -> revisar la story y ejecutar `/plan-task`
+   - todas DONE -> revisar `/plan-validate` y `/plan-archive`
 
 ## 5. Comando `/plan-audit-docs`
 

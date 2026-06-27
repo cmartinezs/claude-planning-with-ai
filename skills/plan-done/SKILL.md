@@ -19,21 +19,23 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
 ## Steps
 
 1. Parse `$ARGUMENTS`.
-2. Read `.planning/active/<planning-id>/02-deepening/<story-id>-*.md`.
+2. Read `.planning/active/<planning-id>/02-deepening/<story-id>-*.md` and `.planning/config.yml` if present. Extract `project.type`, `execution.requires_git`, and `software.smoke_tests_file`.
 3. If a specific task number was given: find that task in the checklist and mark it `[x]`. Report and stop.
 4. If no task number given (mark all):
    a. Mark all tasks `[x]` in the story file.
    b. Execute `[EXECUTE-STORY]` — verify done criteria are satisfied.
       - If `BLOCKED`: report unmet criteria, do NOT advance.
-      - If `DONE`: present the full `## Done Criteria` section of the story file to the user and ask explicitly:
+      - If `DONE`: present the full `## Done Criteria` section of the story file to the user. For `project.type: software`, also present the latest available smoke-test evidence: supporting services, build/start command, connectivity or schema result, and smoke checks. If that evidence is missing or stale, rerun the smoke test plan before asking for approval.
 
-        > "The system verified the done criteria automatically. Please open the story file and confirm each criterion below is truly satisfied in the codebase before this story is marked DONE:"
+        > "The system verified the done criteria automatically. Please open the story file and review the actual codebase before this story is marked DONE:"
 
         List every criterion with its current `[x]` / `[ ]` state. Then ask:
 
-        > "Reply with **confirmed** to finalize, or indicate which criteria still need work."
+        > "Reply with **approved** to finalize, push, and create the PR, or list the requested corrections."
 
-        Do not advance until the user confirms.
+        Do not advance until the user approves.
+
+        If the reviewer requests corrections, implement them, rerun the relevant verification, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed, and ask for a new human review. Do not mark the story `DONE`, push, or create a PR before approval.
       - After confirmation: set story status to `DONE` in the story file.
    c. Execute `[CHECK-TRACEABILITY]` — ensure all terms from this story are recorded.
    d. Execute `[NEXT-STORY]` to identify the next pending story.
@@ -43,7 +45,7 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
 
 ### Git finalize (conditional)
 
-After step 4b, if no specific task number was given (story fully done):
+After step 4b, if no specific task number was given (story fully done) and the human developer review approved finalization:
 
 6. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if absent) and `execution.requires_git` (default: `true`).
    - If `execution.requires_git` is `false`, skip steps 7–11 and note in the report that push and PR creation are disabled by `.planning/config.yml`.

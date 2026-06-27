@@ -22,6 +22,7 @@ Reference workflows:
 ## Steps
 
 1. Parse `$ARGUMENTS` and locate the planning in `.planning/active/` (or `.planning/finished/`). If not found, stop and report.
+1b. Read `.planning/config.yml` if present. Extract `project.type` (default `software`) and `software.smoke_tests_file` (default `SMOKE-TESTS.md` for software).
 2. Build the story set to audit: the given story, or every story in `02-deepening/` that has a task folder (`<story-id>-*/` containing `task-NN-*.md` files). If the target story has no task folder, report it as not atomized and suggest `/plan-atomize`.
 3. Build the workflow catalog from `.planning/WORKFLOWS/README.md` (valid set for `Workflow` fields).
 4. **Structural checks per atomized story:**
@@ -33,12 +34,13 @@ Reference workflows:
    f. A task `IN PROGRESS` or `DONE` whose `Depends On` tasks are not all `DONE` is a **WARN** (executed out of order).
    g. A story marked `DONE` with any task not `DONE` is a **FAIL**.
 5. **Atomicity checks per task file** — execute `[CHECK-ATOMICITY]` requirement by requirement:
-   a. Required sections present: `## Objective`, `## Technical Design`, `## Implementation Steps`, `## Unit Tests`, `## Done Criteria`. Missing section is a **FAIL**.
+   a. Required sections present: `## Objective`, `## Technical Design`, `## Implementation Steps`, `## Verification` (or legacy `## Unit Tests`), and `## Done Criteria`. Missing section is a **FAIL**.
    b. `Workflow` value exists in the catalog. Unknown ID is a **FAIL**.
    c. Surviving template placeholders (`[Task Name]`, `[WORKFLOW-NAME]`, `[Step naming...]`, etc.) are a **WARN** in `TODO` tasks and a **FAIL** in `IN PROGRESS`/`DONE` tasks.
    d. Objective naming more than one deliverable is a **WARN** (requirement 1: candidate for splitting).
-   e. Empty `Unit Tests` table is a **FAIL** (requirement 5).
-   f. Done criteria that are not binary/verifiable ("works well", "is reasonable") are a **WARN** (requirement 6).
+   e. Empty `Verification` table is a **FAIL** (requirement 5). Legacy `Unit Tests` is accepted but should be migrated to `Verification`.
+   f. For `project.type: software`, missing `### Software Smoke Test Check` or missing done criteria for supporting services, startup/build, connectivity or schema checks, smoke checks, and human developer code review is a **FAIL**.
+   g. Done criteria that are not binary/verifiable ("works well", "is reasonable") are a **WARN** (requirement 6).
 6. **Report.** Print one block per story:
 
 ```
@@ -50,12 +52,12 @@ story-NN-name (N tasks)
 
 End with a global summary: `N tasks audited — X clean, Y with warnings, Z with failures.` State clearly that nothing was modified.
 
-7. **Suggest fixes.** For each finding, suggest the command or edit that resolves it (e.g. status mismatch → update the index row; non-atomic task → split it and re-run `/plan-atomize` review; missing tests → fill the `Unit Tests` table before `/plan-task`). Do not apply any fix.
+7. **Suggest fixes.** For each finding, suggest the command or edit that resolves it (e.g. status mismatch → update the index row; non-atomic task → split it and re-run `/plan-atomize` review; missing verification → fill the `Verification` table and, for software, the local runtime check before `/plan-task`). Do not apply any fix.
 
 8. **File review prompt.** After the report, list every task file and story index referenced in a FAIL or WARN and ask the user to inspect them:
 
    > "Before applying any fix, open and verify the following files directly — the report above may not capture every detail visible in the source:
-   > - `<task-file-path>` — check `## Done Criteria` (all `[x]`?) and `## Unit Tests` (table populated?)
+   > - `<task-file-path>` — check `## Done Criteria` (all `[x]`?), `## Verification` (table populated?), and software local runtime evidence when applicable.
    > …
    > Confirm the issues are still present before modifying or re-running the skill."
 

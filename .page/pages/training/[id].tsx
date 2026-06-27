@@ -15,6 +15,7 @@ import scenario06 from '@/data/training/scenario-06-autonomous'
 import scenario07 from '@/data/training/scenario-07-recovery'
 import scenario08 from '@/data/training/scenario-08-context-switch'
 import scenario09 from '@/data/training/scenario-09-advisory-audit'
+import scenario10 from '@/data/training/scenario-10-smoke-config'
 import type { TrainingScenario } from '@/types/training'
 
 const SCENARIOS: Record<string, TrainingScenario> = {
@@ -27,6 +28,7 @@ const SCENARIOS: Record<string, TrainingScenario> = {
   'recovery': scenario07,
   'context-switch': scenario08,
   'advisory-audit': scenario09,
+  'smoke-config': scenario10,
 }
 
 const META_ES: Record<string, { title: string; description: string }> = {
@@ -64,7 +66,11 @@ const META_ES: Record<string, { title: string; description: string }> = {
   },
   'advisory-audit': {
     title: 'Decisión y auditoría',
-    description: 'Practica /plan-next, métricas, auditoría documental y verificación estructural del plugin.',
+    description: 'Practica /plan-status, métricas, auditoría documental y verificación estructural del plugin.',
+  },
+  'smoke-config': {
+    title: 'Smoke tests',
+    description: 'Configura el plan de smoke tests del proyecto para validar arranque, conectividad y migraciones antes del code review humano.',
   },
 }
 

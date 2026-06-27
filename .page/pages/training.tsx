@@ -110,10 +110,19 @@ const SCENARIOS: ScenarioCard[] = [
   {
     id: 'advisory-audit',
     title: 'Decisión y auditoría',
-    description: 'Usa el flujo nuevo de v3: recomienda siguiente acción, reporta métricas, audita docs y valida el plugin.',
+    description: 'Usa el flujo de estado, métricas, auditoría documental y validación estructural del plugin.',
     difficulty: 'intermediate',
     durationMin: 6,
-    commands: ['/plan-next', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
+    commands: ['/plan-status', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
+    available: true,
+  },
+  {
+    id: 'smoke-config',
+    title: 'Smoke tests',
+    description: 'Configura el plan de smoke tests del proyecto para que cada tarea termine con validaciones reales del stack.',
+    difficulty: 'intermediate',
+    durationMin: 6,
+    commands: ['/plan-smoke-config'],
     available: true,
   },
 ]
@@ -132,7 +141,7 @@ export default function TrainingCatalogPage() {
     <>
       <Head>
         <title>Entrenamientos — Planning with AI</title>
-        <meta name="description" content="Practica el plugin con escenarios reales paso a paso. 9 entrenamientos que cubren el ciclo de vida completo." />
+        <meta name="description" content="Practica el plugin con escenarios reales paso a paso. 10 entrenamientos que cubren el ciclo de vida completo." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 

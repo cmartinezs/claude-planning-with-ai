@@ -79,7 +79,7 @@ The planning system defaults to `software`, but `.planning/config.yml` can adapt
 
 | Mode | Use when | Verification expectation |
 |------|----------|--------------------------|
-| `software` | Source code, services, apps, infrastructure, automation | Tests, build checks, linting, runtime checks |
+| `software` | Source code, services, apps, infrastructure, automation | Tests, build checks, linting, stack-specific smoke tests, connectivity or schema checks, and human developer review |
 | `general` | General project delivery | Evidence checklist, manual validation, stakeholder confirmation |
 | `documentation` | Docs, guides, content, knowledge bases | Review, links, rendered output, publication checks |
 | `research` | Discovery, analysis, experiments | Notes, sources, decisions, reproducible evidence |

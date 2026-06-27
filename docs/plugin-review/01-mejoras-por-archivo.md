@@ -26,7 +26,7 @@
 
 1. Reemplazar referencias a `scope`, `scope-NN` y `/plan-scope` por `story`, `story-NN` y `/plan-story` cuando representen la unidad antigua.
 2. Actualizar la estructura instalada por `/plan-init`: actualmente muestra `scope-NN-name.md`, pero la plantilla real es `story-NN-name.md`.
-3. Mantener una tabla completa con los 47 comandos detectados en `skills/`.
+3. Mantener una tabla completa con los 48 comandos detectados en `skills/`.
 4. Separar comandos por intención real: setup, backlog, lifecycle, execution, automation agents, documentation, release planning, maintenance and recovery.
 5. Documentar `argument-hint` y modo de uso para cada comando.
 

@@ -18,7 +18,7 @@ Each story lives under `02-deepening/story-NN-name.md`, has its own tasks, statu
 
 The smallest executable unit of work, produced by `/plan-atomize`. One task file lives under `02-deepening/story-NN-name/task-NN-name.md` and contains objective, technical design or approach, implementation steps, verification, and binary done criteria.
 
-For software, verification usually means unit tests or the project test runner. For non-software work, use concrete evidence such as a reviewed document, approved checklist, published asset, signed decision, or reproducible manual validation.
+For software, verification means unit tests or the project test runner plus the configured local runtime smoke check. For non-software work, use concrete evidence such as a reviewed document, approved checklist, published asset, signed decision, or reproducible manual validation.
 
 ### Project Configuration
 
@@ -32,6 +32,16 @@ Each initialized project has `.planning/config.yml`. It controls:
 | `execution.requires_git` | Enables or disables git pre-flight checks |
 | `execution.requires_tests` | Distinguishes test-backed verification from manual acceptance evidence |
 | `integrations.external_issues` | Records whether external issue IDs come from GitHub, Jira, Linear, or are disabled |
+| `software.smoke_tests_file` | Points to the project smoke test plan file under `.planning/` |
+
+For software projects, `.planning/config.yml` can point to a stack-specific smoke test plan file. The default file is `.planning/SMOKE-TESTS.md`, and the plan should describe the supporting services, build/start command, connectivity or schema checks, and the smallest smoke checks that prove the changed surface still works.
+
+```yaml
+software:
+  smoke_tests_file: SMOKE-TESTS.md   # Optional override for the smoke-test plan file under .planning/
+```
+
+When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, run the smoke checks, then wait for human developer code review. Requested corrections restart the verification/review loop. Git add/commit/push and PR creation happen only after human approval.
 
 ### Area
 
@@ -176,16 +186,16 @@ Use this when the planning is clear enough for a guided autonomous run.
 | `assisted` | Asks once for the run, then stops for blockers or risky conditions |
 | `autonomous` | Continues through non-destructive phases when structure is valid |
 
-### Flow F — Decide The Next Action
+### Flow F — Check State Before Choosing
 
-Use this when you are not sure which command should run next.
+Use this when you want to inspect current state before choosing the next command.
 
 ```text
-/plan-next
-/plan-next 002-payment-gateway
+/plan-status
+/plan-status 002-payment-gateway
 ```
 
-`/plan-next` reads planning state, dependencies, blockers, project type, and autonomy settings. It returns one recommended command, supporting findings, and alternatives.
+`/plan-status` reads planning state, dependencies, blockers, project type, and autonomy settings so you can decide the next command with context.
 
 ### Flow G — Documentation Audit
 
@@ -206,6 +216,7 @@ The audit compares expected docs from stories and tasks against actual files, lo
 |---------|----------|-------------|
 | `/plan-init` | `[--blank] [--force]` | Initialize `.planning/` and configure areas |
 | `/plan-git-config` | `[--base-branch <branch>]` | View or update planning git config |
+| `/plan-smoke-config` | `[--blank]` | Generate or update the project smoke test plan |
 
 ### Backlog
 
@@ -230,13 +241,13 @@ The audit compares expected docs from stories and tasks against actual files, lo
 | `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` | Audit atomic tasks |
 | `/plan-story` | `NNN-slug story-NN` | Execute all tasks in a story |
 | `/plan-done` | `NNN-slug story-NN [task-N]` | Mark a task or story done |
-| `/plan-next` | `[NNN-slug]` | Recommend the next safest command |
+| `/plan-status` | `[NNN-slug]` | Show planning state and story progress |
 | `/plan-validate` | `[NNN-slug]` | Check structural integrity |
 | `/plan-archive` | `NNN-slug` | Audit and archive to `finished/` |
 
 ### Automation, Maintenance, Docs, Releases
 
-See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/plan-audit-docs`, `/release-*`, `/plan-health`, `/plan-doctor`, `/plan-report`, `/plan-export`, recovery commands, and history/status utilities.
+See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/plan-audit-docs`, `/release-*`, `/plan-health`, `/plan-doctor`, `/plan-report`, `/plan-export`, `/plan-smoke-config`, recovery commands, and history/status utilities.
 
 ## Choosing Similar Commands
 
@@ -250,7 +261,7 @@ See [Command Reference](reference.md) for the complete list, including `/plan-ru
 | An active planning story is too broad | `/plan-split-story` |
 | You want to scan the entire `.planning/` system | `/plan-health` |
 | You want a detailed audit of a planning | `/plan-validate` |
-| You are unsure which command should run next | `/plan-next` |
+| You want to inspect current planning state before choosing | `/plan-status` |
 | You changed generated documentation and need coverage/freshness checks | `/plan-audit-docs` |
 | You maintain this plugin and need a structural audit | `/plan-doctor` |
 

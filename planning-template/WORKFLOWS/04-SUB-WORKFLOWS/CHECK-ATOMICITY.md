@@ -16,7 +16,7 @@ A task is atomic when **all** of the following hold:
 | 2 | **Independently executable** — can be completed without waiting on undone work, or declares explicit dependencies | `Depends On` lists task IDs or `—` |
 | 3 | **Technical design included** — approach, affected files, and interfaces are decided before implementation | Technical Design section has no placeholders |
 | 4 | **Concrete implementation steps** — ordered steps naming real files or components | No abstract verbs ("handle", "manage") without a target file |
-| 5 | **Unit test plan** — cases, expected results, and test location are defined | Unit Tests table has at least one row |
+| 5 | **Verification plan** — cases, expected results, and validation location are defined | Verification table has at least one row; software tasks also include smoke test checks |
 | 6 | **Binary done criteria** — each criterion is pass/fail verifiable, no judgment calls | Every criterion can be answered yes/no |
 | 7 | **Workflow reference** — execution is governed by a workflow ID from the catalog | `Workflow` value exists in `WORKFLOWS/README.md` |
 | 8 | **Session-sized** — completable in one focused work session | If it needs more, it hides more than one deliverable |

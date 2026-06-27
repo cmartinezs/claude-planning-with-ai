@@ -256,6 +256,9 @@ execution:
   requires_git: <true-or-false>
   requires_tests: <true-or-false>
 
+software:
+  smoke_tests_file: SMOKE-TESTS.md   # Optional override for the smoke-test plan file under .planning/
+
 integrations:
   external_issues: disabled     # disabled | github | jira | linear
 

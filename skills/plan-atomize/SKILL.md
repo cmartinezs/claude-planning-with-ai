@@ -29,6 +29,7 @@ Reference workflows:
    - `project.type` (default `software`)
    - `execution.requires_tests` (default `true`)
    - `execution.requires_git` (default `true`)
+   - `software.smoke_tests_file` (default `SMOKE-TESTS.md`) for software smoke-test expectations
 
 3. **For each story in the work list**, execute the following sub-steps:
 
@@ -54,6 +55,7 @@ Reference workflows:
       - `Technical Design` — approach, affected files, interfaces, design notes.
       - `Implementation Steps` — ordered, naming real files or components.
       - `Verification` — if `execution.requires_tests` is `true`, include unit or automated tests for code changes; otherwise include concrete manual/evidence checks appropriate to `project.type`.
+      - `Software Smoke Test Check` — for `project.type: software`, include the smoke-test plan, supporting services, startup/build command, connectivity or schema checks, smoke checks, and human developer code review expectations.
       - `Done Criteria` — binary, verifiable conditions.
       - Header fields: `Status: TODO`, `Workflow` (from the catalog), `Depends On`.
    c. Rewrite the story's `## Tasks` table as an index: each task name becomes a link to its task file (`[Task name](<story-id>-<name>/task-NN-slug.md)`), keeping `Workflow`, `Status`, and `Output` columns in sync with the task files.

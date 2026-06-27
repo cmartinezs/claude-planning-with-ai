@@ -31,6 +31,7 @@ Reference workflows:
    - `execution.requires_tests` (default `true`)
    - `execution.requires_git` (default `true`)
    - `docs.output_dir` (default `docs`)
+   - `software.smoke_tests_file` (default `SMOKE-TESTS.md`; resolved under `.planning/`)
 4. **Readiness checks** (stop and report if any fails):
    a. Task status must not be `DONE`.
    b. Every task in `Depends On` must have status `DONE` in its own file. List the pending ones otherwise.
@@ -42,19 +43,45 @@ Reference workflows:
    b. Apply the `Implementation Steps` in order, announcing each one.
    c. Run the checks listed in the `Verification` table. If `execution.requires_tests` is `true`, write and run the listed unit tests for code tasks. If it is `false`, collect the stated manual, documentary, approval, or reproducibility evidence appropriate to `project.type`.
    d. Run the project's relevant validation command when applicable. If `execution.requires_tests` is `false` and no automated validation exists, do not invent a test runner; include the evidence summary in the report instead.
+   e. For `project.type: software`, execute the smoke test plan before asking for human review:
+      1. Read `.planning/${software.smoke_tests_file}` if present. If missing, infer the smoke plan from the repository stack signals (`package.json`, `pom.xml`, `build.gradle*`, `docker-compose.yml`, `compose.yml`, migrations, health endpoints, CLI entrypoints) and write the inferred plan into the report before running it.
+      2. Start the supporting services or fixtures required by the smoke plan using the safest non-destructive commands for the detected stack.
+      3. Compile or build the application using the project build tool or the task's verification command.
+      4. Start the application or worker using the project-local configuration described by the smoke plan.
+      5. Run the smoke checks focused on real integration failures:
+         - compilation/build failure
+         - dependency or connectivity failure
+         - schema or migration failure when applicable
+         - minimal health/API/CLI checks that prove the changed surface starts correctly
+      6. If any smoke check fails, keep the task `IN PROGRESS`, report the concrete failure logs, implement the correction, and repeat this step before asking for human code review.
 7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the output is consistent with `docs/` contracts.
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 9. Verify every `Done Criteria` item. If any is unmet, leave the task `IN PROGRESS`, list what is missing, and stop.
 
-9b. **Manual review checkpoint** — before marking the task DONE, present the full `## Done Criteria` section to the user exactly as it appears in the task file. Then ask explicitly:
+9b. **Human developer code review checkpoint** — before marking the task DONE or staging any files, present:
+   - the full `## Done Criteria` section exactly as it appears in the task file
+   - the files changed/created
+   - unit/automated verification results
+   - for software projects, smoke-test evidence: supporting services, app/build command, connectivity or schema result, and smoke checks
 
-   > "Please review each criterion above and confirm that all of them are satisfied in the actual codebase (not just in the task file). Reply with **confirmed** to mark this task DONE, or indicate which criteria need further work."
+   Then ask explicitly:
 
-   Do not proceed to step 10 until the user confirms.
+   > "Please perform a human developer code review before this task is marked DONE or committed. Reply with **approved** to mark this task DONE and continue to git add/commit, or list the requested corrections."
+
+   Do not proceed to step 10 until the user approves.
+
+   If the reviewer requests corrections:
+   - implement the requested changes
+   - rerun the task verification
+   - for software projects, rerun the smoke test plan
+   - present the updated review summary again
+   - wait for a new human code review
+
+   Repeat this loop until the reviewer replies with **approved**. Do not mark the task `DONE`, stage files, commit, push, or create a PR before approval.
 
 10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
 
-10b. **Conventional commit** — commit the task output only when `execution.requires_git` is `true`:
+10b. **Conventional commit after review approval** — commit the task output only when `execution.requires_git` is `true`:
 
    If `execution.requires_git` is `false`, skip this step and report that git commit was disabled by `.planning/config.yml`.
 
@@ -73,7 +100,7 @@ Reference workflows:
 
    c. Derive the **description** from the task filename: strip the `task-NN-` prefix from `task-NN-<slug>` and replace hyphens with spaces → e.g. `task-02-create-user-model` → `create user model`.
 
-   d. Stage only the files listed in the task's `Technical Design → Affected files / components` field, plus any additional files created during implementation. If the field is missing or clearly incomplete, stop and ask the user to confirm the exact files to stage. Do **not** use `git add -A` or `git add .`.
+   d. Stage only the files listed in the task's `Technical Design → Affected files / components` field, plus any additional files created during implementation and review corrections. If the field is missing or clearly incomplete, stop and ask the user to confirm the exact files to stage. Do **not** use `git add -A` or `git add .`.
 
    e. Commit:
    ```bash

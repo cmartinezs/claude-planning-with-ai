@@ -108,7 +108,7 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-status
 
 # Recomendar el siguiente comando seguro
-/plan-next [NNN-slug]
+/plan-status [NNN-slug]
 
 # Validar integridad estructural (solo lectura: ubicación, stories, workflows, dependencias)
 /plan-validate                         # todos los plannings
@@ -124,7 +124,7 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-task-validate NNN-slug [story-NN] [task-NN]
 
 # Ejecutar todas las tareas de una story
-# → crea rama desde base, commit por tarea (conventional commits), push + PR al final
+# → crea rama desde base, ejecuta tareas, espera code review humano, commitea tareas aprobadas, push + PR al final
 /plan-story NNN-slug story-NN
 
 # Marcar story completo (verifica done criteria y avanza al siguiente)
@@ -193,13 +193,14 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Publicar una release | `/release-status vX.Y.Z --mark-released` |
 | Configurar rama base en un proyecto existente | `/plan-git-config --base-branch <branch>` |
 | Ver configuración git actual | `/plan-git-config` |
+| Configurar smoke tests del proyecto | `/plan-smoke-config [--blank]` |
 | Crear una user story nueva | `/us-new epic-NN-slug` |
 | Story existe pero le faltan secciones de ejecución | `/us-enrich US-NNN` |
 | Epic necesita más stories | `/epic-enrich epic-NN-slug` |
 | Convertir un epic en planning ejecutable | `/plan-from-epic NNN epic-NN-slug` |
 | Planificar trabajo técnico sin epic | `/plan-template` → `/plan-new` → `/plan-expand` |
 | Ver todos los plannings activos | `/plan-status` |
-| Decidir qué ejecutar después | `/plan-next [NNN-slug]` |
+| Revisar el estado antes de decidir | `/plan-status [NNN-slug]` |
 | Verificar que un planning está bien formado | `/plan-validate NNN-slug` |
 | Las tareas de una story son muy gruesas para ejecutar | `/plan-atomize NNN-slug story-NN` |
 | Ejecutar una sola tarea atómica | `/plan-task NNN-slug story-NN task-NN` |
@@ -230,7 +231,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Planning activo en `.planning/active/` | `/plan-enrich-story`, `/plan-split-story`, `/plan-enrich-epic` | `/us-enrich`, `/us-split` |
 | Chequeo global de `.planning/` | `/plan-health` | `/plan-validate` |
 | Auditoría detallada de un planning | `/plan-validate NNN-slug` | `/plan-health` |
-| Siguiente acción recomendada | `/plan-next` | `/plan-status` |
+| Revisar el estado actual | `/plan-status` | `/plan-health` |
 | Comunicación diaria | `/plan-standup` | `/plan-report` |
 | Resumen ejecutivo | `/plan-report` | `/plan-standup` |
 | Artefacto externo para PR/tickets/issues/docs | `/plan-export` | `/plan-report` |
@@ -250,7 +251,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-template` | `slug [--interactive\|--blank]` |
 | `/plan-new` | `NNN-slug -- intent` ó `NNN-slug @path.md` |
 | `/plan-expand` | `NNN-slug` |
-| `/plan-next` | `[NNN-slug]` |
+| `/plan-status` | `[NNN-slug]` |
 | `/plan-validate` | `[NNN-slug]` (vacío = todos) |
 | `/plan-atomize` | `NNN-slug story-NN` |
 | `/plan-task` | `NNN-slug story-NN task-NN` |
@@ -263,6 +264,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-doctor` | `[--plugin-root <path>]` |
 | `/release-status` | `[vX.Y.Z] [--mark-planned\|--mark-in-progress\|--mark-blocked\|--mark-released\|--mark-cancelled]` |
 | `/plan-git-config` | `[--base-branch <branch>]` (vacío = mostrar config actual) |
+| `/plan-smoke-config` | `[--blank]` (vacío = generar con preguntas e inferencia) |
 | `/plan-story` | `NNN-slug story-NN` |
 | `/plan-done` | `NNN-slug story-NN` ó `NNN-slug story-NN task-N` |
 | `/plan-archive` | `NNN-slug` |

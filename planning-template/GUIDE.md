@@ -21,7 +21,7 @@ flowchart LR
 |-------|---------|-------------|
 | **INITIAL** | `00-initial.md` | General idea without dimensioning. What needs to be achieved, why, approximate context. Clarity of intent — not exhaustiveness. |
 | **EXPANSION** | `01-expansion.md` | All user stories are identified and listed. Dependencies between them are mapped. Impact per SDLC phase is documented. |
-| **DEEPENING** | `02-deepening/` | One `.md` file per story. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a story into atomic task files under `story-NN-name/`, each with technical design, implementation steps, and unit tests. |
+| **DEEPENING** | `02-deepening/` | One `.md` file per story. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a story into atomic task files under `story-NN-name/`, each with technical design, implementation steps, verification, and software local-runtime checks when applicable. |
 
 ---
 
