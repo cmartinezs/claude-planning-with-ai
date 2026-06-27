@@ -1,6 +1,11 @@
 # Canonical command inventory for docs and landing-page synchronization.
 # Keep this file aligned with skills/<command>/SKILL.md.
 
+defaults:
+  audience: contributors using Claude Code planning workflows
+  project_modes: [software, general, documentation, research, operations]
+  usage: see the command's `argument-hint` in the referenced SKILL.md
+
 commands:
   - name: doc-generate
     category: documentation
@@ -14,6 +19,13 @@ commands:
     category: documentation
     source: skills/doc-task/SKILL.md
     summary: Wrapper for task-level documentation generation.
+  - name: plan-audit-docs
+    category: documentation
+    source: skills/plan-audit-docs/SKILL.md
+    summary: Audit planning-generated documentation for coverage, freshness, links, and traceability.
+    usage: /plan-audit-docs <NNN-slug> [--docs-dir <path>]
+    audience: maintainers, documentation owners, reviewers
+    project_modes: [software, general, documentation, research, operations]
   - name: epic-enrich
     category: backlog
     source: skills/epic-enrich/SKILL.md
@@ -46,6 +58,13 @@ commands:
     category: lifecycle
     source: skills/plan-done/SKILL.md
     summary: Mark a task or story done.
+  - name: plan-doctor
+    category: maintenance
+    source: skills/plan-doctor/SKILL.md
+    summary: Audit a plugin checkout or installed template for command, skill, and documentation drift.
+    usage: /plan-doctor [--plugin-root <path>]
+    audience: plugin maintainers
+    project_modes: [software, general, documentation, research, operations]
   - name: plan-enrich-epic
     category: adjustment
     source: skills/plan-enrich-epic/SKILL.md
@@ -90,6 +109,13 @@ commands:
     category: lifecycle
     source: skills/plan-new/SKILL.md
     summary: Create a planning in INITIAL state.
+  - name: plan-next
+    category: status
+    source: skills/plan-next/SKILL.md
+    summary: Recommend the next safest planning action from current state and project mode.
+    usage: /plan-next [NNN-slug]
+    audience: contributors, maintainers
+    project_modes: [software, general, documentation, research, operations]
   - name: plan-report
     category: communication
     source: skills/plan-report/SKILL.md

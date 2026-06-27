@@ -86,6 +86,110 @@ If you discover a contradiction between a `docs/` decision and the implementatio
 
 ## Prompt Library (Reusable)
 
+### Create a planning from an idea
+
+```
+Context: I want to create planning [NNN-name] for [short intent].
+Task: Use /plan-template to shape the idea, then /plan-new when the objective,
+      boundaries, and first acceptance criteria are clear.
+Constraints:
+  - Keep scope narrow enough to finish in one planning.
+  - Capture open questions explicitly instead of assuming answers.
+  - Include expected docs, code, research, or operational outputs.
+Done when:
+  - 00-initial.md exists
+  - intent, why, scope, and open questions are filled
+  - project.type from config.yml was considered
+```
+
+---
+
+### Split an oversized story
+
+```
+Context: Planning [NNN-name], story [story-NN] is too large or mixes concerns.
+Task: Use /plan-split-story to divide it into smaller stories with independent
+      outputs, dependencies, risks, and done criteria.
+Constraints:
+  - Preserve the original intent.
+  - Do not split by implementation layer only; split by independently verifiable outcome.
+  - Update 01-expansion.md dependency and risk tables.
+Done when:
+  - New story files exist
+  - Dependencies are explicit
+  - The original story is replaced, retired, or clearly marked
+```
+
+---
+
+### Validate done criteria
+
+```
+Context: Planning [NNN-name], story [story-NN] is close to DONE.
+Task: Review every done criterion and classify it as verifiable, ambiguous, or missing evidence.
+Constraints:
+  - Each criterion must be binary.
+  - Verification must name the command, file, review, or manual check used.
+  - Residual work must be recorded instead of hidden in notes.
+Done when:
+  - All criteria have evidence
+  - Missing evidence is listed as follow-up work
+  - /plan-validate NNN-name passes or its warnings are explained
+```
+
+---
+
+### Write an ADR
+
+```
+Context: Planning [NNN-name], story [story-NN] made a decision that affects future work.
+Task: Draft an ADR in [docs/adr/NNNN-title.md] using the project's ADR convention.
+Constraints:
+  - State context, decision, alternatives, consequences, and rollback path.
+  - Link the related planning story and external issue ID if present.
+  - Record any new terms in TRACEABILITY.md.
+Done when:
+  - ADR exists
+  - Story done criteria reference the ADR
+  - Related docs link to the ADR
+```
+
+---
+
+### Review risk before execution
+
+```
+Context: Planning [NNN-name] is ready to execute.
+Task: Review the Risk Register, each story Risk section, and task Technical Design risks.
+Constraints:
+  - High risks must have mitigation or a blocker.
+  - Risks involving data loss, security, compliance, or public user impact require explicit confirmation.
+  - Routine low-risk work can be marked "Low — routine change".
+Done when:
+  - Risk values are consistent across expansion, story, and task files
+  - Mitigations are concrete
+  - /plan-next recommends an execution command or a validation command
+```
+
+---
+
+### Adapt planning to a non-software project
+
+```
+Context: This project is [documentation/research/operations/general], not primarily software.
+Task: Adapt the planning language and verification style using WORKFLOWS/06-PROJECT-GUIDANCE.
+Constraints:
+  - Keep the same planning lifecycle and files.
+  - Replace tests with acceptance checks only when execution.requires_tests is false.
+  - Use terms from config.yml terminology.planning_item consistently.
+Done when:
+  - config.yml project.type and terminology match the project
+  - stories/deliverables have concrete outputs
+  - verification does not depend on nonexistent build or test commands
+```
+
+---
+
 ### Advance to next story
 
 ```

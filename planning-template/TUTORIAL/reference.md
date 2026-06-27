@@ -107,6 +107,9 @@ Todos los comandos disponibles con su sintaxis exacta.
 # Ver estado de todos los plannings
 /plan-status
 
+# Recomendar el siguiente comando seguro
+/plan-next [NNN-slug]
+
 # Validar integridad estructural (solo lectura: ubicación, stories, workflows, dependencias)
 /plan-validate                         # todos los plannings
 /plan-validate NNN-slug                # solo uno
@@ -196,6 +199,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Convertir un epic en planning ejecutable | `/plan-from-epic NNN epic-NN-slug` |
 | Planificar trabajo técnico sin epic | `/plan-template` → `/plan-new` → `/plan-expand` |
 | Ver todos los plannings activos | `/plan-status` |
+| Decidir qué ejecutar después | `/plan-next [NNN-slug]` |
 | Verificar que un planning está bien formado | `/plan-validate NNN-slug` |
 | Las tareas de una story son muy gruesas para ejecutar | `/plan-atomize NNN-slug story-NN` |
 | Ejecutar una sola tarea atómica | `/plan-task NNN-slug story-NN task-NN` |
@@ -213,6 +217,8 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Iniciar planificación con otra en curso → pausa automática | detección automática en `/plan-run` y `/plan-agent-execute` |
 | Cambiar de story con otra en progreso → pausa automática | detección automática en `/plan-story` |
 | Retomar una story en STANDBY | `/plan-story NNN-slug story-NN` |
+| Auditar documentación generada por un planning | `/plan-audit-docs NNN-slug` |
+| Auditar este plugin o plantilla instalada | `/plan-doctor` |
 
 ---
 
@@ -224,9 +230,11 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Planning activo en `.planning/active/` | `/plan-enrich-story`, `/plan-split-story`, `/plan-enrich-epic` | `/us-enrich`, `/us-split` |
 | Chequeo global de `.planning/` | `/plan-health` | `/plan-validate` |
 | Auditoría detallada de un planning | `/plan-validate NNN-slug` | `/plan-health` |
+| Siguiente acción recomendada | `/plan-next` | `/plan-status` |
 | Comunicación diaria | `/plan-standup` | `/plan-report` |
 | Resumen ejecutivo | `/plan-report` | `/plan-standup` |
 | Artefacto externo para PR/tickets/docs | `/plan-export` | `/plan-report` |
+| Cobertura/frescura de docs | `/plan-audit-docs` | `/doc-generate` |
 | Estado de una entrega/version | `/release-status` | `/plan-status` |
 
 ---
@@ -242,6 +250,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-template` | `slug [--interactive\|--blank]` |
 | `/plan-new` | `NNN-slug -- intent` ó `NNN-slug @path.md` |
 | `/plan-expand` | `NNN-slug` |
+| `/plan-next` | `[NNN-slug]` |
 | `/plan-validate` | `[NNN-slug]` (vacío = todos) |
 | `/plan-atomize` | `NNN-slug story-NN` |
 | `/plan-task` | `NNN-slug story-NN task-NN` |
@@ -250,6 +259,8 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/release-new` | `vX.Y.Z -- <purpose>` |
 | `/release-add` | `vX.Y.Z NNN-slug [NNN-slug ...]` |
 | `/release-remove` | `vX.Y.Z NNN-slug` |
+| `/plan-audit-docs` | `NNN-slug [--docs-dir <path>]` |
+| `/plan-doctor` | `[--plugin-root <path>]` |
 | `/release-status` | `[vX.Y.Z] [--mark-planned\|--mark-in-progress\|--mark-blocked\|--mark-released\|--mark-cancelled]` |
 | `/plan-git-config` | `[--base-branch <branch>]` (vacío = mostrar config actual) |
 | `/plan-story` | `NNN-slug story-NN` |

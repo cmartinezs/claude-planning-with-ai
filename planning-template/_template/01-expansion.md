@@ -7,10 +7,10 @@
 
 ## Story Summary
 
-| # | Story | SDLC Phase(s) | Depends On | Status |
-|---|-------|--------------|------------|--------|
-| 01 | [story name] | [D / R / S / …] | — | TODO |
-| 02 | [story name] | [D / R / S / …] | 01 | TODO |
+| # | Story | SDLC Phase(s) | Depends On | Risk | External Issue | Status |
+|---|-------|--------------|------------|------|----------------|--------|
+| 01 | [story name] | [D / R / S / …] | — | M | — | TODO |
+| 02 | [story name] | [D / R / S / …] | 01 | L | — | TODO |
 
 ---
 
@@ -39,6 +39,24 @@ flowchart LR
 ## Notes
 
 *Add context, risks, or cross-cutting concerns here.*
+
+---
+
+## Risk Register
+
+| ID | Risk | Impact | Likelihood | Mitigation | Owner | Status |
+|----|------|--------|------------|------------|-------|--------|
+| R-01 | [What could make this planning fail?] | M | M | [Prevention or fallback] | [Owner] | Open |
+
+Use `L`, `M`, or `H` for impact and likelihood. Carry high risks into the related story and task files.
+
+---
+
+## External Issue Mapping
+
+| Story | External System | External ID / URL | Sync Notes |
+|-------|-----------------|-------------------|------------|
+| 01 | — | — | — |
 
 ---
 

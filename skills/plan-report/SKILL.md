@@ -1,7 +1,7 @@
 ---
 name: plan-report
-description: Generate an executive summary of a planning — objective, story completion, key technical decisions, duration, and next steps.
-argument-hint: <NNN-slug>
+description: Generate an executive summary of a planning — objective, story completion, risks, metrics, key technical decisions, duration, and next steps.
+argument-hint: <NNN-slug> [--metrics]
 allowed-tools: [Read, Bash, Glob]
 ---
 
@@ -10,6 +10,7 @@ Generate a structured report for a planning, suitable for retrospectives, stakeh
 ## Arguments
 
 `$ARGUMENTS` — planning id (e.g. `001-jwt-auth-api`)
+- `--metrics` — include planning metrics such as throughput, blocked ratio, skipped ratio, task count, and risk distribution
 
 ## Steps
 
@@ -17,7 +18,7 @@ Generate a structured report for a planning, suitable for retrospectives, stakeh
 
 2. Read `00-initial.md`: extract intent, why, approximate scope, open questions.
 
-3. Read `01-expansion.md` (if it exists): extract story list, area codes, dependency map.
+3. Read `01-expansion.md` (if it exists): extract story list, area codes, dependency map, risks, and external issue IDs.
 
 4. Read all story files under `02-deepening/*.md`. For each story, collect: name, status, done criteria, and any notes.
 
@@ -27,7 +28,21 @@ Generate a structured report for a planning, suitable for retrospectives, stakeh
 
 7. Compute summary stats: total stories, DONE count, IN PROGRESS count, TODO count, BLOCKED count, SKIPPED count.
 
-8. Output the report:
+8. Extract risk and external issue data:
+   - `Risk` and `External Issue` columns from `01-expansion.md`
+   - `Risk Register` rows from `01-expansion.md`
+   - `## Risk` sections from story files
+   - `Risk` bullets from task `Technical Design` sections
+
+9. If `--metrics` is present, compute:
+   - completion rate: `(DONE + SKIPPED) / total stories`
+   - blocked ratio: `BLOCKED / total stories`
+   - skipped ratio: `SKIPPED / total stories`
+   - average tasks per story
+   - count of H/M/L risks
+   - external issue coverage: stories with external issue IDs / total stories
+
+10. Output the report:
 
 ```
 # Planning Report — <planning-id>
@@ -50,11 +65,25 @@ Generated: <today's date>
 | **Total** | **N** |
 
 ## Story Detail
-| Story | Area | Status | Notes |
-|-------|------|--------|-------|
-| story-01-docs | DO | DONE | — |
-| story-02-api-domain | AP | DONE | — |
+| Story | Area | Risk | External Issue | Status | Notes |
+|-------|------|------|----------------|--------|-------|
+| story-01-docs | DO | M | GH-123 | DONE | — |
+| story-02-api-domain | AP | L | — | DONE | — |
 ...
+
+## Risk Summary
+| Risk | Impact | Likelihood | Mitigation | Status |
+|------|--------|------------|------------|--------|
+| R-01 | M | M | — | Open |
+
+## Metrics
+<include only when --metrics is passed>
+- Completion rate: N%
+- Blocked ratio: N%
+- Skipped ratio: N%
+- Average tasks per story: N
+- Risk distribution: H=N, M=N, L=N
+- External issue coverage: N/N stories
 
 ## Key Technical Decisions
 - [story-03 / task-01] Chose stateless JWT over session tokens to avoid distributed session storage.

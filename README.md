@@ -96,13 +96,13 @@ Or generate a planning directly from existing stories:
 | Init | `/plan-init` · `--blank` · `--force` · `/plan-git-config` |
 | Lifecycle | `/plan-new` · `/plan-expand` · `/plan-story` · `/plan-done` · `/plan-archive` |
 | Atomic tasks | `/plan-atomize` · `/plan-task` · `/plan-task-validate` |
-| Status / ideas | `/plan-status` · `/plan-validate` · `/plan-template` · `/plan-health` |
+| Status / ideas | `/plan-status` · `/plan-next` · `/plan-validate` · `/plan-template` · `/plan-health` |
 | Backlog | `/us-new` · `/us-enrich` · `/us-split` · `/us-status` · `/epic-enrich` · `/plan-from-epic` |
 | Adjust | `/plan-enrich-epic` · `/plan-enrich-story` · `/plan-split-story` · `/plan-story-skip` · `/plan-merge` |
 | Automation | `/plan-run` · `/plan-agent-plan` · `/plan-agent-execute` · `/plan-agent-validate` |
-| Docs | `/doc-generate` · `/doc-task` · `/doc-story` |
+| Docs | `/doc-generate` · `/doc-task` · `/doc-story` · `/plan-audit-docs` |
 | Releases | `/release-init` · `/release-new` · `/release-add` · `/release-remove` · `/release-status` |
-| Recovery / reports | `/plan-retry` · `/plan-rollback` · `/plan-standup` · `/plan-report` · `/plan-history` · `/plan-clone` · `/plan-export` |
+| Recovery / reports | `/plan-retry` · `/plan-rollback` · `/plan-standup` · `/plan-report` · `/plan-history` · `/plan-clone` · `/plan-export` · `/plan-doctor` |
 
 Full flag reference → [`docs/reference.md`](docs/reference.md)
 
@@ -118,6 +118,9 @@ Full flag reference → [`docs/reference.md`](docs/reference.md)
 | Split an active planning story | `/plan-split-story` |
 | Check the whole `.planning/` system | `/plan-health` |
 | Validate one planning in detail | `/plan-validate` |
+| Decide what to do next | `/plan-next` |
+| Audit generated documentation | `/plan-audit-docs` |
+| Audit this plugin checkout | `/plan-doctor` |
 
 ---
 

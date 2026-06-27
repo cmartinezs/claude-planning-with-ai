@@ -1,6 +1,7 @@
 ---
 name: release-init
 description: Initialize the .releases/ directory for release planning. Run once per project, independent of /plan-init.
+argument-hint: ""
 allowed-tools: [Bash, Write]
 ---
 

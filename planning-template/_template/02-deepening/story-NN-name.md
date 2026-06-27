@@ -13,6 +13,14 @@
 
 ---
 
+## Risk
+
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+| [What could block or degrade this story?] | M | M | [How the story reduces or monitors this risk] |
+
+---
+
 ## Tasks
 
 > **Each row in this table must have a corresponding `task-NN-name.md` file under `story-NN-name/` before this story can be marked `IN PROGRESS`.** Use `/plan-atomize` to generate all task files at once, or create them individually — but they must exist before execution begins. The task name in each row should link to its file once created.

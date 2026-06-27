@@ -31,10 +31,15 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
    | `.planning/active/NNN-slug/` with all stories DONE | READY TO CLOSE |
    | `.planning/finished/NNN-slug/` | COMPLETED — nothing to do |
 
-2b. **Planning context check:** Read `.planning/config.yml` if it exists and extract `execution.requires_git` (default: `true`). If `execution.requires_git` is `true`, execute `[CHECK-PLANNING-CONTEXT]`. If `execution.requires_git` is `false`, skip this check and continue to step 3.
+2b. **Planning context check:** Read `.planning/config.yml` if it exists and extract `execution.requires_git` (default: `true`) and `autonomy.level` (default: `assisted`). If `execution.requires_git` is `true`, execute `[CHECK-PLANNING-CONTEXT]`. If `execution.requires_git` is `false`, skip this check and continue to step 3.
    - If **ABORT**: stop immediately; do not modify anything.
    - If **INSPECT**: the sub-workflow loops internally until the user makes a definitive choice.
    - If **STABILIZED** or **PROCEED**: continue to step 3.
+
+   Apply `autonomy.level` throughout the run:
+   - `manual`: stop for confirmation before each phase.
+   - `assisted`: ask once before the full run, then stop only for blockers, destructive actions, or missing verification.
+   - `autonomous`: proceed through all non-destructive phases when the planning is structurally valid, stopping only for blockers or explicit user input requirements.
 
 3. **Build the execution plan.** Determine which phases need to run:
 
@@ -64,7 +69,7 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
    Proceed? (yes/no)
    ```
 
-5. **Wait for confirmation.** If the user says no or requests changes: stop. If yes: continue without further questions for the rest of the run (unless a critical error occurs).
+5. **Wait for confirmation.** If the user says no or requests changes: stop. If yes: continue according to `autonomy.level`.
 
 6. **Execute phases in sequence:**
    - If Planning phase is needed: invoke `/plan-agent-plan` with the planning ID or description.

@@ -15,6 +15,7 @@ All workflows and sub-workflows for the planning system. Every task in every sto
 | Maintenance | [03-MAINTENANCE-WORKFLOWS/](03-MAINTENANCE-WORKFLOWS/README.md) | Traceability and integrity |
 | Sub-workflows | [04-SUB-WORKFLOWS/](04-SUB-WORKFLOWS/README.md) | Reusable step sequences |
 | SDLC Guidance | [05-SDLC-PHASE-GUIDANCE/](05-SDLC-PHASE-GUIDANCE/README.md) | Per-phase GENERATE-DOCUMENT reference |
+| Project Guidance | [06-PROJECT-GUIDANCE/](06-PROJECT-GUIDANCE/README.md) | Adapt planning to documentation, research, operations, and general projects |
 
 ---
 
@@ -36,7 +37,7 @@ All workflows and sub-workflows for the planning system. Every task in every sto
 | [MILESTONE-FEEDBACK](03-MAINTENANCE-WORKFLOWS/MILESTONE-FEEDBACK.md) | Closing a story or planning with a review summary |
 | [AUDIT-PLANNING](03-MAINTENANCE-WORKFLOWS/AUDIT-PLANNING.md) | Verifying completeness before archiving a planning |
 
-> For per-phase guidance when executing `GENERATE-DOCUMENT`, see [05-SDLC-PHASE-GUIDANCE/](05-SDLC-PHASE-GUIDANCE/README.md).
+> For per-phase guidance when executing `GENERATE-DOCUMENT`, see [05-SDLC-PHASE-GUIDANCE/](05-SDLC-PHASE-GUIDANCE/README.md). For non-software planning, see [06-PROJECT-GUIDANCE/](06-PROJECT-GUIDANCE/README.md).
 
 ---
 

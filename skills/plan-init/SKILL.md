@@ -245,9 +245,19 @@ git:
 project:
   type: <confirmed-project-mode>      # software | general | documentation | research | operations
 
+terminology:
+  planning_item: story          # story | workstream | deliverable | experiment | initiative
+  verification_label: Verification
+
+autonomy:
+  level: assisted       # manual | assisted | autonomous
+
 execution:
   requires_git: <true-or-false>
   requires_tests: <true-or-false>
+
+integrations:
+  external_issues: disabled     # disabled | github | jira | linear
 
 docs:
   output_dir: docs

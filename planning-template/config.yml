@@ -7,9 +7,19 @@ git:
 project:
   type: software      # software | general | documentation | research | operations
 
+terminology:
+  planning_item: story          # story | workstream | deliverable | experiment | initiative
+  verification_label: Verification
+
+autonomy:
+  level: assisted       # manual | assisted | autonomous
+
 execution:
   requires_git: true
   requires_tests: true
+
+integrations:
+  external_issues: disabled     # disabled | github | jira | linear
 
 docs:
   output_dir: docs

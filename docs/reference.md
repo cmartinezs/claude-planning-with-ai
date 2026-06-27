@@ -40,6 +40,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-new <NNN-slug> @<path.md>` | Creates a planning in INITIAL state from an idea document |
 | `/plan-expand <NNN-slug>` | Advances INITIAL -> EXPANSION and creates planning stories |
 | `/plan-status` | Shows all plannings and story statuses |
+| `/plan-next [NNN-slug]` | Recommends the next safest planning action |
 | `/plan-validate [NNN-slug]` | Checks structural integrity for one or all plannings |
 | `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done |
 | `/plan-archive <NNN-slug>` | Audits and moves a completed planning to `finished/` |
@@ -79,6 +80,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/doc-generate <NNN-slug> [story-NN] [task-NN]` | Generates task, story, or planning-level documentation |
 | `/doc-task <NNN-slug> <story-NN> <task-NN>` | Thin wrapper for task-level documentation |
 | `/doc-story <NNN-slug> <story-NN>` | Thin wrapper for story-level documentation |
+| `/plan-audit-docs <NNN-slug> [--docs-dir <path>]` | Audits generated documentation for coverage, freshness, links, and traceability |
 
 ### Release Planning
 
@@ -95,6 +97,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | Command | What it does |
 |---------|-------------|
 | `/plan-health` | Scans the whole `.planning/` system for anomalies |
+| `/plan-doctor [--plugin-root <path>]` | Audits plugin command inventory, skill metadata, template integrity, and legacy drift |
 | `/plan-report <NNN-slug>` | Generates an executive planning summary |
 | `/plan-history <NNN-slug>` | Shows status transitions from git history |
 | `/plan-standup <NNN-slug>` | Generates standup text |
@@ -119,6 +122,8 @@ Some commands intentionally overlap because they operate at different layers.
 | Planning story is too broad | `/plan-split-story` | Splits execution stories and updates planning indexes/dependencies |
 | Whole `.planning/` system may be inconsistent | `/plan-health` | Global scan across active, initial, finished, indexes, and stale state |
 | One planning needs a structural audit | `/plan-validate` | Detailed read-only validation for a specific planning or all plannings |
+| You are unsure what to run next | `/plan-next` | Read-only recommendation based on state, blockers, dependencies, project mode, and autonomy |
+| The plugin checkout itself may be inconsistent | `/plan-doctor` | Checks command inventory, skill metadata, template integrity, and legacy drift |
 
 ## Communication Outputs
 
@@ -127,6 +132,7 @@ Some commands intentionally overlap because they operate at different layers.
 | Daily update | `/plan-standup` | Team sync |
 | Executive or handoff summary | `/plan-report` | Stakeholders, maintainers |
 | PR/ticket/markdown artifact | `/plan-export` | GitHub, Jira, Linear, external docs |
+| Documentation coverage audit | `/plan-audit-docs` | Documentation owners, reviewers |
 | Release readiness and transitions | `/release-status` | Release owners |
 
 ## Documentation Commands

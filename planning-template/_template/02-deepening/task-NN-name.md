@@ -22,6 +22,7 @@
 - **Approach:** [Why this solution and not the obvious alternative — argue the design decision in the context of this story. If the obvious approach is correct, say so explicitly. If alternatives were discarded, name them briefly.]
 - **Affected files / components:** [Exact list of files that will be created or modified]
 - **Interfaces / contracts:** [What this task exposes to the rest of the story: types, routes, tokens, schemas. "None" if fully internal.]
+- **Risk:** [Main risk in this task and how the implementation reduces it. Use "Low — routine change" if appropriate.]
 - **Design notes:** [Constraints, invariants, gotchas the implementer must know before touching code]
 
 ---
