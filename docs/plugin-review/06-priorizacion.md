@@ -3,7 +3,7 @@
 ## Orden sugerido de implementación
 
 1. Corregir referencias a comandos inexistentes y `scope/story` en docs activos.
-2. Actualizar `docs/reference.md` con los 44 comandos reales.
+2. Mantener `docs/reference.md` sincronizado con todos los comandos reales.
 3. Corregir `skills/plan-story/SKILL.md` por `/plan-advance`.
 4. Alinear estados válidos entre glossary, validate, done, skip, standby y releases.
 5. Reducir y actualizar metadata de plugin y marketplace.

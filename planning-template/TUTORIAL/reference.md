@@ -233,7 +233,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Siguiente acción recomendada | `/plan-next` | `/plan-status` |
 | Comunicación diaria | `/plan-standup` | `/plan-report` |
 | Resumen ejecutivo | `/plan-report` | `/plan-standup` |
-| Artefacto externo para PR/tickets/docs | `/plan-export` | `/plan-report` |
+| Artefacto externo para PR/tickets/issues/docs | `/plan-export` | `/plan-report` |
 | Cobertura/frescura de docs | `/plan-audit-docs` | `/doc-generate` |
 | Estado de una entrega/version | `/release-status` | `/plan-status` |
 

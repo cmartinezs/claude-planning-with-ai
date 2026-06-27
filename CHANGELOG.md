@@ -4,10 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] — 2026-06-26
+
+### Added
+
+- `/plan-next` — read-only recommendation command that inspects planning state, blockers, dependencies, project type, and autonomy level to suggest the safest next command.
+- `/plan-doctor` — plugin/template audit command for command inventory coverage, skill metadata, template integrity, and legacy reference drift.
+- `/plan-audit-docs` — documentation audit command that checks expected docs for coverage, freshness, links, traceability, and consistency with planning stories/tasks.
+- `planning-template/WORKFLOWS/06-PROJECT-GUIDANCE/` — guidance for adapting the workflow to documentation, research, operations, and general projects.
+- `scripts/verify-plugin.sh` — local compatibility check for plugin structure, skill metadata, command inventory, workflow groups, and template markers.
+- Configurable planning defaults in `.planning/config.yml`: `terminology`, `autonomy.level`, and `integrations.external_issues`.
+- Risk and external issue fields in planning templates, including story summary risk, risk register, external issue mapping, story-level risk, and task-level risk.
+- Prompt snippets for creating plannings, splitting stories, validating done criteria, writing ADRs, reviewing risk, and adapting planning to non-software projects.
+
 ### Changed
 
+- `/plan-run` now honors `autonomy.level` (`manual`, `assisted`, `autonomous`) when deciding confirmation checkpoints.
+- `/plan-report` now supports `--metrics` and reports risk distribution, external issue coverage, and planning health metrics.
+- `/plan-export` now supports external issue draft formats: `github-issue`, `jira`, and `linear`.
+- `docs/commands.yml` now carries reusable defaults for `audience`, `project_modes`, and `usage`, plus command-specific metadata for the new commands.
+- Public docs, tutorial reference, and landing command inventory now list 47 commands and cover the new advisory, audit, and documentation workflows.
+- Landing tutorials and training now include the v3 decision/audit flow with `/plan-next`, `/plan-report --metrics`, `/plan-audit-docs`, and `/plan-doctor`.
+- `release-init` skill metadata now includes `argument-hint` so all skills satisfy the same frontmatter contract.
 - Refreshed public docs and metadata to align with the current story-based command model (`/plan-story`, `story-NN`) and remove active references to the old `/plan-scope` workflow.
-- Updated command reference coverage for the current 44 commands, including agents, documentation, release, recovery, and maintenance commands.
+- Updated command reference coverage for the current 47 commands, including agents, documentation, release, recovery, and maintenance commands.
 - Added general-project language to the user guide and planning task template so non-software work can use verification evidence instead of only unit-test language.
 - Archived legacy SDLC-specific sub-workflows from the installed planning template and marked `docs/superpowers/` as historical design material.
 - Documented intentional command overlaps by layer/audience and added `docs/commands.yml` as the canonical command inventory for docs synchronization.
@@ -173,7 +193,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.4.0...v3.0.0
 [2.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.1.0...v2.2.0

@@ -14,6 +14,7 @@ import scenario05 from '@/data/training/scenario-05-release'
 import scenario06 from '@/data/training/scenario-06-autonomous'
 import scenario07 from '@/data/training/scenario-07-recovery'
 import scenario08 from '@/data/training/scenario-08-context-switch'
+import scenario09 from '@/data/training/scenario-09-advisory-audit'
 import type { TrainingScenario } from '@/types/training'
 
 const SCENARIOS: Record<string, TrainingScenario> = {
@@ -25,6 +26,7 @@ const SCENARIOS: Record<string, TrainingScenario> = {
   'autonomous': scenario06,
   'recovery': scenario07,
   'context-switch': scenario08,
+  'advisory-audit': scenario09,
 }
 
 const META_ES: Record<string, { title: string; description: string }> = {
@@ -59,6 +61,10 @@ const META_ES: Record<string, { title: string; description: string }> = {
   'context-switch': {
     title: 'Cambio de contexto',
     description: 'Cambia de story de forma segura: el plugin detecta el conflicto, pausa con STANDBY y permite reanudar sin perder progreso.',
+  },
+  'advisory-audit': {
+    title: 'Decisión y auditoría',
+    description: 'Practica /plan-next, métricas, auditoría documental y verificación estructural del plugin.',
   },
 }
 

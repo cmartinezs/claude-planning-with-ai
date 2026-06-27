@@ -107,6 +107,15 @@ const SCENARIOS: ScenarioCard[] = [
     commands: ['/plan-status', '/plan-story'],
     available: true,
   },
+  {
+    id: 'advisory-audit',
+    title: 'Decisión y auditoría',
+    description: 'Usa el flujo nuevo de v3: recomienda siguiente acción, reporta métricas, audita docs y valida el plugin.',
+    difficulty: 'intermediate',
+    durationMin: 6,
+    commands: ['/plan-next', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
+    available: true,
+  },
 ]
 
 type Filter = 'all' | Difficulty
@@ -123,7 +132,7 @@ export default function TrainingCatalogPage() {
     <>
       <Head>
         <title>Entrenamientos — Planning with AI</title>
-        <meta name="description" content="Practica el plugin con escenarios reales paso a paso. 8 entrenamientos que cubren el ciclo de vida completo." />
+        <meta name="description" content="Practica el plugin con escenarios reales paso a paso. 9 entrenamientos que cubren el ciclo de vida completo." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 

@@ -50,7 +50,7 @@
 
 1. Archivo principal: `docs/reference.md`.
 2. Fuente de verdad: directorios bajo `skills/`.
-3. Debe incluir 44 comandos actuales:
+3. Debe incluir todos los comandos actuales:
    - 3 `doc-*`
    - 1 `epic-*`
    - 31 `plan-*`

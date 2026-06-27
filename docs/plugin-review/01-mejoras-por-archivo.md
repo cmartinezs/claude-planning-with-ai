@@ -26,7 +26,7 @@
 
 1. Reemplazar referencias a `scope`, `scope-NN` y `/plan-scope` por `story`, `story-NN` y `/plan-story` cuando representen la unidad antigua.
 2. Actualizar la estructura instalada por `/plan-init`: actualmente muestra `scope-NN-name.md`, pero la plantilla real es `story-NN-name.md`.
-3. Agregar una tabla completa con los 44 comandos detectados en `skills/`.
+3. Mantener una tabla completa con los 47 comandos detectados en `skills/`.
 4. Separar comandos por intención real: setup, backlog, lifecycle, execution, automation agents, documentation, release planning, maintenance and recovery.
 5. Documentar `argument-hint` y modo de uso para cada comando.
 
@@ -49,7 +49,7 @@
 
 ### `CHANGELOG.md`
 
-1. Corregir enlaces inferiores: falta `[2.4.0]` y `[Unreleased]` todavía compara contra `v2.3.0`.
+1. Mantener enlaces inferiores completos: `[Unreleased]` debe comparar contra la última versión publicada y cada versión debe tener link propio.
 2. Agregar nota en `[Unreleased]` si se corrige la deriva `scope/story`.
 3. Considerar mover planes internos antiguos a un archivo de diseño o mantenerlos fuera de la documentación pública si generan ruido.
 
@@ -210,5 +210,5 @@
 
 1. `planning-template/TUTORIAL/README.md`: decidir bilingüismo formal y agregar flujo para proyecto general, solo documentación y solo release.
 2. `planning-template/TUTORIAL/reference.md`: corregir "story demasiado amplio", reemplazar "scope nuevo" y añadir comandos de docs/release.
-3. `.page/locales/commandsPage.*`: usar como fuente parcial para actualizar `docs/reference.md` y verificar 44 comandos reales.
+3. `.page/locales/commandsPage.*`: usar como fuente parcial para actualizar `docs/reference.md` y verificar los comandos reales.
 4. `.page/components/Commands.tsx`: no requiere cambios prioritarios comparado con docs/skills.

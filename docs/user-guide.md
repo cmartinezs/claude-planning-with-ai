@@ -20,6 +20,19 @@ The smallest executable unit of work, produced by `/plan-atomize`. One task file
 
 For software, verification usually means unit tests or the project test runner. For non-software work, use concrete evidence such as a reviewed document, approved checklist, published asset, signed decision, or reproducible manual validation.
 
+### Project Configuration
+
+Each initialized project has `.planning/config.yml`. It controls:
+
+| Key | Purpose |
+|-----|---------|
+| `project.type` | Selects the default planning style: `software`, `general`, `documentation`, `research`, or `operations` |
+| `terminology.planning_item` | Lets a non-software project call stories `deliverable`, `workstream`, `experiment`, or another local term |
+| `autonomy.level` | Controls `/plan-run` checkpoints: `manual`, `assisted`, or `autonomous` |
+| `execution.requires_git` | Enables or disables git pre-flight checks |
+| `execution.requires_tests` | Distinguishes test-backed verification from manual acceptance evidence |
+| `integrations.external_issues` | Records whether external issue IDs come from GitHub, Jira, Linear, or are disabled |
+
 ### Area
 
 A distinct surface of the project tracked by the traceability matrix. `/plan-init` detects repository areas such as `AP` for `api/`, `WB` for `web/`, or `IN` for `infra/`. In general projects, areas can represent teams, workstreams, deliverables, departments, or folders.
@@ -155,6 +168,36 @@ Use this when the planning is clear enough for a guided autonomous run.
 
 `/plan-run` delegates to `/plan-agent-plan`, `/plan-agent-execute`, and `/plan-agent-validate`. It is autonomous except for critical checkpoints such as git state, blockers, or explicit user confirmation required by a called skill.
 
+`autonomy.level` in `.planning/config.yml` adjusts how much it stops:
+
+| Level | Behavior |
+|-------|----------|
+| `manual` | Stops before each phase so the user drives the sequence |
+| `assisted` | Asks once for the run, then stops for blockers or risky conditions |
+| `autonomous` | Continues through non-destructive phases when structure is valid |
+
+### Flow F — Decide The Next Action
+
+Use this when you are not sure which command should run next.
+
+```text
+/plan-next
+/plan-next 002-payment-gateway
+```
+
+`/plan-next` reads planning state, dependencies, blockers, project type, and autonomy settings. It returns one recommended command, supporting findings, and alternatives.
+
+### Flow G — Documentation Audit
+
+Use this after a planning created or changed project documentation.
+
+```text
+/plan-audit-docs 002-payment-gateway
+/plan-audit-docs 002-payment-gateway --docs-dir docs
+```
+
+The audit compares expected docs from stories and tasks against actual files, local links, traceability, external issue references, and freshness.
+
 ## Command Reference
 
 ### Setup
@@ -187,12 +230,13 @@ Use this when the planning is clear enough for a guided autonomous run.
 | `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` | Audit atomic tasks |
 | `/plan-story` | `NNN-slug story-NN` | Execute all tasks in a story |
 | `/plan-done` | `NNN-slug story-NN [task-N]` | Mark a task or story done |
+| `/plan-next` | `[NNN-slug]` | Recommend the next safest command |
 | `/plan-validate` | `[NNN-slug]` | Check structural integrity |
 | `/plan-archive` | `NNN-slug` | Audit and archive to `finished/` |
 
 ### Automation, Maintenance, Docs, Releases
 
-See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/release-*`, `/plan-health`, `/plan-report`, `/plan-export`, recovery commands, and history/status utilities.
+See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/plan-audit-docs`, `/release-*`, `/plan-health`, `/plan-doctor`, `/plan-report`, `/plan-export`, recovery commands, and history/status utilities.
 
 ## Choosing Similar Commands
 
@@ -206,14 +250,17 @@ See [Command Reference](reference.md) for the complete list, including `/plan-ru
 | An active planning story is too broad | `/plan-split-story` |
 | You want to scan the entire `.planning/` system | `/plan-health` |
 | You want a detailed audit of a planning | `/plan-validate` |
+| You are unsure which command should run next | `/plan-next` |
+| You changed generated documentation and need coverage/freshness checks | `/plan-audit-docs` |
+| You maintain this plugin and need a structural audit | `/plan-doctor` |
 
 ## Communication Outputs
 
 | Need | Command | Output shape |
 |------|---------|--------------|
 | Daily sync | `/plan-standup` | Yesterday / today / blockers |
-| Stakeholder summary | `/plan-report` | Objective, progress, decisions, next steps |
-| External artifact | `/plan-export` | PR description, ticket list, markdown |
+| Stakeholder summary | `/plan-report --metrics` | Objective, progress, risks, metrics, decisions, next steps |
+| External artifact | `/plan-export` | PR description, ticket list, GitHub/Jira/Linear issue draft, markdown |
 | Release readiness | `/release-status` | Release table, planning statuses, transition suggestions |
 
 ## Common Patterns

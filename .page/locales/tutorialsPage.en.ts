@@ -100,6 +100,22 @@ const tutorialsPage = {
       source: 'planning-template/TUTORIAL/flow-05-autonomous.md',
     },
     {
+      id: 'flow-f',
+      title: 'Flow F - Decision, docs audit, and plugin health',
+      when:
+        'Use this when the planning changed documentation, several next commands could apply, or you maintain the plugin itself.',
+      outcome:
+        'A safer next action, a metrics-backed report, audited documentation coverage, and a verified plugin checkout.',
+      steps: [
+        'Ask for the safest next action before executing more work.',
+        'Generate metrics to review completion, risks, and external issue coverage.',
+        'Audit generated docs for freshness, links, traceability, and missing references.',
+        'Run the plugin doctor when command inventory or template integrity might have drifted.',
+      ],
+      commands: ['/plan-next', '/plan-report', '/plan-audit-docs', '/plan-doctor'],
+      source: 'planning-template/TUTORIAL/reference.md',
+    },
+    {
       id: 'reference',
       title: 'Quick command reference',
       when:
@@ -110,9 +126,9 @@ const tutorialsPage = {
         'Identify whether you are working in product backlog or .planning/.',
         'Choose the command for the lifecycle phase.',
         'Check expected arguments before running it.',
-        'Use /plan-status or /plan-health when the current state is unclear.',
+        'Use /plan-next when the next action is unclear, or /plan-health when the whole system may be inconsistent.',
       ],
-      commands: ['/us-new', '/us-enrich', '/plan-from-epic', '/plan-new', '/plan-expand', '/plan-status', '/plan-health', '/plan-run'],
+      commands: ['/us-new', '/us-enrich', '/plan-from-epic', '/plan-new', '/plan-expand', '/plan-next', '/plan-health', '/plan-run'],
       source: 'planning-template/TUTORIAL/reference.md',
     },
   ],

@@ -98,10 +98,10 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 |---------|-------------|
 | `/plan-health` | Scans the whole `.planning/` system for anomalies |
 | `/plan-doctor [--plugin-root <path>]` | Audits plugin command inventory, skill metadata, template integrity, and legacy drift |
-| `/plan-report <NNN-slug>` | Generates an executive planning summary |
+| `/plan-report <NNN-slug> [--metrics]` | Generates an executive planning summary with optional metrics and risk coverage |
 | `/plan-history <NNN-slug>` | Shows status transitions from git history |
 | `/plan-standup <NNN-slug>` | Generates standup text |
-| `/plan-export <NNN-slug> --format <format>` | Exports a planning as PR text, ticket list, or markdown summary |
+| `/plan-export <NNN-slug> --format <format>` | Exports a planning as PR text, ticket list, external issue draft, or markdown summary |
 | `/plan-clone <source-id> <target-id>` | Clones a planning structure into a fresh ID |
 | `/plan-retry <NNN-slug>` | Retries BLOCKED stories after blockers are resolved |
 | `/plan-rollback <NNN-slug> <story-NN>` | Reverts story planning state from DONE to TODO |
@@ -130,7 +130,7 @@ Some commands intentionally overlap because they operate at different layers.
 | Need | Command | Audience |
 |------|---------|----------|
 | Daily update | `/plan-standup` | Team sync |
-| Executive or handoff summary | `/plan-report` | Stakeholders, maintainers |
+| Executive or handoff summary | `/plan-report --metrics` | Stakeholders, maintainers |
 | PR/ticket/markdown artifact | `/plan-export` | GitHub, Jira, Linear, external docs |
 | Documentation coverage audit | `/plan-audit-docs` | Documentation owners, reviewers |
 | Release readiness and transitions | `/release-status` | Release owners |
