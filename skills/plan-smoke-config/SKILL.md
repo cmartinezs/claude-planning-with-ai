@@ -31,8 +31,10 @@ Reference workflows:
    2. What supporting services must be started before the app can run locally?
    3. What is the normal local start or build command?
    4. What schema, migration, or database checks must pass before review?
-   5. What are the smallest smoke checks that prove the changed surface works?
-   6. What evidence should be shown to the human reviewer?
+   5. If this project has an ORM or generated DB client, what static consistency command validates database schema/migrations against ORM models/entities/generated client?
+   6. What local runtime command starts the environment needed for persistence smoke checks?
+   7. What are the smallest smoke checks that prove the changed surface works?
+   8. What evidence should be shown to the human reviewer?
 6. Prefill the template from repository inference when the answers are incomplete. Prefer concrete commands and file paths over generic notes.
 7. Write the populated smoke-test plan to `.planning/${software.smoke_tests_file}`.
 8. If `.planning/config.yml` exists and the file path changed, update `software.smoke_tests_file` to match the generated file.
@@ -78,10 +80,22 @@ Reference workflows:
 
 ---
 
+## Database / ORM Consistency
+
+Required for tasks that modify database structure, migrations, schema files, seed/bootstrap data, ORM models/entities, generated clients, repositories tied to ORM models, or persistence configuration.
+
+| # | Check | How to validate |
+|---|-------|----------------|
+| 1 | Static DB/ORM consistency | [migration/schema validate, ORM generate/check, typecheck/compile, or manual mapping review command] |
+| 2 | Local runtime environment | [command to start DB/services and app/worker locally; ask the human if not inferable] |
+| 3 | Persistence smoke check | [minimal non-destructive check for migration/bootstrap and changed persistence path] |
+
+---
+
 ## Notes For Automation
 
 - Prefer non-destructive commands.
-- If this project has migrations or seed data, include those checks here.
+- If this project has migrations, seed data, ORM models/entities, or generated DB clients, include both static consistency checks and local runtime persistence smoke checks here.
 - If the project has no backend or no external services, replace the rows with the closest reproducible local evidence.
 
 ---

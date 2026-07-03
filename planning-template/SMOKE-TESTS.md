@@ -38,11 +38,23 @@
 
 ---
 
+## Database / ORM Consistency
+
+Required for tasks that modify database structure, migrations, schema files, seed/bootstrap data, ORM models/entities, generated clients, repositories tied to ORM models, or persistence configuration.
+
+| # | Check | How to validate |
+|---|-------|----------------|
+| 1 | Static DB/ORM consistency | [migration/schema validate, ORM generate/check, typecheck/compile, or manual mapping review command] |
+| 2 | Local runtime environment | [command to start DB/services and app/worker locally; ask the human if not inferable] |
+| 3 | Persistence smoke check | [minimal non-destructive check for migration/bootstrap and changed persistence path] |
+
+---
+
 ## Notes For Automation
 
 - If this file is missing, infer the smoke checks from the repository structure and build files before asking for human review.
 - Prefer non-destructive commands and the smallest checks that still prove the real integration path works.
-- If the project has migrations, schema generation, or seed data, include those checks here.
+- If the project has migrations, schema generation, seed data, ORM models/entities, or generated DB clients, include static consistency checks and local runtime persistence smoke checks here.
 - If the project has no backend or no external services, replace those rows with the closest reproducible local evidence.
 
 ---

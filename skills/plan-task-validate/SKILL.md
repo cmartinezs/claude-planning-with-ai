@@ -40,7 +40,9 @@ Reference workflows:
    d. Objective naming more than one deliverable is a **WARN** (requirement 1: candidate for splitting).
    e. Empty `Verification` table is a **FAIL** (requirement 5). Legacy `Unit Tests` is accepted but should be migrated to `Verification`.
    f. For `project.type: software`, missing `### Software Smoke Test Check` or missing done criteria for supporting services, startup/build, connectivity or schema checks, smoke checks, and human developer code review is a **FAIL**.
-   g. Done criteria that are not binary/verifiable ("works well", "is reasonable") are a **WARN** (requirement 6).
+   g. If a task appears to change database structure or ORM artifacts (keywords/paths such as migration, schema, database, db, table, column, index, seed, Prisma, TypeORM, Sequelize, SQLAlchemy, Hibernate, JPA, Entity, Model, repository, generated client), missing `### Database / ORM Consistency Check` or missing done criteria for static DB/ORM consistency plus local runtime persistence smoke evidence is a **FAIL**.
+   h. If any task in a story changes database structure or ORM artifacts, the story must contain a later explicit validation task depending on those change tasks. Missing DB/ORM validation task is a **FAIL**.
+   i. Done criteria that are not binary/verifiable ("works well", "is reasonable") are a **WARN** (requirement 6).
 6. **Report.** Print one block per story:
 
 ```

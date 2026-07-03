@@ -22,6 +22,12 @@ Initialize the `.planning/` directory structure in the current project.
 
 Determine the current working directory. Note the project name (last segment of the path).
 
+Use the current directory as the only initialization target:
+- Create or reinitialize only `./.planning/`.
+- Do not search parent directories for an existing `.planning/`.
+- Do not reuse a parent `.planning/` when the current directory is a monorepo child artifact.
+- If a parent directory also has `.planning/`, treat it as a separate coordinating workspace.
+
 ### 2 — Check existing state
 
 - If `.planning/` already exists and `--force` was NOT passed → stop and report: "`.planning/` already exists. Use `--force` to reinitialize system files without touching active plannings or area configuration."
@@ -279,11 +285,15 @@ Areas configured:
 Structure created:
   .planning/
   ├── _template/
+  │   ├── README.md
+  │   ├── RETROSPECTIVE-RAW.md
+  │   └── ...
   ├── WORKFLOWS/
   │   └── 05-SDLC-PHASE-GUIDANCE/
   │       ├── AREA-<CODE>-<dirname>.md   ← one per area
   │       └── ...
   ├── TUTORIAL/
+  ├── update-version/   (migration instructions for older .planning workspaces)
   ├── active/          (empty — ready for plannings)
   ├── finished/        (empty)
   ├── GUIDE.md         ← area table filled in

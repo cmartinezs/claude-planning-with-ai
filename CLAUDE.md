@@ -76,3 +76,9 @@ There is no compiler or schema engine — the markdown files are the only repres
 ## Key constraint
 
 When changing a skill command, update all related references in `planning-template/` (README, TUTORIAL, workflow docs) in the same pass.
+
+When bumping the plugin version with a patch or minor release, update the existing `planning-template/update-version/<previous-major>-<current-major>.md` migration so the current major migration remains cumulative. Only a new major version should add a new adjacent update-version migration file. Do not create skip migrations such as `2-4.md`; `/plan-update-version 2.x 4.x` applies `2-3.md` and then `3-4.md`.
+
+Planning commands must use the current working directory's `./.planning/` only. Never search parent directories for `.planning/`. In monorepos, parent and child artifact planning workspaces are independent; a parent planning may coordinate linked child plannings, but child implementation must be planned in the child artifact's own `.planning/`.
+
+For the layered git workflow, task branches are local working branches only until their PR is merged into the story branch. After a task PR is merged, delete the local task branch with `git branch -d <task-branch>` from an updated story branch checkout. After the final story PR is merged into `git.base_branch` (for example `develop`), delete the local story branch with `git branch -d <story-branch>` from an updated base branch checkout. Do not force-delete branches, and leave remote branch deletion to the PR/repository workflow.

@@ -36,6 +36,16 @@ flowchart LR
 
 ---
 
+## Linked Child Plannings
+
+Use this section when a parent monorepo planning coordinates work owned by child artifact workspaces. Child implementation must live in each child's own `.planning/`; the parent keeps only synchronization and parent-scope work.
+
+| Child Workspace | Child Planning | Ownership | Sync Notes | Status |
+|-----------------|----------------|-----------|------------|--------|
+| — | — | — | — | — |
+
+---
+
 ## Notes
 
 *Add context, risks, or cross-cutting concerns here.*

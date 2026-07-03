@@ -41,7 +41,7 @@ const SCENARIOS: ScenarioCard[] = [
     description: 'Flujo base completo: inicializa el sistema, crea un planning, expándelo, ejecuta una story y archívalo.',
     difficulty: 'basic',
     durationMin: 8,
-    commands: ['/plan-init', '/plan-new', '/plan-expand', '/plan-story', '/plan-done', '/plan-archive'],
+    commands: ['/plan-init', '/plan-new', '/plan-expand', '/plan-story', '/plan-done', '/plan-retrospective', '/plan-archive'],
     available: true,
   },
   {
@@ -59,7 +59,7 @@ const SCENARIOS: ScenarioCard[] = [
     description: 'Adapta un planning activo: agrega stories, divide una demasiado grande y omite trabajo obsoleto.',
     difficulty: 'intermediate',
     durationMin: 6,
-    commands: ['/plan-enrich-epic', '/plan-split-story', '/plan-story-skip'],
+    commands: ['/plan-enrich-epic', '/plan-split-story', '/plan-edge-case', '/plan-story-skip'],
     available: true,
   },
   {
@@ -95,7 +95,7 @@ const SCENARIOS: ScenarioCard[] = [
     description: 'Diagnostica y recupera un planning bloqueado: valida, revierte y reintenta stories en mal estado.',
     difficulty: 'advanced',
     durationMin: 6,
-    commands: ['/plan-health', '/plan-validate', '/plan-rollback', '/plan-retry'],
+    commands: ['/plan-health', '/plan-validate', '/plan-edge-case', '/plan-rollback', '/plan-retry'],
     available: true,
   },
   {

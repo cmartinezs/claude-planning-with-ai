@@ -29,7 +29,7 @@ const es = {
     demoBtn: 'Ver demo',
     stats: [
       { value: '5', label: 'Estados del ciclo' },
-      { value: '47', label: 'Comandos' },
+      { value: '50', label: 'Comandos' },
       { value: 'Markdown', label: 'Formato nativo' },
       { value: '0', label: 'Dependencias' },
     ],
@@ -103,7 +103,7 @@ const es = {
     cards: [
       {
         title: 'Comandos completos',
-        description: 'Consulta los 47 comandos con argumentos, comportamiento, fuente y casos de uso.',
+        description: 'Consulta los 50 comandos con argumentos, comportamiento, fuente y casos de uso.',
         href: '/commands',
         linkLabel: 'Abrir referencia',
         iconPath: 'M4 6h16M4 12h16M4 18h10',

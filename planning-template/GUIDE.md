@@ -8,6 +8,38 @@ Detailed reference for the lifecycle, structure, and naming conventions of the p
 
 ---
 
+## 📍 Workspace Boundary
+
+Planning commands always operate on the current working directory's `./.planning/` directory.
+
+- Do not search parent directories for `.planning/`.
+- If the current directory has no `./.planning/`, run `/plan-init` in the current directory before creating or running a planning.
+- In a monorepo, the parent workspace and each child artifact workspace are separate planning systems when they each have their own `.planning/`.
+- Running `/plan-new`, `/plan-from-epic`, `/plan-agent-plan`, or `/plan-expand` inside a child artifact must create or modify only that child artifact's `.planning/`.
+
+### Layered git branch cleanup
+
+When git execution is enabled, the planning system uses a layered branch model:
+
+- Story branches start from `git.base_branch`.
+- Task branches start from the story branch and open task PRs back into that story branch.
+- After a task PR is merged into the story branch, delete the local task branch from an updated story branch checkout with `git branch -d <task-branch>`.
+- After the final story PR is merged into `git.base_branch`, delete the local story branch from an updated base branch checkout with `git branch -d <story-branch>`.
+- Do not force-delete these branches. If `git branch -d` refuses, confirm the PR merge state first.
+- Remote branch deletion remains a PR/repository policy action.
+
+### Monorepo parent/child coordination
+
+When a parent monorepo planning affects child artifacts that have their own `.planning/` workspaces:
+
+- The parent planning owns parent-scope work: orchestration, cross-artifact decisions, integration sequencing, shared docs, releases, and synchronization.
+- Each child artifact owns its implementation work in a child planning under `<child>/.planning/`.
+- The parent planning links to child plannings in `01-expansion.md → Linked Child Plannings`.
+- The parent must not duplicate child implementation stories or tasks. It should contain coordination stories that track child planning status and integration checkpoints.
+- If a child artifact lacks `.planning/`, initialize it there with `/plan-init` before expanding the parent planning.
+
+---
+
 ## 🔁 Planning Lifecycle
 
 ```mermaid
@@ -35,6 +67,7 @@ planning/
 ├── GLOSSARY.md                      # Operational vocabulary
 ├── PROMPTING.md                     # AI prompting guidelines
 ├── _template/                       # Template for new plannings
+├── update-version/                  # Versioned migrations for older planning-system structures
 │
 ├── NNN-planning-name/               # Plannings in INITIAL state (just created)
 │   └── ...
@@ -45,6 +78,7 @@ planning/
 │       ├── README.md
 │       ├── 00-initial.md
 │       ├── 01-expansion.md
+│       ├── RETROSPECTIVE-RAW.md
 │       ├── 02-deepening/
 │       │   ├── story-01-[name].md
 │       │   ├── story-01-[name]/         # Atomic tasks (optional, via /plan-atomize)

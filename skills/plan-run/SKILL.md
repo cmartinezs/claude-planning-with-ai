@@ -16,6 +16,8 @@ Orchestrate a complete planning run. Detects state, confirms once, then delegate
 
 ## Steps
 
+0. **Workspace boundary.** Use only `./.planning/` in the current working directory. Do not search parent directories for `.planning/`. If `./.planning/` does not exist, stop and ask the user to run `/plan-init` in the current directory.
+
 1. **Resolve the target planning:**
    - If `$ARGUMENTS` is empty: list all plannings in `.planning/` (INITIAL), `.planning/active/` (EXPANSION/DEEPENING), and ask the user which to run. Stop until answered.
    - If `$ARGUMENTS` matches `\d{3}-[a-z0-9-]+`: check all three directories for the planning.

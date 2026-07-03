@@ -71,11 +71,13 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-expand NNN-slug` | INITIAL → EXPANSION (solo flujo general) |
 | `/plan-git-config [--base-branch <branch>]` | Configura la rama base git (para proyectos ya inicializados) |
 | `/plan-atomize NNN-slug story-NN` | Descompone una story en tareas atómicas (diseño + implementación + verificación) |
-| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una tarea; en software valida el smoke test plan del proyecto, espera code review humano y recién después hace commit |
+| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una tarea en rama propia, valida, espera code review humano, abre PR hacia la rama de story y recuerda limpiar la rama local tras el merge |
 | `/plan-task-validate NNN-slug [story-NN]` | Audita tareas atómicas contra el checklist de atomicidad |
-| `/plan-story NNN-slug story-NN` | Ejecuta todas las tareas de una story — crea rama, comitea tareas aprobadas, espera revisión final, pushea y abre PR |
-| `/plan-done NNN-slug story-NN` | Marca story completo tras revisión humana, pushea y abre PR si la rama está activa |
+| `/plan-story NNN-slug story-NN` | Crea rama de story desde la rama base, coordina PRs de task, limpia ramas locales mergeadas y abre PR final de story |
+| `/plan-done NNN-slug story-NN` | Marca story completo tras revisión humana y PRs de task mergeados; recuerda limpiar la rama local de story tras el merge final |
 | `/plan-done NNN-slug story-NN task-N` | Marca una tarea específica |
+| `/plan-edge-case NNN-slug -- nota` | Registra un evento inesperado para la retrospectiva |
+| `/plan-retrospective NNN-slug` | Genera la retrospectiva final |
 | `/plan-archive NNN-slug` | Audita y archiva a `finished/` |
 
 **Enriquecimiento del planning (plannings ACTIVE):**

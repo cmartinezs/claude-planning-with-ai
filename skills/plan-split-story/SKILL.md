@@ -12,6 +12,7 @@ Layer boundary: this command edits an active planning. If the oversized story ex
 Reference workflows:
 - `.planning/WORKFLOWS/02-EXECUTION-WORKFLOWS/EXPAND-ELEMENT.md`
 - `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md`
+- `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/RECORD-EDGE-CASE.md`
 
 ## Arguments
 
@@ -43,6 +44,7 @@ Reference workflows:
    e. Delete (or rename with a `_split-into` note in its header) the original story file.
 7. Update `.planning/active/README.md` to reflect the new story list.
 8. Run `[CHECK-AGNOSTIC-BOUNDARY]` on each new story file to verify consistency with `docs/` contracts.
-9. Report: original story replaced by N new stories, list them with IDs and names. Note any dependency changes made.
+9. Execute `[RECORD-EDGE-CASE]` with source `/plan-split-story`, original story, new stories, and dependency changes.
+10. Report: original story replaced by N new stories, list them with IDs and names. Note any dependency changes made.
 
 > If any task in the original story was already `[x]`, carry that mark into the appropriate new story file.

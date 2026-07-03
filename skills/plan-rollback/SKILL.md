@@ -28,6 +28,7 @@ Revert a DONE story to TODO so it can be re-executed. Removes the atomized task 
    - If the `## Tasks` table was an atomized index (links to task files), revert it to a plain task list (remove the file links, keep the task names).
 7. Update the story's row in `01-expansion.md` — set status to `TODO`.
 8. Update `.planning/active/README.md`.
-9. Report: story reverted to TODO, task folder deleted (yes/no), reminder that generated code must be reverted manually.
+9. Execute `[RECORD-EDGE-CASE]` with source `/plan-rollback`, related story, reason from user/context if available, task folder deletion result, and reminder that generated code was not reverted by this command.
+10. Report: story reverted to TODO, task folder deleted (yes/no), reminder that generated code must be reverted manually.
 
 > Does NOT revert code changes made during the story's execution. You must undo those separately (e.g., `git checkout` or `git revert`).

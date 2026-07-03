@@ -21,8 +21,8 @@ Reference workflow: `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/AUDIT-PLANNING
    b. Verify all tasks in each story have their documented output. If any are missing → list them and stop.
    c. Verify `TRACEABILITY.md` is fully populated (no empty cells for evaluated terms).
    d. Verify no open inconsistencies remain unaddressed.
-   e. Verify `README.md` has a `## Retrospective` section. If missing → ask the user to add it before proceeding.
-   f. Execute `MILESTONE-FEEDBACK` (`.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/MILESTONE-FEEDBACK.md`) if not already done — summarize key outcomes and decisions.
+   e. Verify `README.md` has a completed `## Retrospective` section. If missing or still placeholder-only, read `RETROSPECTIVE-RAW.md`; if raw entries exist, invoke `/plan-retrospective $ARGUMENTS` and re-check. If the retrospective is still missing or placeholder-only, ask the user to complete it before proceeding.
+   f. Execute `MILESTONE-FEEDBACK` (`.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/MILESTONE-FEEDBACK.md`) if not already done — summarize key outcomes and decisions in the retrospective.
 3. **Archive:**
    a. Move `.planning/active/$ARGUMENTS/` to `.planning/finished/$ARGUMENTS/`.
    b. Update `.planning/active/README.md` — remove the entry for this planning.

@@ -17,14 +17,14 @@ Validate structural integrity, close all stories, and archive a completed planni
 
 2. Invoke `/plan-validate $ARGUMENTS`.
    - Read the validation output and parse the result:
-     - If any **FAIL** items are present: stop. Report all failing checks. Do NOT proceed to done/archive. Suggest manual fix and re-running `/plan-agent-validate`.
-     - If only **WARN** items: continue (warnings do not block closure).
+     - If any **FAIL** items are present: execute `[RECORD-EDGE-CASE]` with the validation failures, then stop. Report all failing checks. Do NOT proceed to done/archive. Suggest manual fix and re-running `/plan-agent-validate`.
+     - If only **WARN** items: execute `[RECORD-EDGE-CASE]` with the warnings, then continue (warnings do not block closure).
      - If all **PASS**: continue.
 
 3. Read all story files under `.planning/active/$ARGUMENTS/02-deepening/*.md` and check statuses:
    - `DONE` and `SKIPPED` are closable states.
    - `TODO`, `IN PROGRESS`, `BLOCKED`, and `STANDBY` are not closable.
-   - If any story is not closable: list the story and status, then stop — the planning is not ready to close.
+   - If any story is not closable: execute `[RECORD-EDGE-CASE]` with the non-closable stories and statuses, list them, then stop — the planning is not ready to close.
    - If all stories are closable: continue.
 
 4. Invoke `/plan-done $ARGUMENTS` (without story argument — marks the full planning done).

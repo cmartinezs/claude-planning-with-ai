@@ -194,8 +194,9 @@ const commandsPage = {
           description: 'Ejecuta una tarea atómica individual.',
           details: [
             'Sigue el diseño técnico de la tarea y aplica implementación y tests.',
-            'Marca la tarea como DONE y hace un commit con formato convencional (feat/fix/refactor/docs/…).',
-            'Puede disparar documentación de nivel tarea.',
+            'Crea una rama de task desde la rama de story, la pushea y abre PR de vuelta a la rama de story.',
+            'Después de mergear el PR de task, elimina la rama local de task con git branch -d.',
+            'Marca la tarea como DONE solo después de verificación y revisión humana.',
           ],
           source: 'skills/plan-task/SKILL.md',
         },
@@ -204,8 +205,9 @@ const commandsPage = {
           usage: '/plan-story <NNN-slug> <story-NN>',
           description: 'Ejecuta todas las tareas dentro de una story.',
           details: [
-            'Crea rama desde la base configurada, ejecuta cada tarea y hace commit convencional por tarea.',
-            'Al finalizar: rebase, push y apertura de PR hacia la rama base.',
+            'Crea y pushea una rama de story desde la rama base configurada.',
+            'Ejecuta tareas mediante ramas de task, espera que sus PRs estén mergeados y limpia ramas locales de task antes de cerrar la story.',
+            'Al finalizar: rebase, push y apertura de PR de story hacia la rama base; tras el merge final se limpia la rama local de story.',
             'Es el comando principal de ejecución por stories.',
           ],
           source: 'skills/plan-story/SKILL.md',
@@ -216,7 +218,7 @@ const commandsPage = {
           description: 'Marca una tarea o toda una story como terminada.',
           details: [
             'Verifica criterios de completitud antes de avanzar.',
-            'Al cerrar una story completa: hace push y abre PR si la rama de la story está activa.',
+            'Al cerrar una story completa: verifica PRs de task mergeados, limpia ramas locales de task y abre el PR de story hacia la rama base.',
             'Avanza el planning cuando todas las stories están completas.',
           ],
           source: 'skills/plan-done/SKILL.md',
@@ -231,6 +233,17 @@ const commandsPage = {
             'Es una auditoría previa útil antes de cerrar o archivar.',
           ],
           source: 'skills/plan-validate/SKILL.md',
+        },
+        {
+          name: '/plan-retrospective',
+          usage: '/plan-retrospective <NNN-slug>',
+          description: 'Genera la retrospectiva final del planning.',
+          details: [
+            'Lee RETROSPECTIVE-RAW.md, contexto del planning, stories y notas de trazabilidad.',
+            'Reemplaza o crea README.md# Retrospective con un resumen profesional.',
+            'Útil justo antes de plan-archive.',
+          ],
+          source: 'skills/plan-retrospective/SKILL.md',
         },
         {
           name: '/plan-archive',
@@ -303,6 +316,17 @@ const commandsPage = {
             'Registra una razón cuando se entrega.',
           ],
           source: 'skills/plan-story-skip/SKILL.md',
+        },
+        {
+          name: '/plan-edge-case',
+          usage: '/plan-edge-case [NNN-slug] [story-NN] -- <nota>',
+          description: 'Registra un evento inesperado para la retrospectiva final.',
+          details: [
+            'Agrega una entrada raw a RETROSPECTIVE-RAW.md.',
+            'Puede inferir el planning cuando existe exactamente un planning activo.',
+            'Úsalo para correcciones manuales, bloqueos, decisiones inusuales o sorpresas fuera de comandos del plugin.',
+          ],
+          source: 'skills/plan-edge-case/SKILL.md',
         },
         {
           name: '/plan-rollback',
@@ -419,6 +443,17 @@ const commandsPage = {
             'Pensado para mantenedores del plugin y chequeos de compatibilidad.',
           ],
           source: 'skills/plan-doctor/SKILL.md',
+        },
+        {
+          name: '/plan-update-version',
+          usage: '/plan-update-version <from> <to> [--dry-run] [--allow-dirty]',
+          description: 'Aplica una migración versionada a un workspace .planning antiguo.',
+          details: [
+            'Busca update-version/<from>-<to>.md en el workspace y luego en el template del plugin.',
+            'Permite dry-run para descubrir cambios antes de escribir o renombrar archivos de planning.',
+            'Parte con la migración 1.4.0 -> 2.0.0 desde terminología legacy scope hacia story.',
+          ],
+          source: 'skills/plan-update-version/SKILL.md',
         },
       ],
     },

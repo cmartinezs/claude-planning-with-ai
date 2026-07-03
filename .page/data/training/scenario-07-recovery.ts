@@ -4,7 +4,7 @@ const scenario: TrainingScenario = {
   id: 'recovery',
   difficulty: 'advanced',
   durationMin: 6,
-  commands: ['/plan-health', '/plan-validate', '/plan-rollback', '/plan-retry', '/plan-story'],
+  commands: ['/plan-health', '/plan-validate', '/plan-edge-case', '/plan-rollback', '/plan-retry', '/plan-story'],
   steps: [
     {
       command: '/plan-health',
@@ -103,7 +103,7 @@ const scenario: TrainingScenario = {
     {
       command: '/plan-rollback 006-reporting story-02',
       hint: '/plan-rollback revierte story-02 a estado TODO limpio: resetea todos sus tasks, borra el estado IN PROGRESS y elimina la rama local corrupta. El código que ya se escribió no se pierde — solo el estado del planning se limpia.',
-      nextHint: 'story-02 revuelta a TODO limpio. Si hubiera otras stories en BLOCKED, plan-retry las resetea todas a la vez.',
+      nextHint: 'story-02 revertida a TODO limpio. Registra el incidente como edge case para que la retrospectiva final explique la recuperación.',
       output: [
         '  Haciendo rollback de story-02...',
         '',
@@ -150,6 +150,38 @@ const scenario: TrainingScenario = {
       ],
     },
     {
+      command: '/plan-edge-case 006-reporting story-02 -- rollback por task DONE sin commit verificable y rama no pusheada',
+      hint: '/plan-edge-case guarda el hecho crudo en RETROSPECTIVE-RAW.md. No intenta embellecerlo: deja material para que /plan-retrospective genere la retro final después.',
+      nextHint: 'Edge case registrado. Si hubiera otras stories en BLOCKED, plan-retry las resetea todas a la vez.',
+      output: [
+        '  ⟳ Actualizando RETROSPECTIVE-RAW.md...',
+        '',
+        '  ✓ Entrada agregada',
+        '  Source: manual',
+        '  Related story/task: story-02',
+        '  Retrospective signal: recovery process and git hygiene follow-up',
+      ],
+      files: [
+        { name: '.planning', level: 0, type: 'folder' },
+        { name: 'active', level: 1, type: 'folder' },
+        { name: '006-reporting', level: 2, type: 'folder' },
+        { name: 'RETROSPECTIVE-RAW.md', level: 3, type: 'file', done: true },
+      ],
+      tab: 'RETROSPECTIVE-RAW.md',
+      code: [
+        '# Retrospective Raw Notes: reporting',
+        '',
+        '## Log',
+        '',
+        '### 2026-06-28 10:40 - Rollback de story-02',
+        '',
+        '- **Source:** manual',
+        '- **Related story/task:** story-02',
+        '- **What happened:** task DONE sin commit verificable y rama no pusheada.',
+        '- **Resolution:** rollback del estado de planning y re-ejecución controlada.',
+      ],
+    },
+    {
       command: '/plan-retry 006-reporting',
       hint: 'En plannings complejos puede haber múltiples stories en BLOCKED. /plan-retry las resetea todas de una vez a TODO sin necesidad de hacer rollback manual una por una.',
       nextHint: 'Todo limpio. Ahora ejecuta story-02 normalmente — este ciclo empezará desde cero, limpio.',
@@ -190,8 +222,8 @@ const scenario: TrainingScenario = {
     },
     {
       command: '/plan-story 006-reporting story-02',
-      hint: 'El planning está saneado. Ejecuta story-02 normalmente: /plan-story creará la rama, ejecutará las tareas con commits convencionales y abrirá el PR al finalizar.',
-      nextHint: '¡Entrenamiento completado! Aprendiste a diagnosticar, revertir y recuperar un planning bloqueado con plan-health, plan-validate, plan-rollback y plan-retry.',
+      hint: 'El planning está saneado. Ejecuta story-02 normalmente: /plan-story creará la rama de story, usará ramas por task y abrirá el PR final de story al finalizar.',
+      nextHint: '¡Entrenamiento completado! Aprendiste a diagnosticar, registrar, revertir y recuperar un planning bloqueado con plan-health, plan-validate, plan-edge-case, plan-rollback y plan-retry.',
       output: [
         '  ⟳ Git pre-flight...',
         '  ✓ Rama creada: story-02-charts',
@@ -208,7 +240,7 @@ const scenario: TrainingScenario = {
         '  ✓ story-02 → DONE',
         '',
         '  ✓ Push: story-02-charts',
-        '  ✓ PR abierto: https://github.com/.../pull/9',
+        '  ✓ PR story→main abierto: https://github.com/.../pull/9',
         '',
         '  Progreso 006-reporting: 2/3 stories DONE',
       ],

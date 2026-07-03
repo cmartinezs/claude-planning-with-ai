@@ -193,8 +193,8 @@ Muestra badge `✓ Completado` en las cards del catálogo y contador global `N c
 | 1 | `/plan-init` | Crea `.planning/`, detecta áreas AP y DO |
 | 2 | `/plan-new 001-user-auth -- Autenticación JWT` | Planning en INITIAL |
 | 3 | `/plan-expand 001-user-auth` | 3 stories generadas, → EXPANSION |
-| 4 | `/plan-story 001-user-auth story-01` | Rama, tareas, commits, push, PR |
-| 5 | `/plan-done 001-user-auth story-01` | Story DONE, PR confirmado |
+| 4 | `/plan-story 001-user-auth story-01` | Rama, tareas, commits, push, PR, limpieza local de ramas mergeadas |
+| 5 | `/plan-done 001-user-auth story-01` | Story DONE, PR confirmado, limpieza local posterior al merge |
 | 6 | `/plan-status` | Vista general del planning |
 | 7 | `/plan-archive 001-user-auth` | → `finished/` |
 
@@ -209,9 +209,9 @@ Muestra badge `✓ Completado` en las cards del catálogo y contador global `N c
 | 2 | `/us-enrich docs/product/epic-checkout/03-payment.md` | Agrega DoD + Technical Notes |
 | 3 | `/plan-from-epic 002-checkout docs/product/epic-checkout/` | Planning activo generado |
 | 4 | `/plan-atomize 002-checkout story-01` | Story → 3 tareas atómicas |
-| 5 | `/plan-task 002-checkout story-01 task-01` | Ejecuta tarea + commit convencional |
-| 6 | `/plan-task 002-checkout story-01 task-02` | Segunda tarea + commit |
-| 7 | `/plan-done 002-checkout story-01` | Push + PR |
+| 5 | `/plan-task 002-checkout story-01 task-01` | Ejecuta tarea + commit convencional + PR a story |
+| 6 | `/plan-task 002-checkout story-01 task-02` | Segunda tarea tras merge y limpieza local de la rama anterior |
+| 7 | `/plan-done 002-checkout story-01` | Push + PR final, limpieza local posterior al merge |
 
 ---
 
@@ -262,7 +262,7 @@ Muestra badge `✓ Completado` en las cards del catálogo y contador global `N c
 |------|---------|---------------|
 | 1 | `/plan-run "Exportación de reportes en PDF"` | Crea planning + inicia ciclo completo |
 | 2 | *(output automático)* agente plan | INITIAL → EXPANSION sin pausas |
-| 3 | *(output automático)* agente execute | Stories en paralelo, commits por tarea |
+| 3 | *(output automático)* agente execute | Stories en paralelo, PRs por task |
 | 4 | *(output automático)* agente validate | Validación + archive |
 | 5 | `/plan-status` | Planning en `finished/` |
 

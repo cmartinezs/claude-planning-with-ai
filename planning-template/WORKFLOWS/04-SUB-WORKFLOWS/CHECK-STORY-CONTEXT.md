@@ -2,7 +2,7 @@
 
 > [← README](README.md)
 
-Validates the current git and story state before switching to a new story branch. Detects in-progress work on the current branch and offers safe alternatives before any context switch.
+Validates the current git and story state before switching to a new story branch. Detects in-progress work on the current story branch or task branch and offers safe alternatives before any context switch.
 
 ---
 
@@ -13,16 +13,20 @@ Validates the current git and story state before switching to a new story branch
    git branch --show-current
    ```
 
-2. If the current branch does **not** match the pattern `story-NN-*`: return **OK** — no story context to protect; caller continues normally.
+2. If the current branch does **not** match either pattern `story-NN-*` or `story-NN-*/*`: return **OK** — no story context to protect; caller continues normally.
 
-3. If the current branch is a story branch:
+3. If the current branch is a story branch or a task branch under a story branch:
 
-   a. Find the corresponding story file under `.planning/active/*/02-deepening/<branch-name>.md`.
+   a. Derive the protected story branch:
+      - For `story-NN-slug`, protected story branch is the current branch.
+      - For `story-NN-slug/task-NN-task-slug`, protected story branch is the segment before `/`.
+
+   b. Find the corresponding story file under `.planning/active/*/02-deepening/<protected-story-branch>.md`.
       If no matching story file is found, return **OK** — branch exists but is not tracked by the planning system.
 
-   b. Read the story file status. If the status is not `IN PROGRESS`: return **OK** — nothing to protect.
+   c. Read the story file status. If the status is not `IN PROGRESS`: return **OK** — nothing to protect.
 
-   c. Gather git state:
+   d. Gather git state:
       ```bash
       git status --short
       git log @{u}..HEAD --oneline 2>/dev/null || echo "(no upstream configured)"
@@ -34,13 +38,14 @@ Validates the current git and story state before switching to a new story branch
       - **Untracked files** (lines starting with `??`)
       - **Unpushed commits** (lines from `git log @{u}..HEAD`)
 
-   d. Present a structured report to the user:
+   e. Present a structured report to the user:
 
       ```
       ⚠️  Story context conflict detected
 
       Current story : <story-NN> — <story name>
       Branch        : <branch-name>
+      Story branch  : <protected-story-branch>
       Status        : IN PROGRESS
 
       Git state:
@@ -51,12 +56,12 @@ Validates the current git and story state before switching to a new story branch
         Existing stashes    : Q
       ```
 
-   e. Present the following options and wait for the user to choose:
+   f. Present the following options and wait for the user to choose:
 
       ```
       Choose how to proceed:
 
-        A) Abort              — stay on this story branch; do not start the new story
+        A) Abort              — stay on this story/task branch; do not start the new story
         B) Stash              — stash pending changes, then switch to the new story branch
         C) Commit WIP         — commit tracked changes as WIP, then switch
                                 (untracked files are left in place)

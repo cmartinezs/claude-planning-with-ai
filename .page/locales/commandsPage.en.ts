@@ -194,8 +194,9 @@ const commandsPage = {
           description: 'Executes one atomic task.',
           details: [
             'Follows the task technical design and applies implementation and tests.',
-            'Marks the task DONE and commits with conventional commit format (feat/fix/refactor/docs/…).',
-            'Can trigger task-level documentation.',
+            'Creates a task branch from the story branch, pushes it, and opens a PR back to the story branch.',
+            'After the task PR is merged, deletes the local task branch with git branch -d.',
+            'Marks the task DONE only after verification and human review.',
           ],
           source: 'skills/plan-task/SKILL.md',
         },
@@ -204,8 +205,9 @@ const commandsPage = {
           usage: '/plan-story <NNN-slug> <story-NN>',
           description: 'Executes all tasks inside a story.',
           details: [
-            'Creates a branch from the configured base, executes each task with a conventional commit.',
-            'When done: rebases, pushes, and opens a PR toward the base branch.',
+            'Creates and pushes a story branch from the configured base branch.',
+            'Runs tasks through task branches, waits for task PRs to be merged, and cleans local task branches before story closure.',
+            'When done: rebases, pushes, and opens a story PR toward the base branch; after final merge it cleans the local story branch.',
             'Main story-based execution command.',
           ],
           source: 'skills/plan-story/SKILL.md',
@@ -216,7 +218,7 @@ const commandsPage = {
           description: 'Marks one task or a whole story as done.',
           details: [
             'Checks completion criteria before advancing.',
-            'When closing a full story: pushes and opens a PR if the story branch is active.',
+            'When closing a full story: verifies task PRs are merged, cleans local task branches, then opens the story PR to the base branch.',
             'Advances the planning when all stories are complete.',
           ],
           source: 'skills/plan-done/SKILL.md',
@@ -231,6 +233,17 @@ const commandsPage = {
             'Useful audit before closing or archiving.',
           ],
           source: 'skills/plan-validate/SKILL.md',
+        },
+        {
+          name: '/plan-retrospective',
+          usage: '/plan-retrospective <NNN-slug>',
+          description: 'Generates the final planning retrospective.',
+          details: [
+            'Reads RETROSPECTIVE-RAW.md, planning context, stories, and traceability notes.',
+            'Replaces or creates README.md# Retrospective with a professional summary.',
+            'Useful immediately before plan-archive.',
+          ],
+          source: 'skills/plan-retrospective/SKILL.md',
         },
         {
           name: '/plan-archive',
@@ -303,6 +316,17 @@ const commandsPage = {
             'Records a reason when provided.',
           ],
           source: 'skills/plan-story-skip/SKILL.md',
+        },
+        {
+          name: '/plan-edge-case',
+          usage: '/plan-edge-case [NNN-slug] [story-NN] -- <note>',
+          description: 'Records an unexpected event for the final retrospective.',
+          details: [
+            'Appends a raw entry to RETROSPECTIVE-RAW.md.',
+            'Can infer the planning when exactly one active planning exists.',
+            'Use it for manual corrections, blockers, unusual decisions, or surprises outside plugin commands.',
+          ],
+          source: 'skills/plan-edge-case/SKILL.md',
         },
         {
           name: '/plan-rollback',
@@ -419,6 +443,17 @@ const commandsPage = {
             'Intended for plugin maintainers and compatibility checks.',
           ],
           source: 'skills/plan-doctor/SKILL.md',
+        },
+        {
+          name: '/plan-update-version',
+          usage: '/plan-update-version <from> <to> [--dry-run] [--allow-dirty]',
+          description: 'Applies a versioned migration to an older .planning workspace.',
+          details: [
+            'Looks for update-version/<from>-<to>.md in the workspace, then in the plugin template.',
+            'Can dry-run discovery before writing or renaming planning files.',
+            'Starts with the 1.4.0 -> 2.0.0 migration from legacy scope terminology to story terminology.',
+          ],
+          source: 'skills/plan-update-version/SKILL.md',
         },
       ],
     },

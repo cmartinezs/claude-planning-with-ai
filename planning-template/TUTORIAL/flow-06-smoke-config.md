@@ -51,6 +51,8 @@ Claude inspecciona el código fuente, infiere el stack y propone un plan concret
 - levantar dependencias de soporte,
 - ejecutar compilación o test de arranque,
 - validar conectividad con la base de datos,
+- validar consistencia estática entre migraciones/schema y ORM si existe,
+- levantar el entorno local necesario para una prueba de persistencia,
 - revisar logs de migración o inicialización,
 - confirmar que el cambio responde correctamente.
 
@@ -67,6 +69,7 @@ El plan de smoke tests debe quedar escrito con suficiente precisión para que al
 | Stack Summary | Stack principal y servicios de soporte |
 | Execution Order | Orden real de arranque y validación |
 | Smoke Checks | Checks mínimos de compilación, conexión y migraciones |
+| Database / ORM Consistency | Validación estática DB/ORM y smoke test local de persistencia |
 | Human Review Gate | Cuándo detenerse y esperar revisión humana |
 
 Si falta un comando, un servicio o un check, corrígelo antes de continuar.

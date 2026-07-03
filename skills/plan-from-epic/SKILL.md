@@ -31,6 +31,14 @@ The `--filter` field and value are matched case-insensitively against any metada
 
 ## Steps
 
+### 0 — Workspace boundary
+
+- Use only the current working directory as the planning workspace.
+- Verify `./.planning/` exists in the current directory before reading the source container.
+- Do not search parent directories for `.planning/`.
+- If `./.planning/` does not exist, stop: "Run `/plan-init` in the current directory first. Parent `.planning/` workspaces are not used for child artifact planning."
+- Report the resolved planning root as `<current-directory>/.planning/`.
+
 ### 1 — Resolve the container
 
 - If the path does not exist, stop and report.

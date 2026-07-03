@@ -58,6 +58,10 @@ commands:
     category: lifecycle
     source: skills/plan-done/SKILL.md
     summary: Mark a task or story done.
+  - name: plan-edge-case
+    category: maintenance
+    source: skills/plan-edge-case/SKILL.md
+    summary: Add a raw retrospective note for an unexpected event.
   - name: plan-doctor
     category: maintenance
     source: skills/plan-doctor/SKILL.md
@@ -117,6 +121,15 @@ commands:
     category: communication
     source: skills/plan-report/SKILL.md
     summary: Generate an executive planning summary.
+  - name: plan-retrospective
+    category: maintenance
+    source: skills/plan-retrospective/SKILL.md
+    summary: Generate a professional retrospective from raw edge-case notes and planning context.
+  - name: plan-update-version
+    category: maintenance
+    source: skills/plan-update-version/SKILL.md
+    summary: Apply a versioned migration to update old .planning workspaces to newer major-version conventions.
+    usage: /plan-update-version <from> <to> [--dry-run] [--allow-dirty]
   - name: plan-retry
     category: recovery
     source: skills/plan-retry/SKILL.md

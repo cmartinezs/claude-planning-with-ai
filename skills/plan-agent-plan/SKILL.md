@@ -15,6 +15,8 @@ Execute the planning phase: create (if mode is from-scratch) and expand a planni
 
 ## Steps
 
+0. **Workspace boundary.** Use only `./.planning/` in the current working directory. Do not search parent directories for `.planning/`. If `./.planning/` does not exist, stop and ask the user to run `/plan-init` in the current directory.
+
 1. **Detect mode:**
    - If `$ARGUMENTS` matches `\d{3}-[a-z0-9-]+`: **resume mode** — planning already exists in INITIAL state.
    - Otherwise: **from-scratch mode** — treat `$ARGUMENTS` as the planning description.

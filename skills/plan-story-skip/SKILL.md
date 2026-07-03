@@ -24,8 +24,9 @@ Mark a story as SKIPPED when it is no longer applicable. SKIPPED stories do not 
    - Otherwise: continue.
 4. Set the story status to `SKIPPED` in the story file. Append a `Skipped reason:` line below the status with the provided reason (or `"not provided"` if omitted) and today's date.
 5. Update the story's row in `.planning/active/<planning-id>/01-expansion.md` — set its status column to `SKIPPED`.
-6. Update `.planning/active/README.md` to reflect the new status.
-7. Check if all stories in the planning are now either `DONE` or `SKIPPED`. If yes, suggest `/plan-archive <planning-id>`.
-8. Report: story marked SKIPPED, reason recorded, remaining non-DONE/SKIPPED stories (if any).
+6. Execute `[RECORD-EDGE-CASE]` with source `/plan-story-skip`, related story, skipped reason, and whether follow-up planning is needed.
+7. Update `.planning/active/README.md` to reflect the new status.
+8. Check if all stories in the planning are now either `DONE` or `SKIPPED`. If yes, suggest `/plan-retrospective <planning-id>` followed by `/plan-archive <planning-id>`.
+9. Report: story marked SKIPPED, reason recorded, remaining non-DONE/SKIPPED stories (if any).
 
 > SKIPPED stories are treated as closed for planning-closure purposes. To undo, manually reset the status to TODO in the story file.

@@ -45,6 +45,7 @@ Run a compatibility and consistency audit for this planning plugin. This command
 5. Verify template integrity:
    - `.planning` template files referenced by `/plan-init` exist.
    - `planning-template/WORKFLOWS/README.md` links to each workflow group directory.
+   - `planning-template/update-version/README.md` exists and lists available major-version migrations.
    - `planning-template/_template/01-expansion.md` includes status, dependency, risk, and external issue fields.
    - `planning-template/_template/02-deepening/story-NN-name.md` includes risk and residual sections.
    - `planning-template/_template/02-deepening/task-NN-name.md` includes verification and risk fields.

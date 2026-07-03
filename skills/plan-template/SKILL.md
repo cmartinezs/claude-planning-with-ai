@@ -24,12 +24,14 @@ Examples:
 
 ## Steps
 
+0. **Workspace boundary.** Use only `./.planning/` in the current working directory. Do not search parent directories for `.planning/`. If `./.planning/` does not exist, stop and ask the user to run `/plan-init` in the current directory.
+
 1. Parse `$ARGUMENTS`:
    - Extract slug if provided (any token without `--`).
    - Determine mode: `--blank` → blank mode; `--interactive` or no flag → interactive mode.
    - If no slug given: ask "¿Cómo quieres llamar esta idea? (kebab-case, ej: `user-auth-api`)" and wait for input.
 
-2. Determine output path: `.planning/ideas/<slug>.md`. Create the `.planning/ideas/` directory if it doesn't exist.
+2. Determine output path: `./.planning/ideas/<slug>.md`. Create the `.planning/ideas/` directory in the current directory if it doesn't exist.
 
 3. **Blank mode:** write the template below with all placeholders intact. Report the file path and exit.
 

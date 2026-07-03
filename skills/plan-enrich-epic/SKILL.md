@@ -13,6 +13,7 @@ Reference workflows:
 - `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/CREATE-PLANNING.md` (steps 4–7, story creation)
 - `.planning/WORKFLOWS/02-EXECUTION-WORKFLOWS/EXPAND-ELEMENT.md`
 - `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md`
+- `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/RECORD-EDGE-CASE.md`
 
 ## Arguments
 
@@ -33,6 +34,7 @@ Reference workflows:
    e. Update the dependency map section in `01-expansion.md` if the new story has or creates dependencies.
    f. Create `.planning/active/<planning-id>/02-deepening/story-NN-name.md` from the deepening template. Set status to `TODO`.
 7. Update `.planning/active/README.md` to list the new stories under the planning entry.
-8. Report: N new stories added, list them with their IDs and names.
+8. Execute `[RECORD-EDGE-CASE]` with source `/plan-enrich-epic`, listing the new stories and why they were discovered after initial expansion.
+9. Report: N new stories added, list them with their IDs and names.
 
 > If the new stories depend on existing IN PROGRESS or DONE stories, note that in the dependency map and in the report.

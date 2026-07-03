@@ -1,11 +1,13 @@
 ---
 name: plan-git-config
-description: View or update the git configuration for the planning system (base branch). Use on projects already initialized with /plan-init.
+description: View or update the git configuration for the planning system base branch. Story branches start from this branch and final story PRs target it.
 argument-hint: [--base-branch <branch>]
 allowed-tools: [Read, Write, Bash]
 ---
 
 View or update `.planning/config.yml`. Use this on projects where `.planning/` was already initialized before git configuration was introduced.
+
+`git.base_branch` is the integration branch for releases (for example `develop`). `/plan-story` ensures a story branch exists when orchestrating a story, and `/plan-task` also creates or reuses the story branch when a user starts directly from a task. `/plan-task` creates task branches from the story branch, task PRs target the story branch, and the final story PR targets `git.base_branch`. After each task PR is merged, the local task branch is deleted with `git branch -d`; after the story PR is merged into `git.base_branch`, the local story branch is deleted the same way. Remote branch deletion remains a PR/repository policy action.
 
 ## Arguments
 

@@ -6,6 +6,45 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Layered git workflow now requires local cleanup after PR merges: delete each merged task branch locally after its PR lands in the story branch, and delete the local story branch after the story PR lands in `git.base_branch`. Remote branch cleanup remains controlled by the PR/repository workflow.
+
+## [3.5.0] — 2026-06-29
+
+### Added
+
+- `/plan-edge-case` — manual command to append unexpected events, corrections, blockers, or unusual situations to a planning's `RETROSPECTIVE-RAW.md`.
+- `/plan-retrospective` — generates or refreshes the final professional `README.md# Retrospective` from `RETROSPECTIVE-RAW.md`, planning context, story statuses, and traceability notes.
+- `/plan-update-version` — applies cumulative adjacent major-pair planning-system migrations from `update-version/<N>-<N+1>.md`, starting with `1-2.md` to migrate legacy `scope` planning artifacts to `story`.
+- `planning-template/update-version/2-3.md` — major-pair migration that brings any `2.x` workspace to the current `3.5.0` baseline by applying the recorded 3.x changes in order.
+- `RETROSPECTIVE-RAW.md` planning template and `RECORD-EDGE-CASE` workflow for preserving raw retrospective signals during execution.
+
+### Changed
+
+- Planning execution, adjustment, recovery, validation, and archive commands now record blockers, corrections, retries, skipped work, rollbacks, validation findings, and scope changes as raw retrospective notes.
+- `/plan-archive` now attempts `/plan-retrospective` when the retrospective is missing or placeholder-only and raw notes exist.
+- Public docs, tutorial reference, and landing command inventory now list 50 commands and include the retrospective and update-version workflows.
+- Git execution now uses layered integration: story branches start from `git.base_branch`, each task opens a PR into the story branch, and the final story PR targets the base branch.
+- `/plan-task` now creates or reuses the story integration branch when invoked directly, so `/plan-story` is optional orchestration rather than a required pre-step.
+- Training workspace now uses a direct custom splitter for Explorer/Main and Editor/Terminal so panel boundaries resize reliably and the reset action restores the intended layout.
+- Software task execution now uses a stack-specific smoke test plan before completion: read or infer `.planning/SMOKE-TESTS.md`, run the supporting services, build/start the app, verify connectivity or schema checks, run smoke checks, and wait for human developer code review before marking DONE or committing.
+- DB/ORM changes now require an explicit validation task with static database-to-ORM consistency checks and local runtime persistence smoke evidence.
+- Added `/plan-smoke-config` and `.planning/SMOKE-TESTS.md` to configure stack-specific smoke tests from questions, manual input, or repository inference.
+- Updated task templates, atomization, task validation, story completion, and user docs to enforce smoke-test evidence and post-verification human review before git add/commit/push/PR.
+
+## [3.4.0] — 2026-06-29
+
+### Added
+
+- `/plan-edge-case` — manual command to append unexpected events, corrections, blockers, or unusual situations to a planning's `RETROSPECTIVE-RAW.md`.
+- `/plan-retrospective` — generates or refreshes the final professional `README.md# Retrospective` from `RETROSPECTIVE-RAW.md`, planning context, story statuses, and traceability notes.
+- `RETROSPECTIVE-RAW.md` planning template and `RECORD-EDGE-CASE` workflow for preserving raw retrospective signals during execution.
+
+### Changed
+
+- Planning execution, adjustment, recovery, validation, and archive commands now record blockers, corrections, retries, skipped work, rollbacks, validation findings, and scope changes as raw retrospective notes.
+- `/plan-archive` now attempts `/plan-retrospective` when the retrospective is missing or placeholder-only and raw notes exist.
+- Public docs, tutorial reference, and landing command inventory now list 50 commands and include the retrospective workflow.
+- Git execution now uses layered integration: story branches start from `git.base_branch`, each task opens a PR into the story branch, and the final story PR targets the base branch.
 - Training workspace now uses a direct custom splitter for Explorer/Main and Editor/Terminal so panel boundaries resize reliably and the reset action restores the intended layout.
 - Software task execution now uses a stack-specific smoke test plan before completion: read or infer `.planning/SMOKE-TESTS.md`, run the supporting services, build/start the app, verify connectivity or schema checks, run smoke checks, and wait for human developer code review before marking DONE or committing.
 - Added `/plan-smoke-config` and `.planning/SMOKE-TESTS.md` to configure stack-specific smoke tests from questions, manual input, or repository inference.
@@ -219,7 +258,9 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.4.0...v3.5.0
+[3.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.2.0...v3.4.0
 [3.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v2.4.0...v3.0.0

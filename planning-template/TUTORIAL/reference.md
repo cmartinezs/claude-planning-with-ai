@@ -124,15 +124,18 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-task-validate NNN-slug [story-NN] [task-NN]
 
 # Ejecutar todas las tareas de una story
-# → crea rama desde base, ejecuta tareas, espera code review humano, commitea tareas aprobadas, push + PR al final
+# → crea rama de story desde base; cada task usa rama propia y PR hacia la story; limpia ramas locales mergeadas; al final abre PR story→base
 /plan-story NNN-slug story-NN
 
 # Marcar story completo (verifica done criteria y avanza al siguiente)
-# → push + PR si la rama de la story está activa
+# → requiere PRs de task mergeados; abre PR final story→base si corresponde; tras el merge final limpia la rama local de story
 /plan-done NNN-slug story-NN
 
 # Marcar solo una tarea (no avanza la story)
 /plan-done NNN-slug story-NN task-N
+
+# Generar retrospectiva final
+/plan-retrospective NNN-slug
 
 # Auditar y archivar a finished/
 /plan-archive NNN-slug
@@ -210,7 +213,10 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Story del planning está mal especificado | `/plan-enrich-story NNN-slug story-NN` |
 | Story del planning es demasiado grande | `/plan-split-story NNN-slug story-NN` |
 | Story nueva de backlog + story nueva de planning coordinadas | `/us-new` → `/plan-enrich-epic` |
-| Cerrar el planning | `/plan-archive NNN-slug` |
+| Algo raro ocurrió fuera de un comando del plugin | `/plan-edge-case NNN-slug -- nota` |
+| Preparar retrospectiva final | `/plan-retrospective NNN-slug` |
+| Workspace `2.x` antiguo | `/plan-update-version 2.1.0 3.5.0 --dry-run` → `/plan-update-version 2.1.0 3.5.0` |
+| Cerrar el planning | `/plan-retrospective NNN-slug` → `/plan-archive NNN-slug` |
 | Ejecutar todo el ciclo sin intervención | `/plan-run NNN-slug` |
 | Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |
 | Solo la ejecución paralela de stories | `/plan-agent-execute NNN-slug` |
@@ -267,6 +273,9 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-smoke-config` | `[--blank]` (vacío = generar con preguntas e inferencia) |
 | `/plan-story` | `NNN-slug story-NN` |
 | `/plan-done` | `NNN-slug story-NN` ó `NNN-slug story-NN task-N` |
+| `/plan-edge-case` | `[NNN-slug] [story-NN] -- nota` |
+| `/plan-retrospective` | `NNN-slug` |
+| `/plan-update-version` | `<from> <to> [--dry-run] [--allow-dirty]` |
 | `/plan-archive` | `NNN-slug` |
 | `/plan-enrich-epic` | `NNN-slug` |
 | `/plan-enrich-story` | `NNN-slug story-NN` |

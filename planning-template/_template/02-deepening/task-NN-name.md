@@ -56,6 +56,16 @@
 | 4 | Changed surface responds correctly | Run the smallest endpoint/API/CLI checks that prove the task did not break startup |
 | 5 | No startup regressions are visible | Confirm logs and smoke output do not show new startup, migration, or boot failures |
 
+### Database / ORM Consistency Check
+
+> *Required when this task changes database structure, migrations, schema files, seed/bootstrap data, ORM models/entities, generated clients, repositories tied to ORM models, or persistence configuration. If no database or ORM is involved, write `N/A`.*
+
+| # | Check | How to validate |
+|---|-------|----------------|
+| 1 | Static database-to-ORM consistency is valid | Compare migrations/schema against ORM models/entities/generated client for fields, types, nullability, defaults, enums, indexes, relationships, table/column names, and generated artifacts |
+| 2 | Local runtime environment starts | Start required local services and the app/worker using the project-local command; ask the human for startup steps if they cannot be inferred |
+| 3 | Persistence smoke check passes | Run a minimal non-destructive check that proves migration/bootstrap and the changed persistence path work in execution |
+
 ---
 
 ## Done Criteria
@@ -63,6 +73,7 @@
 - [ ] [Deliverable exists and is verifiable: specific and binary]
 - [ ] All verification checks listed above pass
 - [ ] For software projects, smoke test plan passes: supporting services, app startup, connectivity or schema checks, and changed-surface smoke checks
+- [ ] If database structure or ORM artifacts changed, static DB/ORM consistency validation passes and local runtime persistence smoke evidence is captured
 - [ ] Human developer code review completed; requested corrections, if any, were implemented and re-reviewed
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
 - [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`

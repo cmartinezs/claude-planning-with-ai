@@ -41,7 +41,17 @@ software:
   smoke_tests_file: SMOKE-TESTS.md   # Optional override for the smoke-test plan file under .planning/
 ```
 
-When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, run the smoke checks, then wait for human developer code review. Requested corrections restart the verification/review loop. Git add/commit/push and PR creation happen only after human approval.
+When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, run the smoke checks, then wait for human developer code review. Requested corrections restart the verification/review loop.
+
+When a story changes database structure or ORM artifacts, `/plan-atomize` must add a separate validation task. That task statically checks consistency between migrations/schema and ORM models/entities/generated clients, then starts the local environment and runs a persistence smoke check. If the local environment cannot be inferred from repository files, the agent must ask the human for startup steps before finalizing or executing that validation.
+
+When `execution.requires_git` is `true`, the git flow is layered:
+
+- The story integration branch starts from `git.base_branch` (for example `develop`). `/plan-story` ensures it exists when orchestrating a story, and `/plan-task` also creates or reuses it when you start directly from a task.
+- `/plan-task` creates and pushes a task branch from the story branch, commits that task, and opens a PR back to the story branch.
+- Task PRs are reviewed and merged into the story branch one by one before the next dependent task starts. After each task PR is merged, delete the local task branch with `git branch -d <task-branch>` from an updated story branch checkout.
+- The story is closed only after all task PRs are merged into the story branch.
+- The final story PR targets `git.base_branch`, so partial planning progress can still be released from the base branch without waiting for every story in the planning. After the story PR is merged into the base branch, delete the local story branch with `git branch -d <story-branch>` from an updated base branch checkout.
 
 ### Area
 
@@ -62,13 +72,15 @@ Each planning records which terms, decisions, and concepts were introduced and w
 
 ## Setting Up A Project
 
-Run once from the root of your project:
+Run once from the directory that should own the planning workspace:
 
 ```text
 /plan-init
 ```
 
 The plugin will scan top-level directories, propose area codes, ask you to confirm or adjust them, generate area guidance files, and pre-fill traceability headers.
+
+Planning commands always use the current directory's `./.planning/`. They do not search parent directories. In a monorepo, run `/plan-init` separately in the parent and in each child artifact that should manage its own work.
 
 For manual or non-standard setup:
 
@@ -77,6 +89,15 @@ For manual or non-standard setup:
 ```
 
 This creates the `.planning/` structure with placeholder tables you can fill manually.
+
+### Monorepo Parent/Child Planning
+
+Use separate planning workspaces when a monorepo has independently managed artifacts:
+
+- Run parent-level plans from the monorepo parent directory. The parent plan owns cross-artifact coordination, integration sequencing, shared docs, releases, and parent-scope changes.
+- Run artifact-level plans from the artifact directory. The artifact plan owns implementation inside that artifact.
+- If a parent plan affects children with their own `.planning/`, `/plan-expand` creates linked child plannings in those child workspaces and records them in the parent's `01-expansion.md`.
+- The parent should track child planning status and sync checkpoints, not duplicate child implementation stories or tasks.
 
 ## Workflows
 
@@ -101,6 +122,7 @@ Use this when you already have user stories or requirements in markdown.
 
 # Validate and archive when stories are complete
 /plan-validate 001-checkout
+/plan-retrospective 001-checkout
 /plan-archive 001-checkout
 ```
 
@@ -131,6 +153,7 @@ Use this when you have an idea but no stories yet.
 
 # Close
 /plan-validate 002-payment-gateway
+/plan-retrospective 002-payment-gateway
 /plan-archive 002-payment-gateway
 ```
 
@@ -243,11 +266,14 @@ The audit compares expected docs from stories and tasks against actual files, lo
 | `/plan-done` | `NNN-slug story-NN [task-N]` | Mark a task or story done |
 | `/plan-status` | `[NNN-slug]` | Show planning state and story progress |
 | `/plan-validate` | `[NNN-slug]` | Check structural integrity |
+| `/plan-edge-case` | `[NNN-slug] [story-NN] -- note` | Record something unexpected for the final retrospective |
+| `/plan-retrospective` | `NNN-slug` | Generate or refresh the planning retrospective |
+| `/plan-update-version` | `<from> <to> [--dry-run] [--allow-dirty]` | Apply a versioned migration to an older `.planning/` workspace |
 | `/plan-archive` | `NNN-slug` | Audit and archive to `finished/` |
 
 ### Automation, Maintenance, Docs, Releases
 
-See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/plan-audit-docs`, `/release-*`, `/plan-health`, `/plan-doctor`, `/plan-report`, `/plan-export`, `/plan-smoke-config`, recovery commands, and history/status utilities.
+See [Command Reference](reference.md) for the complete list, including `/plan-run`, `/plan-agent-*`, `/doc-*`, `/plan-audit-docs`, `/release-*`, `/plan-health`, `/plan-doctor`, `/plan-report`, `/plan-export`, `/plan-smoke-config`, `/plan-update-version`, recovery commands, and history/status utilities.
 
 ## Choosing Similar Commands
 
@@ -292,6 +318,10 @@ Only matching source stories generate planning stories.
 ```
 
 Use atomization when a story's task list hides design decisions or is too coarse to execute directly.
+
+If a story changes database structure or ORM artifacts, atomization must include an explicit DB/ORM validation task after the implementation tasks.
+
+With git enabled, each task runs in its own branch and opens a task PR into the story branch. Merge task PRs into the story branch before closing the story, then delete each merged task branch locally. After the final story PR is merged into the base branch, delete the local story branch too.
 
 ### Marking One Task Done
 
@@ -338,4 +368,6 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 - **Atomize when tasks hide design decisions.** `/plan-atomize` forces approach, steps, verification, and done criteria to be explicit.
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
+- **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.5.0` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

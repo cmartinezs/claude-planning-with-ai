@@ -14,7 +14,7 @@ flowchart TD
     C --> D[Check TRACEABILITY.md is complete]
     D --> E{Open inconsistencies?}
     E -- Yes --> F[Resolve or formally defer to a new planning]
-    E -- No --> G[Verify planning README.md has Retrospective]
+    E -- No --> G[Verify planning README.md has completed Retrospective]
     F --> G
     G --> H[Execute MILESTONE-FEEDBACK if not done]
     H --> I[Move planning to planning/finished/NNN-name/]
@@ -31,7 +31,7 @@ flowchart TD
 2. Verify all tasks in each story have their documented output.
 3. Verify `TRACEABILITY.md` is fully populated (no empty cells for evaluated terms).
 4. Verify no open inconsistencies remain unaddressed.
-5. Verify `README.md` has a `## Retrospective` section.
+5. Verify `README.md` has a completed `## Retrospective` section, not placeholder-only template text. If it is missing or placeholder-only and `RETROSPECTIVE-RAW.md` has entries, run `/plan-retrospective <planning-id>` before blocking.
 6. Execute `MILESTONE-FEEDBACK` if not already done.
 7. Move planning folder to `planning/finished/`.
 8. Update `planning/active/README.md` — remove entry.

@@ -4,6 +4,7 @@ Central directory for all project plannings.
 
 > For detailed structure, lifecycle, and naming conventions, see [`GUIDE.md`](GUIDE.md).
 > For step-by-step guides, see [`TUTORIAL/`](TUTORIAL/README.md).
+> For major-version workspace migrations, see [`update-version/`](update-version/README.md) and run `/plan-update-version <from> <to>`.
 
 ---
 

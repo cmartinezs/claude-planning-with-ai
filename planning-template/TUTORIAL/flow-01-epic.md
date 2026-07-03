@@ -197,10 +197,11 @@ Cuando todos los stories están en `DONE`, valida la integridad estructural ante
 Si el reporte sale limpio (sin FAIL), archiva:
 
 ```
+/plan-retrospective 005-grading-assistance
 /plan-archive 005-grading-assistance
 ```
 
-Claude audita (todos los stories DONE, tareas con output, TRACEABILITY lleno, sección Retrospective presente) y mueve el planning a `finished/`.
+Claude genera la retrospectiva desde `RETROSPECTIVE-RAW.md`, audita (todos los stories DONE, tareas con output, TRACEABILITY lleno, sección Retrospective completada) y mueve el planning a `finished/`.
 
 ---
 

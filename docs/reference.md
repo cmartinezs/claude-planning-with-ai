@@ -42,7 +42,9 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-expand <NNN-slug>` | Advances INITIAL -> EXPANSION and creates planning stories |
 | `/plan-status` | Shows all plannings and story statuses |
 | `/plan-validate [NNN-slug]` | Checks structural integrity for one or all plannings |
-| `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done |
+| `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done; for full stories, verifies task PR merges, cleans local task branches, and opens the story PR |
+| `/plan-edge-case [NNN-slug] [story-NN] -- <note>` | Adds a raw note for an unexpected event or correction |
+| `/plan-retrospective <NNN-slug>` | Generates the final retrospective from raw notes and planning context |
 | `/plan-archive <NNN-slug>` | Audits and moves a completed planning to `finished/` |
 
 ### Execution
@@ -50,9 +52,9 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | Command | What it does |
 |---------|-------------|
 | `/plan-atomize <NNN-slug> [story-NN]` | Decomposes one story or all pending stories into atomic task files |
-| `/plan-task <NNN-slug> <story-NN> <task-NN>` | Executes one atomic task end to end |
+| `/plan-task <NNN-slug> <story-NN> <task-NN>` | Executes one atomic task end to end, opens a task PR, and requires local task branch cleanup after merge |
 | `/plan-task-validate <NNN-slug> [story-NN] [task-NN]` | Audits atomic tasks against the atomicity checklist |
-| `/plan-story <NNN-slug> <story-NN>` | Executes all tasks in a story |
+| `/plan-story <NNN-slug> <story-NN>` | Executes all tasks in a story, cleans merged local task branches, and opens the final story PR |
 
 ### Mid-Execution Adjustments
 
@@ -105,6 +107,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-clone <source-id> <target-id>` | Clones a planning structure into a fresh ID |
 | `/plan-retry <NNN-slug>` | Retries BLOCKED stories after blockers are resolved |
 | `/plan-rollback <NNN-slug> <story-NN>` | Reverts story planning state from DONE to TODO |
+| `/plan-update-version <from> <to> [--dry-run] [--allow-dirty]` | Applies a major-version planning-system migration from `.planning/update-version/` |
 
 ---
 
@@ -143,12 +146,16 @@ Some commands intentionally overlap because they operate at different layers.
 
 ## How area discovery works
 
-When you run `/plan-init`, the plugin scans your project's top-level directories, detects the technology stack in each one, and proposes a short area code (e.g. `AP` for `api/`, `WB` for `web/`). You confirm or adjust the mapping, and the plugin generates:
+When you run `/plan-init`, the plugin initializes only the current directory's `./.planning/`. It does not search parent directories for an existing planning workspace.
+
+The plugin scans the current directory's top-level directories, detects the technology stack in each one, and proposes a short area code (e.g. `AP` for `api/`, `WB` for `web/`). You confirm or adjust the mapping, and the plugin generates:
 
 - One `AREA-<CODE>-<dir>.md` file per area in `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/`
 - Pre-filled traceability matrix columns in `GUIDE.md`, `TRACEABILITY-GLOBAL.md`, and `_template/TRACEABILITY.md`
 
 Areas are the columns of the traceability matrix. Every planning story records which areas it touches. If your project structure changes, update the area files and matrix headers manually.
+
+In monorepos, parent and child artifact workspaces can each have their own `.planning/`. Parent plans coordinate linked child plannings; child plans own child implementation. Do not create skip-level implementation stories in the parent for a child that has its own planning workspace.
 
 ### Area code mapping
 
@@ -190,6 +197,7 @@ Areas are the columns of the traceability matrix. Every planning story records w
 │       ├── AREA-<CODE>-<dir>.md   ← one per project area (generated)
 │       └── AREA-EXAMPLE.md        ← format reference
 ├── TUTORIAL/
+├── update-version/         ← versioned migrations for older planning workspaces
 ├── active/                 ← plannings in EXPANSION or DEEPENING
 ├── finished/               ← completed plannings (read-only)
 ├── GUIDE.md                ← area table filled in by plan-init

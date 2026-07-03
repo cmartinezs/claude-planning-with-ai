@@ -17,7 +17,8 @@ Validates the state of the planning system before launching a new planning execu
    a. Collect for each:
       - Planning ID and name
       - Story ID and name
-      - Git branch derived from the story filename (`story-NN-<slug>`)
+      - Git story branch derived from the story filename (`story-NN-<slug>`)
+      - Any local task branches under that story branch (`story-NN-<slug>/*`)
 
    b. For each affected branch, gather git state:
       ```bash
@@ -34,7 +35,8 @@ Validates the state of the planning system before launching a new planning execu
       In-progress work:
         Planning : <NNN-slug>
         Story    : <story-NN> — <story name>
-        Branch   : <branch-name>
+      Story branch : <branch-name>
+      Task branches: <task-branch-list or none>
 
       Git state on <branch-name>:
         Modified / staged : N files
@@ -65,7 +67,7 @@ Validates the state of the planning system before launching a new planning execu
    - Display the full content of each in-progress story file.
    - Return to step 3d (present options again).
 
-6. **If C (Stabilize):** for each in-progress story branch, in sequence:
+6. **If C (Stabilize):** for each in-progress story branch and any related task branches, in sequence:
 
    a. Switch to the story branch:
       ```bash

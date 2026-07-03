@@ -27,7 +27,7 @@ Atomize and execute all pending stories in a planning. Independent stories run i
    - whether it is already atomized (a matching `02-deepening/story-NN-*/task-*.md` directory exists)
    Skip stories with status `DONE`.
 
-3. Build the dependency graph: a map of `story-id → [story-ids it depends on]`. Flag any circular dependency as a **CRITICAL ERROR** — stop and report.
+3. Build the dependency graph: a map of `story-id → [story-ids it depends on]`. Flag any circular dependency as a **CRITICAL ERROR** — execute `[RECORD-EDGE-CASE]` with the cycle details, then stop and report.
 
 4. Compute execution batches using topological sort: a batch is a set of stories whose dependencies are all already `DONE` or not present. Process batches in order.
 
@@ -58,7 +58,7 @@ Atomize and execute all pending stories in a planning. Independent stories run i
    d. Wait for all subagents in the batch to complete before starting the next batch.
    e. For each subagent result:
       - `DONE`: mark the story status; unlock dependents.
-      - `BLOCKED`: record the story as BLOCKED with the reported reason; continue with remaining batch members.
+      - `BLOCKED`: record the story as BLOCKED with the reported reason; execute `[RECORD-EDGE-CASE]` with source `/plan-agent-execute`, related story, and blocker reason; continue with remaining batch members.
 
 6. After all batches: collect results.
    - If all stories are DONE: report success.

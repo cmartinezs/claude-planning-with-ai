@@ -44,6 +44,8 @@ Move a story from one planning to another. Useful when reorganizing work reveals
    a. Add a new row for the moved story in `.planning/active/<target-id>/01-expansion.md`.
    b. Update `.planning/active/<target-id>/README.md` to add the story entry.
 
-10. Report: story moved from `<source-id>/<old-story-id>` to `<target-id>/<new-story-id>`. If task folder was moved, confirm that too. List any follow-up actions needed (e.g., dependency updates if the story depended on other stories in the source planning).
+10. Execute `[RECORD-EDGE-CASE]` in both affected plannings' `RETROSPECTIVE-RAW.md` files with source `/plan-merge`, the old/new story IDs, and any dependency follow-up.
+
+11. Report: story moved from `<source-id>/<old-story-id>` to `<target-id>/<new-story-id>`. If task folder was moved, confirm that too. List any follow-up actions needed (e.g., dependency updates if the story depended on other stories in the source planning).
 
 > Dependency references in `Depends On` fields are not automatically updated. Review them manually after the move.

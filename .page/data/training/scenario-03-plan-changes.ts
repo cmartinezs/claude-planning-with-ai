@@ -177,7 +177,7 @@ const scenario: TrainingScenario = {
     },
     {
       command: '/plan-story 003-inventory-api story-03a',
-      hint: 'El planning está reorganizado. Ejecuta la primera story pendiente: generación de reportes PDF. El flujo git crea la rama, hace commits por tarea y abre el PR.',
+      hint: 'El planning está reorganizado. Ejecuta la primera story pendiente: generación de reportes PDF. El flujo git crea rama de story, ramas por task, limpia ramas locales mergeadas y finalmente abre PR de story.',
       nextHint: '¡Entrenamiento completado! Viste cómo adaptar un planning activo: agregar stories, dividir una demasiado grande y omitir trabajo obsoleto.',
       output: [
         '  ⟳ Git pre-flight...',
@@ -195,7 +195,7 @@ const scenario: TrainingScenario = {
         '  ✓ story-03a → DONE',
         '',
         '  ✓ Push: story-03a-pdf-reports',
-        '  ✓ PR abierto: https://github.com/.../pull/7',
+        '  ✓ PR story→main abierto: https://github.com/.../pull/7',
       ],
       files: [
         { name: '.planning', level: 0, type: 'folder' },

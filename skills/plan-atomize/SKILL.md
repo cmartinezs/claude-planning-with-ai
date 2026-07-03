@@ -38,6 +38,12 @@ Reference workflows:
    c. If `02-deepening/<story-id>-*/` already contains task files, skip and note: story already atomized (suggest `/plan-task-validate`).
    d. Read the `docs/` contracts for the story's area to gather context.
    e. Derive candidate atomic tasks from the story's objective and existing task rows. Each candidate targets **exactly one verifiable deliverable** and must include enough information to fill every section of the task template.
+   e1. **Database / ORM consistency task.** If any candidate modifies database structure, migrations, schema files, seed/bootstrap data, ORM models/entities, ORM mappings, generated clients, repositories tied to ORM models, or persistence-layer configuration:
+      - Add a separate atomic validation task after the relevant schema/ORM change tasks.
+      - The validation task must depend on every task that changes the database structure or ORM representation.
+      - The validation task must include static consistency validation between database artifacts and ORM artifacts when an ORM exists. Examples: migration/schema diff, entity/model field mapping, generated client/schema sync, repository query shape vs model fields, enum/nullability/index/relationship alignment.
+      - The validation task must include runtime validation by starting the required local environment and running a smoke check against the application or persistence layer. Infer the local environment from repository files (`docker-compose.yml`, `compose.yml`, `.env.example`, package scripts, Maven/Gradle tasks, Prisma/Flyway/Liquibase commands, health endpoints) when possible; if it cannot be inferred, ask the human for the local startup steps before finalizing the task breakdown.
+      - Do not merge this validation into the implementation task unless the implementation task would otherwise be unverifiable. Prefer an explicit task named like `validate-db-orm-consistency`.
    f. For each candidate, execute `[CHECK-ATOMICITY]`:
       - `REJECTED — too large`: split it.
       - `REJECTED — fragment`: merge it with the task it cannot be verified without.
@@ -56,6 +62,7 @@ Reference workflows:
       - `Implementation Steps` — ordered, naming real files or components.
       - `Verification` — if `execution.requires_tests` is `true`, include unit or automated tests for code changes; otherwise include concrete manual/evidence checks appropriate to `project.type`.
       - `Software Smoke Test Check` — for `project.type: software`, include the smoke-test plan, supporting services, startup/build command, connectivity or schema checks, smoke checks, and human developer code review expectations.
+      - `Database / ORM Consistency Check` — required when the task changes database structure or ORM artifacts, and required for the explicit DB/ORM validation task. Include static database-to-ORM checks plus local runtime smoke validation.
       - `Done Criteria` — binary, verifiable conditions.
       - Header fields: `Status: TODO`, `Workflow` (from the catalog), `Depends On`.
    c. Rewrite the story's `## Tasks` table as an index: each task name becomes a link to its task file (`[Task name](<story-id>-<name>/task-NN-slug.md)`), keeping `Workflow`, `Status`, and `Output` columns in sync with the task files.

@@ -38,7 +38,11 @@ The `@` prefix signals a file path. The file is read in full and its content is 
 
 ## Steps
 
-1. Verify `.planning/` exists in the current project. If not, stop: "Run `/plan-init` first to initialize the planning system in this project."
+1. **Workspace boundary.** Use only the current working directory as the planning workspace.
+   - Verify `./.planning/` exists in the current directory.
+   - Do not search parent directories for `.planning/`.
+   - If `./.planning/` does not exist, stop: "Run `/plan-init` in the current directory first. Parent `.planning/` workspaces are not used for child artifact planning."
+   - Report the resolved planning root as `<current-directory>/.planning/` before creating files.
 
 2. Parse `$ARGUMENTS` to determine the input mode:
    - If contains ` -- ` and no `@`: **Mode A** — extract `NNN-slug` and `intent`.
@@ -67,6 +71,8 @@ The `@` prefix signals a file path. The file is read in full and its content is 
    - Set `Date` to today's date.
    - **Mode A:** leave `Why`, `Approximate Scope`, and `Open Questions` for the user to fill.
    - **Mode B:** populate all fields found in the idea document; leave the rest as placeholders.
+
+5b. **Monorepo parent/child note.** If the intent mentions child artifact directories that have their own `.planning/` folders, record them under `Approximate Scope`, but do not create the implementation planning in the parent workspace. The parent planning may coordinate and track synchronization, while each child artifact must get its own planning in that child directory.
 
 6. Update `.planning/README.md`: add an entry under `### 🆕 Initial` with `- [NNN-slug](NNN-slug/00-initial.md) — <intent>`.
 

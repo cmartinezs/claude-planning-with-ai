@@ -2,16 +2,29 @@
 
 > [← Tutorial](README.md)
 
-**Cuándo usar este flujo:** hay un planning activo en `.planning/active/` y algo cambió — aparece trabajo nuevo, una story resulta ser demasiado vago para ejecutar, una story es mucho más grande de lo esperado, o sus tareas son demasiado gruesas para implementarlas directamente.
+**Cuándo usar este flujo:** hay un planning activo en `.planning/active/` y algo cambió — aparece trabajo nuevo, una story resulta ser demasiado vago para ejecutar, una story es mucho más grande de lo esperado, sus tareas son demasiado gruesas para implementarlas directamente, o pasó algo inesperado que debe alimentar la retrospectiva.
 
-Cuatro situaciones, cuatro comandos:
+Cinco situaciones, cinco comandos:
 
 | Situación | Comando |
 |-----------|---------|
+| [Algo inesperado que debe quedar para la retrospectiva](#registrar-un-edge-case) | `/plan-edge-case` |
 | [Trabajo nuevo no previsto](#trabajo-nuevo-no-previsto) | `/plan-enrich-epic` |
 | [Story mal definida o ambigua](#story-mal-definido) | `/plan-enrich-story` |
 | [Story demasiado amplia](#story-demasiado-amplio) | `/plan-split-story` |
 | [Tareas demasiado gruesas para ejecutar](#tareas-demasiado-gruesas) | `/plan-atomize` |
+
+---
+
+## Registrar un edge case
+
+Si ocurre algo fuera del flujo esperado y no fue capturado por otro comando, regístralo como nota raw para la retrospectiva:
+
+```bash
+/plan-edge-case 005-grading-assistance story-02 -- la validación del agente falló por un límite de rate limit no considerado; se resolvió agregando backoff
+```
+
+Esto agrega una entrada en `RETROSPECTIVE-RAW.md`. Al final del planning, `/plan-retrospective` usará estas notas para generar una retrospectiva profesional en `README.md`.
 
 ---
 

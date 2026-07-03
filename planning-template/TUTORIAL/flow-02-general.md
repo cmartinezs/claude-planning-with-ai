@@ -195,6 +195,7 @@ Valida la integridad estructural y, si no hay FAIL, archiva:
 
 ```
 /plan-validate 001-jwt-auth-api
+/plan-retrospective 001-jwt-auth-api
 /plan-archive 001-jwt-auth-api
 ```
 

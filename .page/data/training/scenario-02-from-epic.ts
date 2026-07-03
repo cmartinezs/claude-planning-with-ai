@@ -175,8 +175,8 @@ const scenario: TrainingScenario = {
     },
     {
       command: '/plan-task 002-checkout story-01 task-01',
-      hint: 'Ejecuta la primera tarea atómica. /plan-task sigue el diseño técnico, implementa, corre los tests y hace un commit convencional.',
-      nextHint: 'task-01 lista con commit. Ejecuta task-02 para continuar la story.',
+      hint: 'Ejecuta la primera tarea atómica. /plan-task crea una rama desde la story, implementa, verifica, pushea y abre PR hacia la rama de story.',
+      nextHint: 'task-01 lista con PR hacia la rama de story. Cuando esté mergeada, elimina la rama local de task y ejecuta task-02 para continuar.',
       reviewNote: 'Revisa task-01-cart-model.md en el editor. Verifica que los done criteria están marcados con [x] y que el status dice DONE. Si algún criterio quedó sin marcar, la tarea no está realmente completa.',
       output: [
         '  ⟳ Verificando readiness...',
@@ -190,7 +190,10 @@ const scenario: TrainingScenario = {
         '  ⟳ Tests...',
         '  ✓ 8/8 tests pasan',
         '',
-        '  ✓ feat(cart): create Cart and CartItem entities  [c1d2e3f]',
+        '  ✓ Commit: feat(cart): create Cart and CartItem entities  [c1d2e3f]',
+        '  ✓ Push: story-01-cart/task-01-cart-model',
+        '  ✓ PR task→story abierto: https://github.com/.../pull/3',
+        '  ℹ Tras mergear el PR: git branch -d story-01-cart/task-01-cart-model',
         '',
         '  ➜ Siguiente: task-02-cart-endpoints',
       ],
@@ -220,7 +223,7 @@ const scenario: TrainingScenario = {
     },
     {
       command: '/plan-task 002-checkout story-01 task-02',
-      hint: 'El modelo está listo. Ahora implementa los endpoints CRUD de /cart. /plan-task hará otro commit convencional al terminar.',
+      hint: 'El modelo está listo y la rama local de task-01 ya fue eliminada tras el merge. Ahora implementa los endpoints CRUD de /cart. /plan-task abrirá otro PR de task hacia la rama de story.',
       nextHint: '2 tareas completadas, 1 pendiente. Cuando termines task-03, usa /plan-done para cerrar la story.',
       reviewNote: 'Revisa story-01-cart.md en el editor. Confirma que la tabla de tasks muestra task-01 y task-02 en DONE. Solo task-03 debe quedar en TODO — si la tabla no refleja eso, hay una inconsistencia.',
       output: [
@@ -261,8 +264,8 @@ const scenario: TrainingScenario = {
     },
     {
       command: '/plan-done 002-checkout story-01',
-      hint: 'Imaginemos que task-03 también está completa. /plan-done verifica los done criteria, pushea la rama y abre el PR.',
-      nextHint: '¡Entrenamiento completado! Viste el flujo desde un epic existente hasta tareas atómicas con commits por cada una.',
+      hint: 'Imaginemos que task-03 también está completa y las ramas locales de task ya fueron limpiadas tras sus merges. /plan-done verifica los done criteria, pushea la rama y abre el PR.',
+      nextHint: '¡Entrenamiento completado! Viste el flujo desde un epic existente hasta tareas atómicas con PR por task y limpieza local posterior al merge.',
       reviewNote: 'Revisa la tabla en 01-expansion.md — story-01 debe aparecer como DONE. Abre también story-01-cart.md y verifica que los done criteria de la story están todos marcados con [x]. En un proyecto real, esta es la verificación manual que complementa la automática.',
       output: [
         '  ✓ story-01 verificada: 3/3 tareas DONE',
@@ -271,7 +274,8 @@ const scenario: TrainingScenario = {
         '  ⟳ Git: rama story-01-cart activa',
         '  ✓ Rebase sobre origin/main',
         '  ✓ Push: story-01-cart',
-        '  ✓ PR abierto: https://github.com/.../pull/4',
+        '  ✓ PR story→main abierto: https://github.com/.../pull/4',
+        '  ℹ Tras mergear el PR final: git branch -d story-01-cart',
         '',
         '  ✓ story-01 → DONE',
         '  ➜ Siguiente: story-02-checkout (depende de story-01 ✓)',

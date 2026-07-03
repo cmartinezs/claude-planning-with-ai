@@ -13,6 +13,7 @@ Reference workflows:
 - `.planning/WORKFLOWS/02-EXECUTION-WORKFLOWS/EXPAND-ELEMENT.md`
 - `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md`
 - `.planning/WORKFLOWS/04-SUB-WORKFLOWS/VALIDATE-GLOSSARY.md`
+- `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/RECORD-EDGE-CASE.md`
 
 ## Arguments
 
@@ -39,6 +40,7 @@ Reference workflows:
    - Record any risk or blocker that affects execution order.
 7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the enriched story is consistent with `docs/` contracts.
 8. Execute `[VALIDATE-GLOSSARY]` — flag any new terms that need to be added to `TRACEABILITY.md` or `GLOSSARY.md`.
-9. Report: list every section that was changed and a one-line summary of what was added or improved.
+9. Execute `[RECORD-EDGE-CASE]` with source `/plan-enrich-story`, related story, diagnosed issues, and sections changed.
+10. Report: list every section that was changed and a one-line summary of what was added or improved.
 
 > Does NOT change story status (TODO / IN PROGRESS / DONE). Does NOT execute any tasks.
