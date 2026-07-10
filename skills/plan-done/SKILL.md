@@ -50,6 +50,8 @@ After step 4b, if no specific task number was given (story fully done), all task
 6. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if absent) and `execution.requires_git` (default: `true`).
    - If `execution.requires_git` is `false`, skip steps 7–15 and note in the report that push, PR creation, and branch cleanup are disabled by `.planning/config.yml`.
 7. Derive the expected branch name: `story-NN-<slug>` (the story filename without `.md`).
+   - If this is a child planning running in a dedicated sibling worktree, derive `<worktree-prefix>` from the worktree directory name and prefix the branch: `<worktree-prefix>/story-NN-<slug>`.
+   - Preserve an existing worktree prefix if the branch already has one. The prefix must appear before the rest of the branch name.
 8. Check whether the current branch matches the story branch:
    ```bash
    git rev-parse --abbrev-ref HEAD
@@ -67,7 +69,7 @@ After step 4b, if no specific task number was given (story fully done), all task
    git pull --ff-only origin <story-branch>
    git branch -d <task-branch>
    ```
-   Apply this to each local branch matching a completed task for this story, for example `<story-branch>/task-NN-<slug>`. If a task branch does not exist locally, skip it. Use `git branch -d` only; do not force-delete. If a local branch exists but cannot be deleted because Git does not recognize it as merged, stop and report the branch name so the user can confirm the PR merge state. Do not delete remote task branches here; that remains a PR/repository policy action.
+   Apply this to each local branch matching a completed task for this story, for example `<story-branch>/task-NN-<slug>` or `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>` for child worktrees. If a task branch does not exist locally, skip it. Use `git branch -d` only; do not force-delete. If a local branch exists but cannot be deleted because Git does not recognize it as merged, stop and report the branch name so the user can confirm the PR merge state. Do not delete remote task branches here; that remains a PR/repository policy action.
 11. Sync with the base branch before pushing:
    ```bash
    git fetch origin

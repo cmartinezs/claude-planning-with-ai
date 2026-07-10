@@ -53,7 +53,7 @@ claude plugin update claude-planning-with-ai@cmartinezs
 /plan-init
 ```
 
-`/plan-init` initializes `.planning/` in the current directory only. It detects top-level directories there, infers the stack (Next.js, Spring Boot, Terraform…), and proposes a short code per area (`WB`, `AP`, `IN`…). In monorepos, initialize the parent and each independently managed child artifact separately.
+`/plan-init` initializes `.planning/` in the current directory only. It detects top-level directories there, infers the stack (Next.js, Spring Boot, Terraform…), and proposes a short code per area (`WB`, `AP`, `IN`…). In monorepos, initialize the parent and each independently managed child artifact separately; when git is enabled, run child plannings from dedicated sibling worktrees such as `../<worktree-prefix>`.
 
 ---
 
@@ -82,10 +82,10 @@ Or generate a planning directly from existing stories:
 - **Lifecycle enforcement** — INITIAL → EXPANSION → DEEPENING → COMPLETED. No skipping.
 - **Area-aware traceability** — every story records which directories it touches (`AP`, `WB`, `IN`…).
 - **Auto-configured for your project** — `/plan-init` discovers your structure; you confirm.
-- **Monorepo-safe planning** — commands use the current directory's `.planning/`; parent plans coordinate child plannings without absorbing child implementation work.
+- **Monorepo-safe planning** — commands use the current directory's `.planning/`; parent plans coordinate child plannings without absorbing child implementation work, and git-enabled child plannings run in their own sibling worktrees.
 - **Backlog bridge** — convert existing epics/stories into executable plannings in one command.
 - **Atomic task decomposition** — `/plan-atomize` turns a story into session-sized tasks, each with technical design, implementation steps, verification, and software smoke tests when applicable.
-- **Layered git workflow** — story branches start from `git.base_branch`; each task gets its own branch and PR into the story branch; task PRs merge incrementally into the story branch; final story PRs target the base branch; merged task/story branches are cleaned locally.
+- **Layered git workflow** — story branches start from `git.base_branch`; each task gets its own branch and PR into the story branch; child worktree branches keep the worktree prefix before `story-...`; task PRs merge incrementally into the story branch; final story PRs target the base branch; merged task/story branches are cleaned locally.
 - **Mid-execution adjustments** — enrich, split, or deepen stories without losing history. Switching context triggers git-state validation and safe alternatives (stash, WIP commit, STANDBY).
 - **Self-checking** — `/plan-validate` audits structure, dependencies, and workflow references at any time.
 - **Pure markdown** — no lock-in, readable in any editor, version-controlled with your code.

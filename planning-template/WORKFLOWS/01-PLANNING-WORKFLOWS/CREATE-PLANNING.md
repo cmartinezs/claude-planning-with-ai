@@ -29,7 +29,7 @@ flowchart TD
 3. Fill `00-initial.md` — captures purpose, approximate scope, and initiator.
 4. If there is enough clarity:
    - Fill `01-expansion.md` — list all user stories and dependencies.
-   - **Monorepo child split:** If this is a parent workspace and the planning affects child artifact directories that have their own `.planning/`, create linked child plannings in those child workspaces. The parent planning keeps coordination and parent-scope work only; child implementation belongs to the child planning.
+   - **Monorepo child split:** If this is a parent workspace and the planning affects child artifact directories that have their own `.planning/`, create or reuse dedicated sibling git worktrees for those children, then create linked child plannings inside those worktrees. The parent planning keeps coordination and parent-scope work only; child implementation belongs to the child planning. Preserve the worktree prefix at the start of each child branch name, for example `<worktree-prefix>/story-NN-<slug>`.
    - **Consult `.planning/TRACEABILITY-GLOBAL.md` → Consolidated Residuals.** For each row with `Status = OPEN`, verify whether its `Source Planning` or `Notes` fields mention areas or terms that overlap with the intent of this planning. If they match, include the residual as a task in the corresponding deepening story and update the residual's `Status` to `ABSORBED` and its `Notes` to reference this planning's ID.
    - Move folder to `.planning/active/NNN-name/`.
    - Create `02-deepening/story-NN-name.md` for each story (incorporating any absorbed residuals as tasks).

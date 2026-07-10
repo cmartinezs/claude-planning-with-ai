@@ -28,6 +28,8 @@ Reference workflows:
 2. Read `.planning/config.yml` and extract `git.base_branch` (default: `main` if file or key is absent), `project.type` (default: `software`), `execution.requires_git` (default: `true`), and `software.smoke_tests_file` (default: `SMOKE-TESTS.md`).
 3. Read `.planning/active/<planning-id>/02-deepening/<story-id>-*.md`. If it doesn't exist, stop and report.
 4. Derive the story integration branch name from the story filename: `story-NN-<slug>.md` → `story-NN-<slug>`.
+   - If this is a child planning running in a dedicated sibling worktree, derive `<worktree-prefix>` from the worktree directory name and prefix the branch: `<worktree-prefix>/story-NN-<slug>`.
+   - Preserve an existing worktree prefix if the branch already has one. The prefix must appear before the rest of the branch name.
 5. Verify the story is atomized: a folder `02-deepening/<story-id>-*/` exists and contains `task-NN-*.md` files.
    - If not atomized, stop and report: "Run `/plan-atomize <planning-id> <story-id>` first. `/plan-story` does not generate task files during execution."
    - For each row in the `## Tasks` table, verify that its linked `task-NN-*.md` file exists under the story subfolder. If any file is missing, stop and suggest `/plan-task-validate <planning-id> <story-id>` or rerun `/plan-atomize` after fixing the story.
@@ -69,7 +71,7 @@ Reference workflows:
      git pull --ff-only origin <story-branch>
      git branch -d <task-branch>
      ```
-     Apply this to each local branch that matches a completed task for this story, for example `<story-branch>/task-NN-<slug>`. If a task branch does not exist locally, skip it. Use `git branch -d` only; do not force-delete. If a local task branch exists but cannot be deleted because Git does not recognize it as merged, stop and report the branch name so the user can confirm whether the PR was actually merged. Do not delete remote task branches here; that remains a PR/repository policy action.
+     Apply this to each local branch that matches a completed task for this story, for example `<story-branch>/task-NN-<slug>` or `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>` for child worktrees. If a task branch does not exist locally, skip it. Use `git branch -d` only; do not force-delete. If a local task branch exists but cannot be deleted because Git does not recognize it as merged, stop and report the branch name so the user can confirm whether the PR was actually merged. Do not delete remote task branches here; that remains a PR/repository policy action.
 13. Find the first task whose status is not `DONE` and whose `Depends On` tasks are all `DONE`.
    - If found: invoke `/plan-task <planning-id> <story-id> <task-id>`, then stop. Report that the task PR must be merged into `<story-branch>` and its local task branch deleted before rerunning `/plan-story` for the next task.
    - If pending tasks exist but dependencies are not `DONE`, stop and list the blocked tasks.

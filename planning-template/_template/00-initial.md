@@ -25,6 +25,7 @@
 
 > *Which repositories or areas might be affected? This does not need to be exhaustive.*
 > In a monorepo, if a child artifact has its own `.planning/`, list it here but keep its implementation in a child planning created inside that artifact. The parent planning coordinates only parent-scope work and synchronization.
+> When git is enabled, child plannings must run from dedicated sibling worktrees such as `../<worktree-prefix>`, with branch names prefixed by the worktree name.
 
 - [ ] `docs/` — [brief note]
 - [ ] `web/` — [brief note]

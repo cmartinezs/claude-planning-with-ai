@@ -55,7 +55,7 @@ Before generating any implementation, confirm which docs/ document defines the c
 ### 3. Specify the target file and location
 Name the exact file path, module, and class where output goes.
 
-> ✅ *"In `api/src/main/java/ai/gradeops/api/assessment/AssessmentController.java`, add endpoint `POST /api/v1/assessments/{id}/generate-draft`…"*
+> ✅ *"In `api/src/main/java/com/example/api/assessment/AssessmentController.java`, add endpoint `POST /api/v1/assessments/{id}/generate-draft`…"*
 >
 > ❌ *"Add the generate-draft endpoint."*
 

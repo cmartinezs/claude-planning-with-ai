@@ -58,7 +58,7 @@ docs/02-product/user-stories/       ← PRODUCTO (qué y por qué)
 |---------|-----------|----------|
 | `/plan-from-epic` | `NNN path/to/container` | Genera planning activo completo (1 story = 1 user story) |
 
-Los comandos leen la estructura que encuentran y se adaptan — no requieren una jerarquía de carpetas específica ni un formato de ID fijo. Para GradeOps AI el container es `docs/02-product/user-stories/epic-NN-slug/`; en otro proyecto podría ser `features/checkout/` o `requirements.md`.
+Los comandos leen la estructura que encuentran y se adaptan — no requieren una jerarquía de carpetas específica ni un formato de ID fijo. El container podría ser `docs/02-product/user-stories/epic-NN-slug/`, `features/checkout/` o `requirements.md`.
 
 **Ciclo de vida del planning:**
 
@@ -71,9 +71,9 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-expand NNN-slug` | INITIAL → EXPANSION (solo flujo general) |
 | `/plan-git-config [--base-branch <branch>]` | Configura la rama base git (para proyectos ya inicializados) |
 | `/plan-atomize NNN-slug story-NN` | Descompone una story en tareas atómicas (diseño + implementación + verificación) |
-| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una tarea en rama propia, valida, espera code review humano, abre PR hacia la rama de story y recuerda limpiar la rama local tras el merge |
+| `/plan-task NNN-slug story-NN task-NN` | Ejecuta una tarea en rama propia, conserva el prefijo del worktree en child plannings, valida, espera code review humano, abre PR hacia la rama de story y recuerda limpiar la rama local tras el merge |
 | `/plan-task-validate NNN-slug [story-NN]` | Audita tareas atómicas contra el checklist de atomicidad |
-| `/plan-story NNN-slug story-NN` | Crea rama de story desde la rama base, coordina PRs de task, limpia ramas locales mergeadas y abre PR final de story |
+| `/plan-story NNN-slug story-NN` | Crea rama de story desde la rama base o worktree child, coordina PRs de task, limpia ramas locales mergeadas y abre PR final de story |
 | `/plan-done NNN-slug story-NN` | Marca story completo tras revisión humana y PRs de task mergeados; recuerda limpiar la rama local de story tras el merge final |
 | `/plan-done NNN-slug story-NN task-N` | Marca una tarea específica |
 | `/plan-edge-case NNN-slug -- nota` | Registra un evento inesperado para la retrospectiva |

@@ -17,8 +17,8 @@ Validates the state of the planning system before launching a new planning execu
    a. Collect for each:
       - Planning ID and name
       - Story ID and name
-      - Git story branch derived from the story filename (`story-NN-<slug>`)
-      - Any local task branches under that story branch (`story-NN-<slug>/*`)
+      - Git story branch derived from the story filename (`story-NN-<slug>`), or `<worktree-prefix>/story-NN-<slug>` when the planning runs in a dedicated child worktree
+      - Any local task branches under that story branch (`story-NN-<slug>/*` or `<worktree-prefix>/story-NN-<slug>/*`)
 
    b. For each affected branch, gather git state:
       ```bash

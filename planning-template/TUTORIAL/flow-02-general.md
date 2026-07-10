@@ -26,7 +26,7 @@ Claude hace 6 preguntas una por una:
 
 ```
 [1/6] ¿Qué necesita hacerse? (una sola oración)
-> Implement JWT-based authentication for the GradeOps API layer
+> Implement JWT-based authentication for the backend API layer
 
 [2/6] ¿Por qué existe esta iniciativa? ¿Qué problema resuelve?
 > The API has no auth layer yet. All epics that involve teacher actions

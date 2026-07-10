@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Layered git workflow now requires local cleanup after PR merges: delete each merged task branch locally after its PR lands in the story branch, and delete the local story branch after the story PR lands in `git.base_branch`. Remote branch cleanup remains controlled by the PR/repository workflow.
+- Git-enabled child plannings coordinated by a parent now run in dedicated sibling worktrees, and child story/task branches preserve the worktree prefix before the rest of the branch name.
 
 ## [3.5.0] — 2026-06-29
 

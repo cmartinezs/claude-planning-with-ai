@@ -36,7 +36,9 @@ Reference workflows:
    - `software.smoke_tests_file` (default `SMOKE-TESTS.md`; resolved under `.planning/`)
 3c. **Git branch setup** — if `execution.requires_git` is `true`, isolate this task in its own branch. `/plan-task` must work even when `/plan-story` was not run first.
    a. Derive the story branch from the story filename or task folder name: `story-NN-<slug>`.
-   b. Derive the task branch from the story branch and task filename: `<story-branch>/<task-NN-<slug>>`.
+      - If this is a child planning running in a dedicated sibling worktree, derive `<worktree-prefix>` from the worktree directory name and prefix the branch: `<worktree-prefix>/story-NN-<slug>`.
+      - Preserve an existing worktree prefix if the story branch already has one. The prefix must appear before the rest of the branch name.
+   b. Derive the task branch from the story branch and task filename: `<story-branch>/<task-NN-<slug>>`. For prefixed child worktrees this becomes `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
    c. Validate the worktree is clean before branching:
       ```bash
       git status --porcelain

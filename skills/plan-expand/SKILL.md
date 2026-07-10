@@ -21,16 +21,25 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/CREATE-PLANNING.m
 3. Ask the user to describe all user stories if not already known, or infer them from `00-initial.md`. A story maps to a repository area (DO / WB / AP / AG / IN / W). Each story will get its own file.
 3b. **Monorepo child planning split.** Before writing `01-expansion.md`, identify whether any affected path belongs to a child artifact with its own planning workspace (`<child>/.planning/`), excluding the current `./.planning/`.
    - If this is a child artifact workspace, keep the whole planning local to the current child. Never create or update the parent workspace.
-   - If this is a parent workspace and affected child artifacts have their own `.planning/`, create one child planning in each affected child workspace. The child planning owns implementation inside that child; the parent planning owns only parent-scope work and synchronization.
-   - Determine the next available child planning number from `<child>/.planning/README.md` and existing `<child>/.planning/{active,finished,NNN-*}` folders. Use the same slug when available.
-   - Create `<child>/.planning/NNN-slug/` from `<child>/.planning/_template/`, fill its `00-initial.md` with the child-specific intent, set `Related planning` to the parent planning ID and path, and restrict `Approximate Scope` to that child artifact.
-   - Update `<child>/.planning/README.md` with the new child planning entry.
+   - If this is a parent workspace and affected child artifacts have their own `.planning/`, create or reuse one sibling git worktree per affected child, then create one child planning inside that worktree. The child planning owns implementation inside that child; the parent planning owns only parent-scope work and synchronization.
+   - Derive a stable `<worktree-prefix>` for each child from the child worktree directory name. Use that prefix at the start of the child branch name before the story/task branch portion. Example story branch: `<worktree-prefix>/story-NN-<slug>`.
+   - For an existing child planning branch, create the sibling worktree with:
+     ```bash
+     git worktree add ../<worktree-prefix> <branch>
+     ```
+   - For a new child planning branch, create the sibling worktree and branch from `git.base_branch`:
+     ```bash
+     git worktree add -b <worktree-prefix>/story-NN-<slug> ../<worktree-prefix> <base_branch>
+     ```
+   - Determine the next available child planning number from `../<worktree-prefix>/.planning/README.md` and existing `../<worktree-prefix>/.planning/{active,finished,NNN-*}` folders. Use the same slug when available.
+   - Create `../<worktree-prefix>/.planning/NNN-slug/` from `../<worktree-prefix>/.planning/_template/`, fill its `00-initial.md` with the child-specific intent, set `Related planning` to the parent planning ID and path, and restrict `Approximate Scope` to that child artifact.
+   - Update `../<worktree-prefix>/.planning/README.md` with the new child planning entry.
    - In the parent planning, create coordination stories that reference the child planning paths and expected synchronization points. Do not duplicate child implementation stories or tasks in the parent planning.
-   - If an affected child artifact does not have `<child>/.planning/`, stop before expansion and report the missing child workspace. Ask the user to run `/plan-init` inside that child before expanding the parent planning.
+   - If an affected child artifact does not have `.planning/` in its dedicated worktree, stop before expansion and report the missing child workspace. Ask the user to create the worktree, run `/plan-init` inside it, and rerun expansion.
 4. Fill `.planning/$ARGUMENTS/01-expansion.md` from the template:
    - List all stories with their area code, a short description, dependencies, and priority order.
    - Fill the "Impact per Repository Area" table.
-   - If child plannings were created, fill `## Linked Child Plannings` with child workspace paths, child planning IDs, ownership, and sync notes.
+   - If child plannings were created, fill `## Linked Child Plannings` with child worktree paths, prefixed child branch names, child planning IDs, ownership, and sync notes.
 5. Create `.planning/$ARGUMENTS/02-deepening/` directory.
 5b. **Check open residuals.** Read `.planning/TRACEABILITY-GLOBAL.md` → **Consolidated Residuals** table. For each row where `Status` is `OPEN`:
     - Compare its `Source Planning` and `Notes` fields against the intent and story areas of this planning.

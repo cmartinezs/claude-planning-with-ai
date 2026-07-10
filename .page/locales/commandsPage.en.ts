@@ -35,6 +35,7 @@ const commandsPage = {
             'Useful for projects with .planning/ initialized before git configuration was introduced.',
             'Without arguments, shows the current config and offers to edit it.',
             'With --base-branch <branch>, sets the base branch for new story branches.',
+            'Child planning worktrees preserve their worktree prefix before story and task branch names.',
           ],
           source: 'skills/plan-git-config/SKILL.md',
         },
@@ -194,7 +195,7 @@ const commandsPage = {
           description: 'Executes one atomic task.',
           details: [
             'Follows the task technical design and applies implementation and tests.',
-            'Creates a task branch from the story branch, pushes it, and opens a PR back to the story branch.',
+            'Creates a task branch from the story branch, preserving the worktree prefix for child plannings, then pushes it and opens a PR back to the story branch.',
             'After the task PR is merged, deletes the local task branch with git branch -d.',
             'Marks the task DONE only after verification and human review.',
           ],
@@ -205,7 +206,7 @@ const commandsPage = {
           usage: '/plan-story <NNN-slug> <story-NN>',
           description: 'Executes all tasks inside a story.',
           details: [
-            'Creates and pushes a story branch from the configured base branch.',
+            'Creates and pushes a story branch from the configured base branch, preserving the worktree prefix for child plannings.',
             'Runs tasks through task branches, waits for task PRs to be merged, and cleans local task branches before story closure.',
             'When done: rebases, pushes, and opens a story PR toward the base branch; after final merge it cleans the local story branch.',
             'Main story-based execution command.',

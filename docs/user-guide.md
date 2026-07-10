@@ -49,6 +49,8 @@ When `execution.requires_git` is `true`, the git flow is layered:
 
 - The story integration branch starts from `git.base_branch` (for example `develop`). `/plan-story` ensures it exists when orchestrating a story, and `/plan-task` also creates or reuses it when you start directly from a task.
 - `/plan-task` creates and pushes a task branch from the story branch, commits that task, and opens a PR back to the story branch.
+- For child plannings coordinated by a parent, run each child planning in a dedicated sibling worktree created with its own branch: `git worktree add ../<worktree-prefix> <branch>` for an existing branch, or `git worktree add -b <branch> ../<worktree-prefix> <base_branch>` for a new branch.
+- Child worktree branches preserve the worktree prefix before the story/task portion, for example `<worktree-prefix>/story-NN-<slug>` and `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
 - Task PRs are reviewed and merged into the story branch one by one before the next dependent task starts. After each task PR is merged, delete the local task branch with `git branch -d <task-branch>` from an updated story branch checkout.
 - The story is closed only after all task PRs are merged into the story branch.
 - The final story PR targets `git.base_branch`, so partial planning progress can still be released from the base branch without waiting for every story in the planning. After the story PR is merged into the base branch, delete the local story branch with `git branch -d <story-branch>` from an updated base branch checkout.
@@ -95,8 +97,8 @@ This creates the `.planning/` structure with placeholder tables you can fill man
 Use separate planning workspaces when a monorepo has independently managed artifacts:
 
 - Run parent-level plans from the monorepo parent directory. The parent plan owns cross-artifact coordination, integration sequencing, shared docs, releases, and parent-scope changes.
-- Run artifact-level plans from the artifact directory. The artifact plan owns implementation inside that artifact.
-- If a parent plan affects children with their own `.planning/`, `/plan-expand` creates linked child plannings in those child workspaces and records them in the parent's `01-expansion.md`.
+- Run artifact-level plans from the artifact's dedicated worktree, not from the parent checkout. The artifact plan owns implementation inside that artifact.
+- If a parent plan affects children with their own `.planning/`, `/plan-expand` creates or reuses linked child planning worktrees, creates linked child plannings there, and records them in the parent's `01-expansion.md`.
 - The parent should track child planning status and sync checkpoints, not duplicate child implementation stories or tasks.
 
 ## Workflows

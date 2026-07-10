@@ -124,7 +124,7 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-task-validate NNN-slug [story-NN] [task-NN]
 
 # Ejecutar todas las tareas de una story
-# → crea rama de story desde base; cada task usa rama propia y PR hacia la story; limpia ramas locales mergeadas; al final abre PR story→base
+# → crea rama de story desde base; en child plannings conserva el prefijo del worktree; cada task usa rama propia y PR hacia la story; limpia ramas locales mergeadas; al final abre PR story→base
 /plan-story NNN-slug story-NN
 
 # Marcar story completo (verifica done criteria y avanza al siguiente)
