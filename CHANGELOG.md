@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.6.0] — 2026-07-10
+
 ### Changed
 
 - Layered git workflow now requires local cleanup after PR merges: delete each merged task branch locally after its PR lands in the story branch, and delete the local story branch after the story PR lands in `git.base_branch`. Remote branch cleanup remains controlled by the PR/repository workflow.
@@ -16,7 +18,7 @@ All notable changes to this project will be documented in this file.
 - `/plan-edge-case` — manual command to append unexpected events, corrections, blockers, or unusual situations to a planning's `RETROSPECTIVE-RAW.md`.
 - `/plan-retrospective` — generates or refreshes the final professional `README.md# Retrospective` from `RETROSPECTIVE-RAW.md`, planning context, story statuses, and traceability notes.
 - `/plan-update-version` — applies cumulative adjacent major-pair planning-system migrations from `update-version/<N>-<N+1>.md`, starting with `1-2.md` to migrate legacy `scope` planning artifacts to `story`.
-- `planning-template/update-version/2-3.md` — major-pair migration that brings any `2.x` workspace to the current `3.5.0` baseline by applying the recorded 3.x changes in order.
+- `planning-template/update-version/2-3.md` — major-pair migration that brings any `2.x` workspace to the current `3.6.0` baseline by applying the recorded 3.x changes in order.
 - `RETROSPECTIVE-RAW.md` planning template and `RECORD-EDGE-CASE` workflow for preserving raw retrospective signals during execution.
 
 ### Changed
@@ -259,7 +261,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.5.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.2.0...v3.4.0
 [3.2.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.1.0...v3.2.0
