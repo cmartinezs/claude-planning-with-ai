@@ -41,14 +41,14 @@ software:
   smoke_tests_file: SMOKE-TESTS.md   # Optional override for the smoke-test plan file under .planning/
 ```
 
-When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, run the smoke checks, then wait for human developer code review. Requested corrections restart the verification/review loop.
+When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, and run the smoke checks. For git-enabled tasks, `/plan-task` then commits, pushes, and opens or reuses the task PR before asking for human developer code review, so external reviewers can comment on the PR. Requested corrections are implemented, verified, committed, and pushed to the same PR before review is requested again.
 
 When a story changes database structure or ORM artifacts, `/plan-atomize` must add a separate validation task. That task statically checks consistency between migrations/schema and ORM models/entities/generated clients, then starts the local environment and runs a persistence smoke check. If the local environment cannot be inferred from repository files, the agent must ask the human for startup steps before finalizing or executing that validation.
 
 When `execution.requires_git` is `true`, the git flow is layered:
 
 - The story integration branch starts from `git.base_branch` (for example `develop`). `/plan-story` ensures it exists when orchestrating a story, and `/plan-task` also creates or reuses it when you start directly from a task.
-- `/plan-task` creates and pushes a task branch from the story branch, commits that task, and opens a PR back to the story branch.
+- `/plan-task` creates and pushes a task branch from the story branch, commits the implementation, and opens or reuses a PR back to the story branch before human code review. The task remains in progress while the PR is under review; after approval, `/plan-task` marks it `DONE` and pushes the closeout metadata to the same branch.
 - For child plannings coordinated by a parent, run each child planning in a dedicated sibling worktree created with its own branch: `git worktree add ../<worktree-prefix> <branch>` for an existing branch, or `git worktree add -b <branch> ../<worktree-prefix> <base_branch>` for a new branch.
 - Child worktree branches preserve the worktree prefix before the story/task portion, for example `<worktree-prefix>/story-NN-<slug>` and `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
 - Task PRs are reviewed and merged into the story branch one by one before the next dependent task starts. After each task PR is merged, delete the local task branch with `git branch -d <task-branch>` from an updated story branch checkout.
@@ -71,6 +71,19 @@ A distinct surface of the project tracked by the traceability matrix. `/plan-ini
 ### Traceability
 
 Each planning records which terms, decisions, and concepts were introduced and which areas they affect. This makes the impact of a change easier to understand later.
+
+### Project Decision Records
+
+A Project Decision Record (PDR) is optional. It records an accepted or proposed decision that affects multiple stories, repository areas, shared terminology, planning policy, or future plannings. Routine task design stays in the task file; technical architecture choices can stay in ADRs if the project uses them.
+
+`/plan-decision` is the only command that writes `pdr-*.md` files. Other commands may invoke it automatically when the decision is explicit, accepted, cross-cutting, and supported by enough evidence. Otherwise they suggest `/plan-decision` as a follow-up.
+
+Common automatic triggers:
+
+- `RECORD-INCONSISTENCY` / `RESOLVE-CONFLICT` when resolving a conflict establishes a durable cross-cutting rule.
+- `CASCADE-CHANGE` when a policy, terminology, or contract change must be propagated across several documents or areas.
+- `UPDATE-TRACEABILITY` / `CHECK-TRACEABILITY` when an accepted traced decision affects several areas or future plannings.
+- `/plan-edge-case`, `/plan-retrospective`, `/plan-done`, and `/plan-archive` when completed work reveals an accepted cross-cutting decision that is not yet recorded.
 
 ## Setting Up A Project
 
@@ -268,6 +281,7 @@ The audit compares expected docs from stories and tasks against actual files, lo
 | `/plan-done` | `NNN-slug story-NN [task-N]` | Mark a task or story done |
 | `/plan-status` | `[NNN-slug]` | Show planning state and story progress |
 | `/plan-validate` | `[NNN-slug]` | Check structural integrity |
+| `/plan-decision` | `NNN-slug -- decision title` | Record a cross-cutting PDR |
 | `/plan-edge-case` | `[NNN-slug] [story-NN] -- note` | Record something unexpected for the final retrospective |
 | `/plan-retrospective` | `NNN-slug` | Generate or refresh the planning retrospective |
 | `/plan-update-version` | `<from> <to> [--dry-run] [--allow-dirty]` | Apply a versioned migration to an older `.planning/` workspace |
@@ -290,6 +304,7 @@ See [Command Reference](reference.md) for the complete list, including `/plan-ru
 | You want to scan the entire `.planning/` system | `/plan-health` |
 | You want a detailed audit of a planning | `/plan-validate` |
 | You want to inspect current planning state before choosing | `/plan-status` |
+| A decision affects multiple stories, areas, or future plannings | `/plan-decision` |
 | You changed generated documentation and need coverage/freshness checks | `/plan-audit-docs` |
 | You maintain this plugin and need a structural audit | `/plan-doctor` |
 
@@ -323,7 +338,7 @@ Use atomization when a story's task list hides design decisions or is too coarse
 
 If a story changes database structure or ORM artifacts, atomization must include an explicit DB/ORM validation task after the implementation tasks.
 
-With git enabled, each task runs in its own branch and opens a task PR into the story branch. Merge task PRs into the story branch before closing the story, then delete each merged task branch locally. After the final story PR is merged into the base branch, delete the local story branch too.
+With git enabled, each task runs in its own branch and opens a task PR into the story branch before human code review. Review feedback can be recorded in `.code-review/<story-dir>/<task-file>.md`; corrections are committed and pushed to the same task PR. Merge task PRs into the story branch before closing the story, then delete each merged task branch locally. After the final story PR is merged into the base branch, delete the local story branch too.
 
 ### Marking One Task Done
 

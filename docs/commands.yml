@@ -58,6 +58,10 @@ commands:
     category: lifecycle
     source: skills/plan-done/SKILL.md
     summary: Mark a task or story done.
+  - name: plan-decision
+    category: maintenance
+    source: skills/plan-decision/SKILL.md
+    summary: Create or update a Project Decision Record for cross-cutting planning decisions.
   - name: plan-edge-case
     category: maintenance
     source: skills/plan-edge-case/SKILL.md

@@ -29,6 +29,7 @@ Reads `.planning/active/<planning-id>/RETROSPECTIVE-RAW.md`, planning context, s
    - `01-expansion.md` if present
    - all story files under `02-deepening/` if present
    - `TRACEABILITY.md` if present
+   - any `pdr-*.md` files in the planning root
 
 4. If `RETROSPECTIVE-RAW.md` is missing or contains only `*(No unexpected events recorded yet.)*`, continue using the planning files, but include a short note in the report that no raw edge-case notes were available.
 
@@ -36,9 +37,12 @@ Reads `.planning/active/<planning-id>/RETROSPECTIVE-RAW.md`, planning context, s
    - delivered outcomes
    - deviations from original scope or expected workflow
    - blockers, corrections, retries, rollbacks, skipped work, and validation failures
-   - decisions made during execution
+   - decisions made during execution, including accepted PDRs
    - unresolved follow-ups
    - lessons that should inform future planning
+   - accepted cross-cutting decisions missing a PDR
+
+   If an accepted cross-cutting decision is missing a PDR and the planning evidence is complete, invoke `/plan-decision <planning-id> -- <decision title>` before writing the retrospective. If evidence or approval is incomplete, include it as a follow-up instead.
 
 6. Replace or create the `## Retrospective` section in `README.md`.
    - Preserve all content before `## Retrospective`.
@@ -66,7 +70,7 @@ Reads `.planning/active/<planning-id>/RETROSPECTIVE-RAW.md`, planning context, s
 
    ### Decisions And Tradeoffs
 
-   - <decision made during execution and why it was reasonable>
+   - <decision made during execution and why it was reasonable; cite `pdr-*.md` when a PDR exists>
 
    ### Follow-ups
 

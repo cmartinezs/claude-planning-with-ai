@@ -174,7 +174,7 @@ docs/ (canonical product/architecture documentation)
       > infrastructure configuration
 ```
 
-- An active PDR overrides any content document for the element it covers.
+- An accepted PDR in an active planning overrides other planning notes for the element it covers. PDRs are optional; create one with `/plan-decision` only for cross-cutting decisions.
 - Within `docs/`: thematic folders are the source of truth. Historical or auto-generated directories are reference-only.
 
 ---

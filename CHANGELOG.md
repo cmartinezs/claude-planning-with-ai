@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `/plan-decision` creates or updates optional Project Decision Records (PDRs) only when a planning produces a cross-cutting decision.
+
+### Changed
+
+- Git-enabled `/plan-task` now commits, pushes, and opens or reuses the task PR before asking for human developer review, so external PR review can produce feedback first; requested corrections are pushed to the same PR, and the task is marked `DONE` only after review approval.
+- PDRs are no longer copied into every new planning as empty placeholder files. The template now lives at `.planning/PDR-TEMPLATE.md`, while `/plan-report`, `/plan-retrospective`, and `/plan-validate` know how to read or flag real `pdr-*.md` records.
+- Workflows that resolve inconsistencies, cascade cross-cutting changes, update traceability, record edge cases, generate retrospectives, finish stories, or archive plannings can now invoke `/plan-decision` automatically when a decision is explicit, accepted, cross-cutting, and supported by enough evidence; otherwise they suggest it as a follow-up.
+- Markdown templates now include concrete example values and example rows for initial planning, expansion, stories, tasks, traceability, raw retrospectives, PDRs, smoke tests, and idea capture.
+
 ## [3.6.0] — 2026-07-10
 
 ### Changed

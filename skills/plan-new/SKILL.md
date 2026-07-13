@@ -64,6 +64,7 @@ The `@` prefix signals a file path. The file is read in full and its content is 
    If a section is not found in the document, leave that field as the template placeholder.
 
 4. Copy `.planning/_template/` to `.planning/NNN-slug/`.
+   - Do not create a `pdr-*.md` file during planning creation. PDRs are optional and should be created later with `/plan-decision` only when the planning produces a significant cross-cutting decision.
 
 5. Fill `.planning/NNN-slug/00-initial.md`:
    - Replace `[Planning Name]` in the title with the slug.

@@ -10,6 +10,7 @@
 ## Objective
 
 > *The single deliverable this task produces. One task = one verifiable output.*
+> Example: `A persistent reset-token model and repository exist, with expiry and single-use semantics covered by tests.`
 
 [One sentence: what exists after this task that didn't exist before.]
 
@@ -25,6 +26,14 @@
 - **Risk:** [Main risk in this task and how the implementation reduces it. Use "Low — routine change" if appropriate.]
 - **Design notes:** [Constraints, invariants, gotchas the implementer must know before touching code]
 
+Example:
+
+- **Approach:** Store hashed reset tokens in the database instead of plaintext tokens or in-memory state, so tokens survive process restarts without exposing the raw token if records leak.
+- **Affected files / components:** `api/src/main/.../PasswordResetToken.java`, `api/src/main/.../PasswordResetTokenRepository.java`, `api/src/main/resources/db/migration/V12__password_reset_tokens.sql`
+- **Interfaces / contracts:** Internal repository plus service method `createResetToken(email)`; no public API in this task.
+- **Risk:** Medium — token expiry and reuse rules are security-sensitive; cover with repository/service tests.
+- **Design notes:** Raw tokens are shown only once, stored only as hashes, and must be deleted or marked used after password update.
+
 ---
 
 ## Implementation Steps
@@ -34,6 +43,12 @@
 1. [Step naming a real file or component]
 2. [Step naming a real file or component]
 
+Example:
+
+1. Create `V12__password_reset_tokens.sql` with token hash, user id, expiry, used timestamp, and indexes.
+2. Add `PasswordResetToken` entity and repository mapped to the migration fields.
+3. Add service tests for token creation, expiry filtering, and used-token rejection.
+
 ---
 
 ## Verification
@@ -42,7 +57,8 @@
 
 | # | Verification | How to validate |
 |---|-------------|----------------|
-| 1 | [What is checked] | [Exact steps to confirm it passes] |
+| 1 | Repository persists token metadata | Run the repository/service test that saves and reloads a token |
+| 2 | Expired and used tokens are rejected | Run tests covering expired token and reused token paths |
 
 ### Software Smoke Test Check
 
@@ -50,11 +66,11 @@
 
 | # | Check | How to validate |
 |---|-------|----------------|
-| 1 | Supporting services are ready | Start the services required by the smoke plan and confirm they are healthy |
-| 2 | App compiles and starts | Run the normal local build/start command for the stack |
-| 3 | Connectivity or schema validation succeeds | Confirm the app can reach its dependencies and that schema/bootstrap checks pass |
-| 4 | Changed surface responds correctly | Run the smallest endpoint/API/CLI checks that prove the task did not break startup |
-| 5 | No startup regressions are visible | Confirm logs and smoke output do not show new startup, migration, or boot failures |
+| 1 | Supporting services are ready | Example: `docker compose up -d db` then confirm the DB health check passes |
+| 2 | App compiles and starts | Example: `./mvnw test` or `npm run build` followed by the local start command |
+| 3 | Connectivity or schema validation succeeds | Example: app boot applies migrations and connects to the local database |
+| 4 | Changed surface responds correctly | Example: call the reset-token endpoint or service smoke path with a test email |
+| 5 | No startup regressions are visible | Example: inspect logs for new migration, dependency, or boot failures |
 
 ### Database / ORM Consistency Check
 
@@ -62,19 +78,20 @@
 
 | # | Check | How to validate |
 |---|-------|----------------|
-| 1 | Static database-to-ORM consistency is valid | Compare migrations/schema against ORM models/entities/generated client for fields, types, nullability, defaults, enums, indexes, relationships, table/column names, and generated artifacts |
-| 2 | Local runtime environment starts | Start required local services and the app/worker using the project-local command; ask the human for startup steps if they cannot be inferred |
-| 3 | Persistence smoke check passes | Run a minimal non-destructive check that proves migration/bootstrap and the changed persistence path work in execution |
+| 1 | Static database-to-ORM consistency is valid | Example: compare `V12__password_reset_tokens.sql` with `PasswordResetToken` fields, indexes, nullability, enum values, and generated artifacts |
+| 2 | Local runtime environment starts | Example: start local DB plus app using the project command; ask the human if startup cannot be inferred |
+| 3 | Persistence smoke check passes | Example: create a reset token through the service/API and verify the row exists without destructive cleanup |
 
 ---
 
 ## Done Criteria
 
-- [ ] [Deliverable exists and is verifiable: specific and binary]
+- [ ] Reset-token persistence deliverable exists and can be exercised by tests
 - [ ] All verification checks listed above pass
 - [ ] For software projects, smoke test plan passes: supporting services, app startup, connectivity or schema checks, and changed-surface smoke checks
 - [ ] If database structure or ORM artifacts changed, static DB/ORM consistency validation passes and local runtime persistence smoke evidence is captured
-- [ ] Human developer code review completed; requested corrections, if any, were implemented and re-reviewed
+- [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review
+- [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
 - [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`
 

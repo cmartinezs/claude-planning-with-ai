@@ -93,12 +93,12 @@ The process of registering how a term, decision, or concept affects each SDLC ph
 ---
 
 ### PDR (Project Decision Record)
-A record of a significant decision affecting multiple phases or the framework level (e.g., a naming convention change, a new glossary term). Stored in `planning/NNN-name/` folder. Different from an **ADR** (Architecture Decision Record), which is stored at `01-templates/06-development/` and documents technical implementation decisions.
+A record of a significant decision affecting multiple stories, repository areas, workflow policy, glossary terms, or future plannings. PDRs are optional and are created inside the relevant planning as `pdr-NNN-title.md` with `/plan-decision`; use `.planning/PDR-TEMPLATE.md` as the source template. Different from an **ADR** (Architecture Decision Record), which documents technical implementation decisions.
 
 ---
 
 ### ADR (Architecture Decision Record)
-A record of a technical decision affecting the architecture of a specific project being documented. Stored in `01-templates/06-development/`. Different from a **PDR**, which affects the template framework itself.
+A record of a technical decision affecting the architecture of a specific project being documented. Different from a **PDR**, which records cross-cutting planning, workflow, terminology, or repository-area decisions.
 
 ---
 

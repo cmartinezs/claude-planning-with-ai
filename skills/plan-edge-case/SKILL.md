@@ -65,5 +65,7 @@ Reference workflow: `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/RECORD-EDGE-CA
    If the file contains `*(No unexpected events recorded yet.)*`, remove that placeholder.
 
 6. Report the path updated and a one-line summary of the entry.
+   - If the event contains an explicit accepted decision and it affects multiple stories, repository areas, shared terminology, planning policy, or future plannings, invoke `/plan-decision <planning-id> -- <decision title>` after writing the raw note.
+   - If it is only a decision candidate, lesson, open question, or lacks enough context, suggest `/plan-decision <planning-id> -- <decision title>` as the follow-up instead of writing a PDR.
 
-> This command writes raw facts only. Use `/plan-retrospective <planning-id>` to convert them into the final professional retrospective.
+> This command always writes the raw note first. It may invoke `/plan-decision` only after the raw fact is recorded and only when the decision is explicit, accepted, and cross-cutting. Use `/plan-retrospective <planning-id>` to convert raw notes into the final professional retrospective.

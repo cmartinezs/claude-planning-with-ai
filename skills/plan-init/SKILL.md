@@ -294,6 +294,7 @@ Structure created:
   │       └── ...
   ├── TUTORIAL/
   ├── update-version/   (migration instructions for older .planning workspaces)
+  ├── PDR-TEMPLATE.md   (optional decision-record template used by /plan-decision)
   ├── active/          (empty — ready for plannings)
   ├── finished/        (empty)
   ├── GUIDE.md         ← area table filled in

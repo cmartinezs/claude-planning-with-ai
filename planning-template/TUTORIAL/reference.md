@@ -205,6 +205,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Ver todos los plannings activos | `/plan-status` |
 | Revisar el estado antes de decidir | `/plan-status [NNN-slug]` |
 | Verificar que un planning está bien formado | `/plan-validate NNN-slug` |
+| Registrar una decision transversal | `/plan-decision NNN-slug -- titulo` |
 | Las tareas de una story son muy gruesas para ejecutar | `/plan-atomize NNN-slug story-NN` |
 | Ejecutar una sola tarea atómica | `/plan-task NNN-slug story-NN task-NN` |
 | Verificar que las tareas atómicas están bien formadas | `/plan-task-validate NNN-slug story-NN` |
@@ -259,6 +260,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-expand` | `NNN-slug` |
 | `/plan-status` | `[NNN-slug]` |
 | `/plan-validate` | `[NNN-slug]` (vacío = todos) |
+| `/plan-decision` | `NNN-slug -- titulo` |
 | `/plan-atomize` | `NNN-slug story-NN` |
 | `/plan-task` | `NNN-slug story-NN task-NN` |
 | `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` |

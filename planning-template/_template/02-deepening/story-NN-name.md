@@ -8,6 +8,7 @@
 ## Objective
 
 > *What specifically must be produced or changed in this story.*
+> Example: `Create API support for password reset tokens: request token, validate token, update password, and expire used tokens.`
 
 [Describe the concrete goal.]
 
@@ -17,7 +18,8 @@
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| [What could block or degrade this story?] | M | M | [How the story reduces or monitors this risk] |
+| [e.g. Reset endpoint leaks whether an email exists] | H | M | [e.g. Always return the same public response and log details privately] |
+| [e.g. Token persistence is inconsistent with ORM schema] | M | M | [e.g. Include DB/ORM validation task before marking story DONE] |
 
 ---
 
@@ -27,15 +29,16 @@
 
 | # | Task | Workflow | Status | Output |
 |---|------|----------|--------|--------|
-| 1 | [Task description] | [WORKFLOW-NAME] | TODO | [Expected file or change] |
-| 2 | [Task description] | [WORKFLOW-NAME] | TODO | [Expected file or change] |
+| 1 | [Design reset-token persistence](story-NN-name/task-01-reset-token-persistence.md) | GENERATE-DOCUMENT | TODO | [Migration/entity/repository design captured] |
+| 2 | [Implement reset endpoints](story-NN-name/task-02-reset-endpoints.md) | GENERATE-DOCUMENT | TODO | [API routes, service logic, and tests] |
 
 ---
 
 ## Done Criteria
 
-- [ ] [Criterion 1: specific and verifiable]
-- [ ] [Criterion 2: specific and verifiable]
+- [ ] Reset request returns the same public response for known and unknown emails
+- [ ] Used or expired tokens cannot update a password
+- [ ] Automated tests cover success, expiry, reuse, and unknown-email behavior
 - [ ] TRACEABILITY.md updated with new terms from this story
 
 ---
@@ -46,6 +49,7 @@
 
 | # | Description | Docs Involved | Status | Resolution Path |
 |---|-------------|--------------|--------|----------------|
+| 1 | [e.g. API docs say reset tokens expire in 15 minutes, but support guide says 1 hour] | [docs/api/auth.md, docs/support/password-reset.md] | Open | [Resolve with RECORD-INCONSISTENCY; possible PDR if policy applies across clients] |
 | — | *None yet* | — | — | — |
 
 ---
@@ -56,6 +60,7 @@
 
 | # | Description | Deferred To | Status |
 |---|-------------|------------|--------|
+| 1 | [e.g. Add branded reset email template after provider is selected] | [Future email-template planning] | OPEN |
 | — | *None* | — | — |
 
 ---

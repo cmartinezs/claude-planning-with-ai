@@ -71,6 +71,8 @@ Full planning id: `NNN-<slug>` (e.g. `005-grading-assistance`).
 
 Copy `.planning/_template/` to `.planning/active/NNN-<slug>/`.
 
+Do not create a `pdr-*.md` file by default. PDRs are optional and should be created later with `/plan-decision` only if the generated planning includes a significant cross-cutting decision.
+
 ### 5 — Fill `00-initial.md`
 
 Populate from the epic context gathered in Step 2:

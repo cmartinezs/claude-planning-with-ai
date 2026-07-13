@@ -113,38 +113,20 @@ Reference workflows:
       5. Include both static consistency results and runtime smoke evidence in the human review checkpoint.
 7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the output is consistent with `docs/` contracts.
 8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
-9. Verify every `Done Criteria` item. If any is unmet, execute `[RECORD-EDGE-CASE]` with the unmet criteria, leave the task `IN PROGRESS`, list what is missing, and stop.
+9. Verify every `Done Criteria` item that can be satisfied before PR review. If any non-review criterion is unmet, execute `[RECORD-EDGE-CASE]` with the unmet criteria, leave the task `IN PROGRESS`, list what is missing, and stop. If a criterion requires human developer review, keep it unchecked until step 10b.
 
-9b. **Human developer code review checkpoint** — before marking the task DONE or staging any files, present:
+9b. **Publish implementation for PR review when git is enabled** — before asking the human to review implementation code, publish the task branch and PR so the review can happen on the PR.
+
+   If `execution.requires_git` is `false`, skip this step and use the direct human review checkpoint in step 10.
+
+   a. Present the pre-review implementation summary:
    - the full `## Done Criteria` section exactly as it appears in the task file
    - the files changed/created
    - unit/automated verification results
    - for software projects, smoke-test evidence: supporting services, app/build command, connectivity or schema result, and smoke checks
    - for database/ORM changes, static database-to-ORM consistency evidence and local runtime persistence smoke evidence
 
-   Then ask explicitly:
-
-   > "Please perform a human developer code review before this task is marked DONE or committed. Reply with **approved** to mark this task DONE and continue to git add/commit, or list the requested corrections."
-
-   Do not proceed to step 10 until the user approves.
-
-   If the reviewer requests corrections:
-   - execute `[RECORD-EDGE-CASE]` with the requested corrections
-   - implement the requested changes
-   - rerun the task verification
-   - for software projects, rerun the smoke test plan
-   - present the updated review summary again
-   - wait for a new human code review
-
-   Repeat this loop until the reviewer replies with **approved**. Do not mark the task `DONE`, stage files, commit, push, or create a PR before approval.
-
-10. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
-
-10b. **Conventional commit and task PR after review approval** — commit the task output only when `execution.requires_git` is `true`:
-
-   If `execution.requires_git` is `false`, skip this step and report that git commit was disabled by `.planning/config.yml`.
-
-   a. Derive the **commit type** from the task's `Objective` and `Workflow` field (first match wins):
+   b. Derive the **commit type** from the task's `Objective` and `Workflow` field (first match wins):
 
    | Signal | Type |
    |--------|------|
@@ -155,32 +137,33 @@ Reference workflows:
    | Objective contains "setup", "configure", "scaffold", "init", "install" | `chore` |
    | (default) | `feat` |
 
-   b. Derive the **commit scope** from the story filename: strip the `story-NN-` prefix from `story-NN-<slug>` → commit scope is `<slug>`.
+   c. Derive the **commit scope** from the story filename: strip the `story-NN-` prefix from `story-NN-<slug>` → commit scope is `<slug>`.
 
-   c. Derive the **description** from the task filename: strip the `task-NN-` prefix from `task-NN-<slug>` and replace hyphens with spaces → e.g. `task-02-create-user-model` → `create user model`.
+   d. Derive the **description** from the task filename: strip the `task-NN-` prefix from `task-NN-<slug>` and replace hyphens with spaces → e.g. `task-02-create-user-model` → `create user model`.
 
-   d. Stage only the files listed in the task's `Technical Design → Affected files / components` field, plus:
+   e. Stage only the files listed in the task's `Technical Design → Affected files / components` field, plus:
       - the task file itself
-      - the story file index/status updates
-      - any additional files created during implementation and review corrections
+      - any additional files created during implementation
 
       If the affected-files field is missing or clearly incomplete, execute `[RECORD-EDGE-CASE]`, stop, and ask the user to confirm the exact files to stage. Do **not** use `git add -A` or `git add .`.
 
-   e. Commit:
+      Do not mark the task `DONE` before this commit. The task stays `IN PROGRESS` while the PR is under external review.
+
+   f. Commit:
    ```bash
    git commit -m "type(scope): description"
    ```
 
    Example: `feat(user-authentication): create user model`
 
-   If there is nothing to commit, skip push/PR creation and report that no repository changes were produced for the task.
+   If there is nothing to commit but a task PR for `<task-branch>` already exists, continue to step 10 using that PR. If there is nothing to commit and no task PR exists, skip push/PR creation and report that no repository changes were produced for the task.
 
-   f. Push the task branch only if a commit was created:
+   g. Push the task branch only if a commit was created:
    ```bash
    git push -u origin <task-branch>
    ```
 
-   g. Open a pull request from `<task-branch>` to `<story-branch>` only if a commit was created:
+   h. Open or reuse a pull request from `<task-branch>` to `<story-branch>` only if a commit was created:
    ```bash
    gh pr create \
      --title "<task-NN>: <task-name>" \
@@ -188,10 +171,55 @@ Reference workflows:
      --base <story-branch> \
      --head <task-branch>
    ```
-   If `gh` is not available, execute `[RECORD-EDGE-CASE]` noting that task PR creation had to be completed manually, then print the pushed branch and instruct the user to open a PR from `<task-branch>` to `<story-branch>`.
+   If a task PR for `<task-branch>` already exists, reuse it instead of creating a duplicate. If `gh` is not available, execute `[RECORD-EDGE-CASE]` noting that task PR creation had to be completed manually, then print the pushed branch and instruct the user to open a PR from `<task-branch>` to `<story-branch>`.
+
+10. **Human developer PR review checkpoint** — after the task PR exists, ask for review on that PR:
+
+   > "The task implementation has been committed, pushed, and published as a PR for review. Please run the external code review on the PR. Reply with **approved** when the PR review passes, or list the requested corrections / point me to the `.code-review/<story-dir>/<task-file>.md` feedback."
+
+   If `execution.requires_git` is `false`, present the evidence listed in step 9b.a and ask for a direct human review instead:
+
+   > "Please perform a human developer code review before this task is marked DONE. Reply with **approved** to mark this task DONE, or list the requested corrections."
+
+   Do not proceed to step 10b until the user approves.
+
+   If the reviewer requests corrections or points to `.code-review` feedback:
+   - read the requested corrections and any referenced `.code-review/<story-dir>/<task-file>.md` artifact
+   - execute `[RECORD-EDGE-CASE]` with the requested corrections
+   - implement the requested changes
+   - rerun the task verification
+   - for software projects, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed
+   - if git is enabled, stage only the corrected implementation files and any task-file evidence updates, commit a focused correction commit on the same `<task-branch>`, push it, and reuse the same PR
+   - treat `.code-review` files as review input; stage them only if the repository policy explicitly wants review artifacts committed
+   - present the updated PR/review summary again
+   - wait for a new human review
+
+   Repeat this loop until the reviewer replies with **approved**. Do not mark the task `DONE` until approval, but do keep pushing correction commits to the same task PR while review is open.
+
+10b. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
 
 10c. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If the story area is DO or W this is a silent no-op. Include any files written in the final report.
-11. Report: task completed, files created/changed, test results, commit message used (from step 10b), task branch and task PR status when git is enabled, task PR target `<story-branch>`, doc files written (from step 10c), and the next pending task in the story. Remind the user that the task PR must be reviewed and merged into `<story-branch>` before the next task starts. After that PR is merged, the local task branch must be deleted from the developer workspace:
+
+10d. **Push final task closeout metadata when git is enabled**:
+
+   If `execution.requires_git` is `false`, skip this step and report that git commit was disabled by `.planning/config.yml`.
+
+   a. Stage only:
+      - the task file with final `DONE` status and checked done criteria
+      - the story file index/status updates
+      - doc files written by `/doc-task`
+
+   b. Commit if there are staged changes:
+   ```bash
+   git commit -m "chore(<scope>): mark <task-id> done"
+   ```
+
+   c. Push the task branch again:
+   ```bash
+   git push -u origin <task-branch>
+   ```
+
+11. Report: task completed, files created/changed, test results, implementation commit message used (from step 9b), closeout commit message used when applicable (from step 10d), task branch and task PR status when git is enabled, task PR target `<story-branch>`, doc files written (from step 10c), and the next pending task in the story. Remind the user that the task PR must be reviewed and merged into `<story-branch>` before the next task starts. After that PR is merged, the local task branch must be deleted from the developer workspace:
    ```bash
    git checkout <story-branch>
    git pull --ff-only origin <story-branch>

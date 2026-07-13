@@ -42,6 +42,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-expand <NNN-slug>` | Advances INITIAL -> EXPANSION and creates planning stories |
 | `/plan-status` | Shows all plannings and story statuses |
 | `/plan-validate [NNN-slug]` | Checks structural integrity for one or all plannings |
+| `/plan-decision <NNN-slug> -- <decision title>` | Creates or updates an optional PDR for a cross-cutting planning decision |
 | `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done; for full stories, verifies task PR merges, cleans local task branches, and opens the story PR |
 | `/plan-edge-case [NNN-slug] [story-NN] -- <note>` | Adds a raw note for an unexpected event or correction |
 | `/plan-retrospective <NNN-slug>` | Generates the final retrospective from raw notes and planning context |
@@ -101,6 +102,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-health` | Scans the whole `.planning/` system for anomalies |
 | `/plan-doctor [--plugin-root <path>]` | Audits plugin command inventory, skill metadata, template integrity, and legacy drift |
 | `/plan-report <NNN-slug> [--metrics]` | Generates an executive planning summary with optional metrics and risk coverage |
+| `/plan-decision <NNN-slug> -- <decision title>` | Records a durable Project Decision Record when a decision affects multiple stories, areas, or future planning |
 | `/plan-history <NNN-slug>` | Shows status transitions from git history |
 | `/plan-standup <NNN-slug>` | Generates standup text |
 | `/plan-export <NNN-slug> --format <format>` | Exports a planning as PR text, ticket list, external issue draft, or markdown summary |
@@ -126,7 +128,10 @@ Some commands intentionally overlap because they operate at different layers.
 | Whole `.planning/` system may be inconsistent | `/plan-health` | Global scan across active, initial, finished, indexes, and stale state |
 | One planning needs a structural audit | `/plan-validate` | Detailed read-only validation for a specific planning or all plannings |
 | You want to inspect current planning state | `/plan-status` | Read-only status overview before deciding the next command |
+| A decision affects multiple stories or areas | `/plan-decision` | Creates a PDR and updates traceability instead of leaving the decision in chat |
 | The plugin checkout itself may be inconsistent | `/plan-doctor` | Checks command inventory, skill metadata, template integrity, and legacy drift |
+
+`/plan-decision` is the only command that writes PDR files. Other workflows can invoke it automatically after resolving conflicts, cascading cross-cutting changes, updating traceability, or closing milestones. If the decision is not accepted or lacks evidence, those workflows should suggest `/plan-decision` instead of writing a PDR.
 
 ## Communication Outputs
 

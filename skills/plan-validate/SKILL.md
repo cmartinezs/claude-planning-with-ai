@@ -32,6 +32,7 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
    c. `TRACEABILITY.md` — required in `active/` and `finished/`.
    d. `02-deepening/` — required once any story has started DEEPENING.
    e. `RETROSPECTIVE-RAW.md` — recommended in `active/` and `finished/`; missing file is a **WARN** for older plannings and can be created by `/plan-edge-case` or `/plan-retrospective`.
+   f. `pdr-*.md` — optional. If present and still contains template placeholders such as `[Decision Title]`, `[State the decision.]`, or `[Describe the context`, report a **WARN** and suggest deleting the empty legacy file or completing it with `/plan-decision`.
 
 5. **Check story consistency (plannings with `01-expansion.md`):**
    a. Parse the `## Story Summary` table: story IDs, names, `Depends On`, statuses.
@@ -53,7 +54,7 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
    b. Task numbers must be unique and sequential starting at `task-01`.
    c. Every task `Depends On` must reference an existing task in the same story, with no cycles. Violations are a **FAIL**.
    d. Each task file must contain `## Objective`, `## Technical Design`, `## Implementation Steps`, either `## Verification` or the legacy `## Unit Tests`, and `## Done Criteria`. Missing sections are a **FAIL**.
-   e. If `project.type: software`, each task file must contain `### Software Smoke Test Check`, and its `## Done Criteria` must include smoke-test verification and human developer code review. Missing smoke/review criteria are a **FAIL**.
+   e. If `project.type: software`, each task file must contain `### Software Smoke Test Check`, and its `## Done Criteria` must include smoke-test verification and human developer PR review. For git-enabled tasks, done criteria must also cover publishing the task PR before review and pushing corrections to the same PR. Missing smoke/review criteria are a **FAIL**.
    f. If a task appears to change database structure or ORM artifacts (migration/schema/database/ORM/model/entity/repository/generated-client/persistence keywords or paths), it must contain `### Database / ORM Consistency Check`, done criteria for static DB/ORM consistency, and done criteria for local runtime persistence smoke evidence. Missing DB/ORM validation criteria are a **FAIL**.
    g. If any atomized story contains DB/ORM change tasks, it must also contain a later explicit DB/ORM validation task depending on those change tasks. Missing validation task is a **FAIL**. For deep auditing, point to `/plan-task-validate`.
    h. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.

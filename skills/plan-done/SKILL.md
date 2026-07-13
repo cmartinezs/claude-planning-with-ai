@@ -38,6 +38,7 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
         If the reviewer requests corrections, execute `[RECORD-EDGE-CASE]` with the requested corrections, implement them in a task branch, rerun the relevant verification, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed, and ask for a new human review. Do not mark the story `DONE` or open the story PR before approval.
       - After confirmation: set story status to `DONE` in the story file.
    c. Execute `[CHECK-TRACEABILITY]` — ensure all terms from this story are recorded.
+      - If traceability finds an accepted cross-cutting decision without a PDR, invoke `/plan-decision <planning-id> -- <decision title>` before continuing. If the decision is only a candidate or lacks approval, report it as a suggested PDR follow-up.
    d. Execute `[NEXT-STORY]` to identify the next pending story.
       - If more stories exist: set next story to `IN PROGRESS`. Report which story is next.
       - If no more stories: execute `MILESTONE-FEEDBACK`, invoke `/plan-retrospective <planning-id>`, then trigger `/plan-archive <planning-id>`.

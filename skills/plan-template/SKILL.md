@@ -68,6 +68,7 @@ Examples:
 ## Intent
 
 > *Qué necesita hacerse, en una sola oración.*
+> Ejemplo: `Agregar recuperación de contraseña por email para API y web.`
 
 [Describe the intent here.]
 
@@ -76,6 +77,7 @@ Examples:
 ## Why
 
 > *Por qué existe esta iniciativa. Qué problema resuelve o qué valor entrega.*
+> Ejemplo: `Hoy soporte debe resetear cuentas manualmente. Esto reduce carga operativa y mejora la autonomía del usuario.`
 
 [Describe motivation and context.]
 
@@ -84,6 +86,7 @@ Examples:
 ## Desired Outcome
 
 > *Qué resultado concreto debería existir cuando esto esté listo.*
+> Ejemplo: `Un usuario puede solicitar un link, recibirlo, definir una nueva contraseña y volver a iniciar sesión sin intervención manual.`
 
 [Describe the expected outcome.]
 
@@ -92,6 +95,7 @@ Examples:
 ## Approximate Scope
 
 > *Qué áreas o repos se ven afectados. No necesita ser exhaustivo.*
+> Ejemplo: marca `api/` si hay endpoints, `web/` si hay pantallas, `docs/` si hay runbook o guía de soporte.
 
 - [ ] `docs/` — [brief note]
 - [ ] `web/` — [brief note]
@@ -104,6 +108,7 @@ Examples:
 ## Constraints
 
 > *Restricciones conocidas: fechas límite, decisiones ya tomadas, dependencias externas.*
+> Ejemplo: `Debe usar el proveedor de email existente; no se agregan cambios de infraestructura en este planning.`
 
 [None identified yet.]
 
@@ -113,6 +118,7 @@ Examples:
 
 > *Qué no se sabe todavía o necesita investigación antes de ejecutar.*
 
+- [ ] [Example: Should reset links expire after 15 minutes or 1 hour?]
 - [ ] [Question 1]
 
 ---
@@ -122,4 +128,10 @@ Examples:
 - **Captured by:** [human / AI agent]
 - **Date:** YYYY-MM-DD
 - **Related planning (if continuation):** none
+
+Example:
+
+- **Captured by:** human
+- **Date:** 2026-07-12
+- **Related planning (if continuation):** 004-auth-cleanup
 ```

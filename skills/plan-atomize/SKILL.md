@@ -61,7 +61,7 @@ Reference workflows:
       - `Technical Design` — approach, affected files, interfaces, design notes.
       - `Implementation Steps` — ordered, naming real files or components.
       - `Verification` — if `execution.requires_tests` is `true`, include unit or automated tests for code changes; otherwise include concrete manual/evidence checks appropriate to `project.type`.
-      - `Software Smoke Test Check` — for `project.type: software`, include the smoke-test plan, supporting services, startup/build command, connectivity or schema checks, smoke checks, and human developer code review expectations.
+      - `Software Smoke Test Check` — for `project.type: software`, include the smoke-test plan, supporting services, startup/build command, connectivity or schema checks, smoke checks, and human developer PR review expectations. For git-enabled tasks, done criteria must state that the task PR is opened before human review and that corrections are pushed to the same PR.
       - `Database / ORM Consistency Check` — required when the task changes database structure or ORM artifacts, and required for the explicit DB/ORM validation task. Include static database-to-ORM checks plus local runtime smoke validation.
       - `Done Criteria` — binary, verifiable conditions.
       - Header fields: `Status: TODO`, `Workflow` (from the catalog), `Depends On`.

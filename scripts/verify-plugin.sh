@@ -43,6 +43,7 @@ require_file "docs/reference.md"
 require_file "docs/commands.yml"
 require_file "planning-template/README.md"
 require_file "planning-template/config.yml"
+require_file "planning-template/PDR-TEMPLATE.md"
 require_dir "skills"
 require_dir "planning-template/WORKFLOWS"
 
@@ -97,6 +98,10 @@ for template_check in \
     fail "$path missing expected marker: $needle"
   fi
 done
+
+if [[ -f "$ROOT/planning-template/_template/pdr-NNN-title.md" ]]; then
+  fail "planning-template/_template/pdr-NNN-title.md should not exist; PDRs are optional and use planning-template/PDR-TEMPLATE.md"
+fi
 
 if command -v rg >/dev/null 2>&1; then
   unknown_commands="$(rg -o '`/(plan|doc|release|us|epic)-[a-z0-9-]+' "$ROOT/README.md" "$ROOT/docs/reference.md" "$ROOT/planning-template/TUTORIAL" \

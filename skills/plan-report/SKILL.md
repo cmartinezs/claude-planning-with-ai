@@ -24,17 +24,19 @@ Generate a structured report for a planning, suitable for retrospectives, stakeh
 
 5. For each atomized story with task files (`02-deepening/<story-id>-*/task-*.md`): read the `Technical Design` section of each task to extract key decisions made during execution.
 
-6. Run `git log --oneline -- .planning/**/<planning-id>/**` and extract: first commit date (planning start), last commit date (last activity), total commit count.
+6. Read any `pdr-*.md` files in the planning root. Extract PDR id, status, decision, rationale, affected areas, and related story/task.
 
-7. Compute summary stats: total stories, DONE count, IN PROGRESS count, TODO count, BLOCKED count, SKIPPED count.
+7. Run `git log --oneline -- .planning/**/<planning-id>/**` and extract: first commit date (planning start), last commit date (last activity), total commit count.
 
-8. Extract risk and external issue data:
+8. Compute summary stats: total stories, DONE count, IN PROGRESS count, TODO count, BLOCKED count, SKIPPED count.
+
+9. Extract risk and external issue data:
    - `Risk` and `External Issue` columns from `01-expansion.md`
    - `Risk Register` rows from `01-expansion.md`
    - `## Risk` sections from story files
    - `Risk` bullets from task `Technical Design` sections
 
-9. If `--metrics` is present, compute:
+10. If `--metrics` is present, compute:
    - completion rate: `(DONE + SKIPPED) / total stories`
    - blocked ratio: `BLOCKED / total stories`
    - skipped ratio: `SKIPPED / total stories`
@@ -42,7 +44,7 @@ Generate a structured report for a planning, suitable for retrospectives, stakeh
    - count of H/M/L risks
    - external issue coverage: stories with external issue IDs / total stories
 
-10. Output the report:
+11. Output the report:
 
 ```
 # Planning Report — <planning-id>
@@ -90,6 +92,13 @@ Generated: <today's date>
 - [story-03 / task-02] Spring Security filter chain ordered before CSRF filter.
 ...
 (extracted from task Technical Design sections; empty if no atomized tasks)
+
+## Project Decision Records
+| PDR | Status | Decision | Affected Areas | Related |
+|-----|--------|----------|----------------|---------|
+| PDR-001 | Accepted | Use area-specific smoke tests | AP, WB | story-02 |
+
+(empty if no PDRs exist)
 
 ## Timeline
 - Started: <first commit date>
