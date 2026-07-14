@@ -1,90 +1,31 @@
 ---
 name: plan-validate
-description: Validate the structural integrity of one planning (or all plannings) — file locations, story consistency, workflow IDs, dependencies, done criteria, and atomized task files.
+description: Validate the structural integrity of one planning or all plannings using the deterministic planning-check script.
 argument-hint: "[NNN-slug]"
-allowed-tools: [Read, Bash, Glob]
+allowed-tools: [Bash, Read]
 ---
 
-Validate the structural integrity of plannings in `.planning/`. Read-only: report findings, never modify files.
+Validate `.planning/` structure, story consistency, workflow IDs, dependencies, done criteria, and atomized task files. Read-only.
 
-Use `/plan-validate [NNN-slug]` for a detailed structural audit of one planning, or all plannings if no argument is provided. Use `/plan-health` first when you suspect cross-planning, index, duplicate, or stale-state issues across the entire `.planning/` system.
+Use `/plan-validate [NNN-slug]` for a detailed audit of one planning, or all plannings if no argument is provided. Use `/plan-health` first when you suspect cross-planning, index, duplicate, or stale-state issues.
 
-If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, validate every planning found in `.planning/`, `.planning/active/`, and `.planning/finished/`.
+## Arguments
+
+`$ARGUMENTS` — optional `NNN-slug`.
 
 ## Steps
 
-1. **Locate the planning(s).**
-   a. Search for `NNN-slug` folders in `.planning/` (INITIAL), `.planning/active/` (EXPANSION / DEEPENING), and `.planning/finished/` (COMPLETED).
-   b. If an explicit `NNN-slug` was given and not found anywhere, stop and report it.
-   c. If the same `NNN-slug` exists in more than one location, report it as a **FAIL** (duplicate planning).
+1. Use only `./.planning/` in the current working directory. Do not search parent directories.
+2. If `.planning/scripts/planning-check.mjs` is missing, stop and report:
+   - "This workspace needs the latest planning scripts. Run `/plan-update-version <from> <to>` or re-run `/plan-init --force` from the project root."
+3. Run the deterministic validator:
 
-2. **Build the workflow catalog.** Read `.planning/WORKFLOWS/README.md` and list every workflow ID defined there (main workflows and sub-workflows). This is the valid set for task `Workflow` columns.
-
-3. **For each planning, read configuration and check location ↔ state coherence:**
-   - Read `.planning/config.yml` if it exists. Extract `project.type` (default `software`), `execution.requires_git` (default `true`), and `software.smoke_tests_file` (default `SMOKE-TESTS.md` when `project.type: software`).
-   a. A planning at `.planning/NNN-slug/` must contain only `00-initial.md` artifacts (INITIAL state). If it has `01-expansion.md` or `02-deepening/`, flag **FAIL**: it should have been moved to `active/`.
-   b. A planning in `active/` must contain `00-initial.md` and `01-expansion.md`.
-   c. A planning in `finished/` must contain all lifecycle files and have every story marked `DONE` or `SKIPPED`.
-
-4. **Check required files:**
-   a. `00-initial.md` — always required.
-   b. `01-expansion.md` — required in `active/` and `finished/`.
-   c. `TRACEABILITY.md` — required in `active/` and `finished/`.
-   d. `02-deepening/` — required once any story has started DEEPENING.
-   e. `RETROSPECTIVE-RAW.md` — recommended in `active/` and `finished/`; missing file is a **WARN** for older plannings and can be created by `/plan-edge-case` or `/plan-retrospective`.
-   f. `pdr-*.md` — optional. If present and still contains template placeholders such as `[Decision Title]`, `[State the decision.]`, or `[Describe the context`, report a **WARN** and suggest deleting the empty legacy file or completing it with `/plan-decision`.
-
-5. **Check story consistency (plannings with `01-expansion.md`):**
-   a. Parse the `## Story Summary` table: story IDs, names, `Depends On`, statuses.
-   b. Every story row must have a matching `02-deepening/story-NN-*.md` file **if** the planning is in DEEPENING. A story file without a table row, or a row without a file (when expected), is a **FAIL**.
-   c. Every `Depends On` value must reference an existing story ID in the same table. Detect circular dependencies (e.g. 01 → 02 → 01) and flag them as **FAIL**.
-   d. The story status in the summary table must match the `> **Status:**` line of the corresponding story file. Mismatch is a **FAIL**.
-   e. Valid story status values are `TODO`, `IN PROGRESS`, `DONE`, `BLOCKED`, `SKIPPED`, and `STANDBY`. Valid task status values are `TODO`, `IN PROGRESS`, `DONE`, and `BLOCKED`. Any other label (e.g. `PENDING`, a legacy synonym of `TODO`) is a **WARN**: suggest normalizing to a valid status.
-
-6. **Check each story file (`02-deepening/story-NN-*.md`):**
-   a. Required sections: `## Objective`, `## Tasks`, `## Done Criteria`.
-   b. Every row in the `## Tasks` table must have a `Workflow` value that exists in the catalog from step 2. Unknown workflow IDs are a **FAIL**.
-   c. Task numbers must be unique and sequential starting at 1.
-   d. A story marked DONE must have **all** Done Criteria checked (`- [x]`). Unchecked criteria in a DONE story is a **FAIL**. A story marked SKIPPED must include a skipped reason.
-   e. A story with all tasks DONE but status not DONE is a **WARN** (likely forgot `/plan-done`).
-   f. Placeholder text surviving from the template (`[Task description]`, `[Story Name]`, `[WORKFLOW-NAME]`) is a **WARN** in active plannings and a **FAIL** in `finished/`.
-
-7. **Check atomized stories.** For each story with a task folder (`02-deepening/<story-id>-*/` containing `task-NN-*.md`):
-   a. Every row in the story's `## Tasks` index must link to an existing task file, and every task file must have an index row. Orphans in either direction are a **FAIL**.
-   b. Task numbers must be unique and sequential starting at `task-01`.
-   c. Every task `Depends On` must reference an existing task in the same story, with no cycles. Violations are a **FAIL**.
-   d. Each task file must contain `## Objective`, `## Technical Design`, `## Implementation Steps`, either `## Verification` or the legacy `## Unit Tests`, and `## Done Criteria`. Missing sections are a **FAIL**.
-   e. If `project.type: software`, each task file must contain `### Software Smoke Test Check`, and its `## Done Criteria` must include smoke-test verification and human developer PR review. For git-enabled tasks, done criteria must also cover publishing the task PR before review and pushing corrections to the same PR. Missing smoke/review criteria are a **FAIL**.
-   f. If `project.type: software`, each task file must contain `### Logging / Observability`, and code tasks must include done criteria for intelligent logging with correlation/trace context and levels chosen by criticality. Missing logging criteria are a **WARN** for legacy plannings and a **FAIL** for newly atomized code tasks.
-   g. If `project.type: software`, each task file must contain `### Generated Test Suite`, and its `## Done Criteria` must include generated/refreshed test-suite gate evidence plus acceptance dependency inventory evidence. Missing generated test-suite criteria are a **WARN** for legacy plannings and a **FAIL** for newly atomized tasks.
-   h. If a task appears to change database structure or ORM artifacts (migration/schema/database/ORM/model/entity/repository/generated-client/persistence keywords or paths), it must contain `### Database / ORM Consistency Check`, done criteria for static DB/ORM consistency, and done criteria for local runtime persistence smoke evidence. Missing DB/ORM validation criteria are a **FAIL**.
-   i. If any atomized story contains DB/ORM change tasks, it must also contain a later explicit DB/ORM validation task depending on those change tasks. Missing validation task is a **FAIL**. For deep auditing, point to `/plan-task-validate`.
-   j. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.
-   k. Index status must match each task file's `> **Status:**` line. Mismatch is a **FAIL**.
-   l. A task `DONE` with unchecked Done Criteria is a **FAIL**. For deep atomicity auditing, point to `/plan-task-validate`.
-
-8. **Check dependency order:** a story with status `IN PROGRESS`, `DONE`, or `STANDBY` whose `Depends On` stories are not all `DONE` or `SKIPPED` is a **WARN** (dependency executed out of order).
-
-9. **Check traceability:** if any story file's Done Criteria mentions TRACEABILITY and is checked, `TRACEABILITY.md` must exist and be non-empty. Empty or missing while referenced is a **WARN**.
-
-10. **Report.** Print one block per planning:
-
-```
-NNN-slug (LOCATION: initial | active | finished)
-  ✅ PASS  — <count> checks passed
-  ⚠️ WARN  — <description with file and line reference>
-  ❌ FAIL  — <description with file and line reference>
+```bash
+node .planning/scripts/planning-check.mjs validate $ARGUMENTS --format markdown
 ```
 
-End with a global summary: `N plannings validated — X clean, Y with warnings, Z with failures.` Exit message must state clearly that nothing was modified.
+4. Report the script output verbatim.
+5. If FAIL findings are present, list the suggested command or file edit from the output. Do not apply fixes automatically.
+6. If WARN findings are present, group them after FAIL findings and keep the command read-only.
 
-11. **Suggest fixes.** For each FAIL, suggest the command that fixes it (e.g. status mismatch → `/plan-done NNN-slug story-NN`; missing story file → `/plan-enrich-story NNN-slug story-NN`; malformed atomized story → `/plan-task-validate NNN-slug story-NN`). If obsolete command names or concepts appear in active planning files (`/plan-scope`, `scope-NN`, `doc-scope`, `EXECUTE-SCOPE`, `ATOMIZE-SCOPE`), report a **WARN** and suggest updating them to story terminology. Do not apply any fix.
-
-12. **File review prompt.** After the report, list every file referenced in a FAIL or WARN finding and ask the user to verify them directly:
-
-    > "Before running any fix command, open and inspect the following files to confirm the issues reported above:
-    > - `<file-path>` — <what to look for>
-    > …
-    > Verifying the files directly avoids applying fixes to already-resolved issues or misdiagnosed problems."
-
-> This command is read-only. It does not modify any files.
+> This command is read-only. The script performs deterministic checks and does not modify files.

@@ -46,6 +46,7 @@ require_file "planning-template/config.yml"
 require_file "planning-template/PDR-TEMPLATE.md"
 require_file "planning-template/LOGGING.md"
 require_file "planning-template/scripts/generate-test-suite.sh"
+require_file "planning-template/scripts/planning-check.mjs"
 require_dir "skills"
 require_dir "planning-template/WORKFLOWS"
 
@@ -106,6 +107,16 @@ done
 
 if [[ -f "$ROOT/planning-template/_template/pdr-NNN-title.md" ]]; then
   fail "planning-template/_template/pdr-NNN-title.md should not exist; PDRs are optional and use planning-template/PDR-TEMPLATE.md"
+fi
+
+if command -v node >/dev/null 2>&1; then
+  if node --check "$ROOT/planning-template/scripts/planning-check.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-check.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-check.mjs has invalid syntax"
+  fi
+else
+  warn "node not installed; skipped planning-check.mjs syntax check"
 fi
 
 if command -v rg >/dev/null 2>&1; then
