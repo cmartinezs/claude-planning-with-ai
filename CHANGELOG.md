@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8.0] — 2026-07-14
+
+### Added
+
+- `.planning/scripts/planning-check.mjs` centralizes deterministic read-only planning validation for health, planning structure, and atomized task checks, with Markdown and JSON output.
+- `.planning/scripts/doc-generate.mjs` centralizes deterministic documentation generation for task, story, and planning-level artifacts.
+- `docs/plugin-review/07-automation-candidates.md` records the skill automation candidates, applied cuts, and token-reduction measurements.
+
+### Changed
+
+- `/plan-health`, `/plan-validate`, and `/plan-task-validate` now delegate repeated structural checks to `.planning/scripts/planning-check.mjs` instead of carrying long duplicated checklists in skill context.
+- `/doc-generate`, `/doc-task`, and `/doc-story` now delegate document writing, append-vs-overwrite behavior, ADR detection, and planning-level consolidation to `.planning/scripts/doc-generate.mjs`.
+- `scripts/verify-plugin.sh` now verifies both deterministic scripts exist and pass `node --check`.
+- `planning-template/update-version/2-3.md` now brings `2.x` workspaces to the current `3.8.0` baseline, including the deterministic validation and documentation scripts.
+
 ## [3.7.0] — 2026-07-13
 
 ### Added
@@ -280,7 +295,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.7.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.8.0...HEAD
+[3.8.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.4.0...v3.5.0

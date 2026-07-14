@@ -12,7 +12,7 @@
 **Structured lifecycle planning for software projects**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-3.7.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-3.8.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
 [![Platform](https://img.shields.io/badge/Claude%20Code-plugin-7C3AED?style=flat-square)](https://claude.ai/code)
 [![Storage](https://img.shields.io/badge/storage-plain%20markdown-6B7280?style=flat-square)](planning-template/)
 [![Author](https://img.shields.io/badge/author-cmartinezs-0EA5E9?style=flat-square)](https://cmartinezs.github.io)

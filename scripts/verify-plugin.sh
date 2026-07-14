@@ -45,6 +45,7 @@ require_file "planning-template/README.md"
 require_file "planning-template/config.yml"
 require_file "planning-template/PDR-TEMPLATE.md"
 require_file "planning-template/LOGGING.md"
+require_file "planning-template/scripts/doc-generate.mjs"
 require_file "planning-template/scripts/generate-test-suite.sh"
 require_file "planning-template/scripts/planning-check.mjs"
 require_dir "skills"
@@ -110,6 +111,12 @@ if [[ -f "$ROOT/planning-template/_template/pdr-NNN-title.md" ]]; then
 fi
 
 if command -v node >/dev/null 2>&1; then
+  if node --check "$ROOT/planning-template/scripts/doc-generate.mjs" >/dev/null; then
+    pass "planning-template/scripts/doc-generate.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/doc-generate.mjs has invalid syntax"
+  fi
+
   if node --check "$ROOT/planning-template/scripts/planning-check.mjs" >/dev/null; then
     pass "planning-template/scripts/planning-check.mjs syntax is valid"
   else

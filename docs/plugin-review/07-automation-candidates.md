@@ -4,12 +4,18 @@
 
 El problema principal no es solo la cantidad de comandos, sino que varias skills contienen lógica determinista que se repite o que es llamada desde otras skills. Eso aumenta el costo de contexto porque el agente debe cargar instrucciones largas para hacer tareas que un script podria resolver con argumentos, parsing de Markdown y salidas estructuradas.
 
-Medición local:
+Medición inicial antes de aplicar automatizaciones:
 
 - 52 skills en `skills/*/SKILL.md`.
 - 33.399 palabras en total.
 - Skills mas pesadas por palabras: `plan-task` (2.958), `doc-generate` (1.582), `plan-init` (1.566), `plan-story` (1.473), `plan-validate` (1.303), `plan-done` (1.144), `plan-update-version` (1.123), `plan-atomize` (1.029), `release-status` (980), `plan-task-validate` (952).
 - Pares con similitud alta: `doc-story` / `doc-task`, `plan-task-validate` / `plan-validate`, `plan-story` / `plan-task`, `plan-atomize` / `plan-task-validate`, `release-add` / `release-remove`.
+
+Medición despues de automatizar validacion y generacion de documentacion:
+
+- 52 skills en `skills/*/SKILL.md`.
+- 29.488 palabras en total.
+- `doc-generate`, `doc-task`, `doc-story`, `plan-health`, `plan-validate` y `plan-task-validate` quedaron como wrappers.
 
 ## Criterio usado
 
@@ -88,6 +94,8 @@ El script deberia:
 - devolver JSON o Markdown con `written`, `skipped`, `warnings`.
 
 Las skills `doc-task` y `doc-story` podrian desaparecer como skills reales y quedar como aliases/documentacion, o reducirse a una linea que llama el script con el arity correcto.
+
+Estado: aplicado en este checkout. `planning-template/scripts/doc-generate.mjs` centraliza la matriz de documentos, rutas de salida, append-vs-overwrite, deteccion de ADRs y consolidacion de release/user guide. `doc-generate`, `doc-task` y `doc-story` quedaron como wrappers livianos.
 
 ### 3. Release management
 
