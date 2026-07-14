@@ -11,11 +11,11 @@ Medición inicial antes de aplicar automatizaciones:
 - Skills mas pesadas por palabras: `plan-task` (2.958), `doc-generate` (1.582), `plan-init` (1.566), `plan-story` (1.473), `plan-validate` (1.303), `plan-done` (1.144), `plan-update-version` (1.123), `plan-atomize` (1.029), `release-status` (980), `plan-task-validate` (952).
 - Pares con similitud alta: `doc-story` / `doc-task`, `plan-task-validate` / `plan-validate`, `plan-story` / `plan-task`, `plan-atomize` / `plan-task-validate`, `release-add` / `release-remove`.
 
-Medición despues de automatizar validacion y generacion de documentacion:
+Medición despues de automatizar validacion, generacion de documentacion y release management:
 
 - 52 skills en `skills/*/SKILL.md`.
-- 29.488 palabras en total.
-- `doc-generate`, `doc-task`, `doc-story`, `plan-health`, `plan-validate` y `plan-task-validate` quedaron como wrappers.
+- 27.974 palabras en total.
+- `doc-generate`, `doc-task`, `doc-story`, `plan-health`, `plan-validate`, `plan-task-validate`, `release-init`, `release-new`, `release-add`, `release-remove` y `release-status` quedaron como wrappers.
 
 ## Criterio usado
 
@@ -121,6 +121,8 @@ node .planning/scripts/release.mjs status [v1.2.0] [--mark-released]
 ```
 
 La skill deberia intervenir solo cuando falten datos humanos, por ejemplo target/date o aprobacion para marcar `BLOCKED` sin plannings bloqueados.
+
+Estado: aplicado en este checkout. `planning-template/scripts/release.mjs` centraliza inicializacion, creacion, agregado, remocion, estado y transiciones de releases. Las skills `release-*` quedaron como wrappers livianos; `release-new` conserva la interaccion humana para `--target` y `--date`, y `release-remove` / `release-status --mark-blocked` requieren confirmacion explicita antes de usar `--force` en casos sensibles.
 
 ### 4. Inicializacion de `.planning/`
 

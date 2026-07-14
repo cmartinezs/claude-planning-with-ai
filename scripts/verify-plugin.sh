@@ -48,6 +48,7 @@ require_file "planning-template/LOGGING.md"
 require_file "planning-template/scripts/doc-generate.mjs"
 require_file "planning-template/scripts/generate-test-suite.sh"
 require_file "planning-template/scripts/planning-check.mjs"
+require_file "planning-template/scripts/release.mjs"
 require_dir "skills"
 require_dir "planning-template/WORKFLOWS"
 
@@ -122,8 +123,14 @@ if command -v node >/dev/null 2>&1; then
   else
     fail "planning-template/scripts/planning-check.mjs has invalid syntax"
   fi
+
+  if node --check "$ROOT/planning-template/scripts/release.mjs" >/dev/null; then
+    pass "planning-template/scripts/release.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/release.mjs has invalid syntax"
+  fi
 else
-  warn "node not installed; skipped planning-check.mjs syntax check"
+  warn "node not installed; skipped deterministic script syntax checks"
 fi
 
 if command -v rg >/dev/null 2>&1; then

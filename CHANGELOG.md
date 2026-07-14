@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.9.0] — 2026-07-14
+
+### Added
+
+- `.planning/scripts/release.mjs` centralizes deterministic release planning operations for initialization, creation, adding/removing plannings, status reporting, and status transitions.
+
+### Changed
+
+- `/release-init`, `/release-new`, `/release-add`, `/release-remove`, and `/release-status` now delegate `.releases/` file updates and live `.planning/` status reads to `.planning/scripts/release.mjs`.
+- `scripts/verify-plugin.sh` now verifies the release script exists and passes `node --check`.
+- `planning-template/update-version/2-3.md` now brings `2.x` workspaces to the current `3.9.0` baseline, including deterministic validation, documentation, and release-management scripts.
+
 ## [3.8.0] — 2026-07-14
 
 ### Added
@@ -295,7 +307,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.8.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.9.0...HEAD
+[3.9.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.5.0...v3.6.0
