@@ -55,11 +55,13 @@ If `$ARGUMENTS` contains a `NNN-slug`, validate only that planning. If empty, va
    c. Every task `Depends On` must reference an existing task in the same story, with no cycles. Violations are a **FAIL**.
    d. Each task file must contain `## Objective`, `## Technical Design`, `## Implementation Steps`, either `## Verification` or the legacy `## Unit Tests`, and `## Done Criteria`. Missing sections are a **FAIL**.
    e. If `project.type: software`, each task file must contain `### Software Smoke Test Check`, and its `## Done Criteria` must include smoke-test verification and human developer PR review. For git-enabled tasks, done criteria must also cover publishing the task PR before review and pushing corrections to the same PR. Missing smoke/review criteria are a **FAIL**.
-   f. If a task appears to change database structure or ORM artifacts (migration/schema/database/ORM/model/entity/repository/generated-client/persistence keywords or paths), it must contain `### Database / ORM Consistency Check`, done criteria for static DB/ORM consistency, and done criteria for local runtime persistence smoke evidence. Missing DB/ORM validation criteria are a **FAIL**.
-   g. If any atomized story contains DB/ORM change tasks, it must also contain a later explicit DB/ORM validation task depending on those change tasks. Missing validation task is a **FAIL**. For deep auditing, point to `/plan-task-validate`.
-   h. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.
-   i. Index status must match each task file's `> **Status:**` line. Mismatch is a **FAIL**.
-   j. A task `DONE` with unchecked Done Criteria is a **FAIL**. For deep atomicity auditing, point to `/plan-task-validate`.
+   f. If `project.type: software`, each task file must contain `### Logging / Observability`, and code tasks must include done criteria for intelligent logging with correlation/trace context and levels chosen by criticality. Missing logging criteria are a **WARN** for legacy plannings and a **FAIL** for newly atomized code tasks.
+   g. If `project.type: software`, each task file must contain `### Generated Test Suite`, and its `## Done Criteria` must include generated/refreshed test-suite gate evidence plus acceptance dependency inventory evidence. Missing generated test-suite criteria are a **WARN** for legacy plannings and a **FAIL** for newly atomized tasks.
+   h. If a task appears to change database structure or ORM artifacts (migration/schema/database/ORM/model/entity/repository/generated-client/persistence keywords or paths), it must contain `### Database / ORM Consistency Check`, done criteria for static DB/ORM consistency, and done criteria for local runtime persistence smoke evidence. Missing DB/ORM validation criteria are a **FAIL**.
+   i. If any atomized story contains DB/ORM change tasks, it must also contain a later explicit DB/ORM validation task depending on those change tasks. Missing validation task is a **FAIL**. For deep auditing, point to `/plan-task-validate`.
+   j. Task `Workflow` values must exist in the catalog from step 2. Unknown IDs are a **FAIL**.
+   k. Index status must match each task file's `> **Status:**` line. Mismatch is a **FAIL**.
+   l. A task `DONE` with unchecked Done Criteria is a **FAIL**. For deep atomicity auditing, point to `/plan-task-validate`.
 
 8. **Check dependency order:** a story with status `IN PROGRESS`, `DONE`, or `STANDBY` whose `Depends On` stories are not all `DONE` or `SKIPPED` is a **WARN** (dependency executed out of order).
 

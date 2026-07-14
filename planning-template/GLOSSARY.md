@@ -28,6 +28,16 @@ The smallest executable unit of work, produced by decomposing a story with `/pla
 
 ---
 
+### Generated Test Suite
+A deterministic quality-gate artifact produced by `/plan-test-suite` or `.planning/scripts/generate-test-suite.sh`. It can exist at planning, story, or task scope and records applicable test commands and evidence expectations: unit tests, coverage, integration, acceptance/e2e, static analysis, code style, architecture/design guide review, smoke, security/dependency scan, and mutation/test-strength checks.
+
+---
+
+### Logging Policy
+The project-level software logging contract in `.planning/LOGGING.md`. It defines the logging mechanism, supported levels, correlation or trace context, sensitive-data guardrails, and task checklist. Code tasks must follow it so execution can be traced across internal calls, external dependencies, async flows, and failures.
+
+---
+
 ### Workflow
 A defined sequence of steps for executing a specific type of task. Every task in a story must specify which workflow governs its execution. See [`WORKFLOWS/README.md`](WORKFLOWS/README.md) for the full catalog.
 

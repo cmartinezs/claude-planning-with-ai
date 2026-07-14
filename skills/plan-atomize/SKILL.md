@@ -30,6 +30,8 @@ Reference workflows:
    - `execution.requires_tests` (default `true`)
    - `execution.requires_git` (default `true`)
    - `software.smoke_tests_file` (default `SMOKE-TESTS.md`) for software smoke-test expectations
+   - `software.test_suite_generator` (default `scripts/generate-test-suite.sh`) for deterministic test-suite generation
+   - `software.logging_file` (default `LOGGING.md`) for the project logging policy
 
 3. **For each story in the work list**, execute the following sub-steps:
 
@@ -63,10 +65,17 @@ Reference workflows:
       - `Verification` — if `execution.requires_tests` is `true`, include unit or automated tests for code changes; otherwise include concrete manual/evidence checks appropriate to `project.type`.
       - `Software Smoke Test Check` — for `project.type: software`, include the smoke-test plan, supporting services, startup/build command, connectivity or schema checks, smoke checks, and human developer PR review expectations. For git-enabled tasks, done criteria must state that the task PR is opened before human review and that corrections are pushed to the same PR.
       - `Database / ORM Consistency Check` — required when the task changes database structure or ORM artifacts, and required for the explicit DB/ORM validation task. Include static database-to-ORM checks plus local runtime smoke validation.
+      - `Logging / Observability` — for software tasks that implement or change code, include the logging mechanism from `.planning/${software.logging_file}`, correlation/trace context, required log levels (TRACE, DEBUG, INFO, WARN, ERROR, FATAL), execution trace points, sensitive-data guardrails, and verification evidence. If no logging mechanism exists, mark that the agent must suggest a stack-appropriate mechanism and wait for human decision before execution.
+      - `Generated Test Suite` — include the expected task test-suite path and the applicable quality gates: unit, coverage, integration, acceptance/e2e, static analysis, code style, architecture/design guide review, smoke, security/dependency scan, and mutation/test-strength when applicable.
       - `Done Criteria` — binary, verifiable conditions.
       - Header fields: `Status: TODO`, `Workflow` (from the catalog), `Depends On`.
    c. Rewrite the story's `## Tasks` table as an index: each task name becomes a link to its task file (`[Task name](<story-id>-<name>/task-NN-slug.md)`), keeping `Workflow`, `Status`, and `Output` columns in sync with the task files.
-   d. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
+   d. Generate or refresh test suites for the story and tasks:
+      ```bash
+      bash .planning/${software.test_suite_generator} --planning <planning-id> --story <story-id> --all
+      ```
+      If the generator is unavailable, report the exact follow-up command: `/plan-test-suite <planning-id> <story-id> --all`.
+   e. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
 
 6. Report:
    - **Single-story mode**: N atomic tasks created under `02-deepening/<story-id>-<name>/`, dependency order, and the suggested next command (`/plan-task <planning-id> <story-id> task-01` or `/plan-story <planning-id> <story-id>`).

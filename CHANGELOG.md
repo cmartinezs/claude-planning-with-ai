@@ -4,13 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.7.0] — 2026-07-13
+
 ### Added
 
 - `/plan-decision` creates or updates optional Project Decision Records (PDRs) only when a planning produces a cross-cutting decision.
+- `/plan-test-suite` generates deterministic test-suite matrices for a planning, story, or task, using repository tooling before AI-generated guidance.
+- `.planning/scripts/generate-test-suite.sh` detects local test, coverage, integration, acceptance, static-analysis, style, architecture, smoke, security, and mutation-test commands for generated planning artifacts, including Maven Cucumber/Gherkin acceptance tests through an `acceptanceTests` profile.
+- `.planning/LOGGING.md` defines the software logging policy used by code tasks: mechanism, correlation/trace context, levels, sensitive-data guardrails, and stack recommendations.
 
 ### Changed
 
 - Git-enabled `/plan-task` now commits, pushes, and opens or reuses the task PR before asking for human developer review, so external PR review can produce feedback first; requested corrections are pushed to the same PR, and the task is marked `DONE` only after review approval.
+- `/plan-task`, `/plan-atomize`, task templates, and validators now treat generated test-suite gates as first-class execution evidence.
+- `/plan-task`, `/plan-atomize`, task templates, and validators now require software code tasks to include intelligent logging evidence, with stack-specific recommendation and human decision when no logging mechanism is defined.
+- `planning-template/update-version/2-3.md` now brings `2.x` workspaces to the current `3.7.0` baseline, including optional PDRs, test-suite generation, logging policy, and richer template examples.
 - PDRs are no longer copied into every new planning as empty placeholder files. The template now lives at `.planning/PDR-TEMPLATE.md`, while `/plan-report`, `/plan-retrospective`, and `/plan-validate` know how to read or flag real `pdr-*.md` records.
 - Workflows that resolve inconsistencies, cascade cross-cutting changes, update traceability, record edge cases, generate retrospectives, finish stories, or archive plannings can now invoke `/plan-decision` automatically when a decision is explicit, accepted, cross-cutting, and supported by enough evidence; otherwise they suggest it as a follow-up.
 - Markdown templates now include concrete example values and example rows for initial planning, expansion, stories, tasks, traceability, raw retrospectives, PDRs, smoke tests, and idea capture.
@@ -29,7 +37,7 @@ All notable changes to this project will be documented in this file.
 - `/plan-edge-case` — manual command to append unexpected events, corrections, blockers, or unusual situations to a planning's `RETROSPECTIVE-RAW.md`.
 - `/plan-retrospective` — generates or refreshes the final professional `README.md# Retrospective` from `RETROSPECTIVE-RAW.md`, planning context, story statuses, and traceability notes.
 - `/plan-update-version` — applies cumulative adjacent major-pair planning-system migrations from `update-version/<N>-<N+1>.md`, starting with `1-2.md` to migrate legacy `scope` planning artifacts to `story`.
-- `planning-template/update-version/2-3.md` — major-pair migration that brings any `2.x` workspace to the current `3.6.0` baseline by applying the recorded 3.x changes in order.
+- `planning-template/update-version/2-3.md` — major-pair migration that brings any `2.x` workspace to the 3.x baseline by applying the recorded 3.x changes in order.
 - `RETROSPECTIVE-RAW.md` planning template and `RECORD-EDGE-CASE` workflow for preserving raw retrospective signals during execution.
 
 ### Changed
@@ -272,7 +280,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.6.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.7.0...HEAD
+[3.7.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.2.0...v3.4.0

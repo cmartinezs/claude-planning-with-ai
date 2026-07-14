@@ -195,7 +195,7 @@ const scenario: TrainingScenario = {
         '  - name: plan-audit-docs',
         '  - name: plan-doctor',
         '',
-        '# 50 commands represented',
+        '# 52 commands represented',
       ],
     },
   ],

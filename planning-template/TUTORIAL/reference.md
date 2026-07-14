@@ -216,7 +216,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Story nueva de backlog + story nueva de planning coordinadas | `/us-new` → `/plan-enrich-epic` |
 | Algo raro ocurrió fuera de un comando del plugin | `/plan-edge-case NNN-slug -- nota` |
 | Preparar retrospectiva final | `/plan-retrospective NNN-slug` |
-| Workspace `2.x` antiguo | `/plan-update-version 2.1.0 3.6.0 --dry-run` → `/plan-update-version 2.1.0 3.6.0` |
+| Workspace `2.x` antiguo | `/plan-update-version 2.1.0 3.7.0 --dry-run` → `/plan-update-version 2.1.0 3.7.0` |
 | Cerrar el planning | `/plan-retrospective NNN-slug` → `/plan-archive NNN-slug` |
 | Ejecutar todo el ciclo sin intervención | `/plan-run NNN-slug` |
 | Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |
@@ -264,6 +264,7 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | `/plan-atomize` | `NNN-slug story-NN` |
 | `/plan-task` | `NNN-slug story-NN task-NN` |
 | `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` |
+| `/plan-test-suite` | `NNN-slug [story-NN] [task-NN] [--all]` |
 | `/release-init` | *(sin argumentos)* |
 | `/release-new` | `vX.Y.Z -- <purpose>` |
 | `/release-add` | `vX.Y.Z NNN-slug [NNN-slug ...]` |

@@ -29,7 +29,7 @@ const en = {
     demoBtn: 'See demo',
     stats: [
       { value: '5', label: 'Lifecycle states' },
-      { value: '50', label: 'Commands' },
+      { value: '51', label: 'Commands' },
       { value: 'Markdown', label: 'Native format' },
       { value: '0', label: 'Dependencies' },
     ],
@@ -102,7 +102,7 @@ const en = {
     cards: [
       {
         title: 'Complete commands',
-        description: 'Browse all 50 commands with arguments, behavior, source, and use cases.',
+        description: 'Browse all 52 commands with arguments, behavior, source, and use cases.',
         href: '/commands',
         linkLabel: 'Open reference',
         iconPath: 'M4 6h16M4 12h16M4 18h10',

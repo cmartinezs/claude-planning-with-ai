@@ -82,12 +82,37 @@ Example:
 | 2 | Local runtime environment starts | Example: start local DB plus app using the project command; ask the human if startup cannot be inferred |
 | 3 | Persistence smoke check passes | Example: create a reset token through the service/API and verify the row exists without destructive cleanup |
 
+### Logging / Observability
+
+> *Required for software tasks that implement or change code. Use `.planning/LOGGING.md`. If the project has no logging mechanism yet, the agent must suggest the best mechanism for the detected stack and wait for the human decision before continuing.*
+
+- **Logging mechanism:** [Existing project logger or proposed stack-specific mechanism]
+- **Correlation / trace context:** [How request id / trace id / span id is created, propagated, and logged]
+- **Levels by event criticality:** TRACE for detailed flow, DEBUG for diagnostics, INFO for milestones, WARN for recoverable anomalies, ERROR for failed operations, FATAL for unsafe process/system failure
+- **Execution trace points:** [Entry point, decision points, external calls, persistence calls, async/event boundaries, retries/fallbacks, completion]
+- **Sensitive data guardrails:** Do not log secrets, tokens, credentials, passwords, personal data, or raw payloads unless explicitly approved and redacted.
+- **Verification evidence:** [Test/review/log sample proving the task emits useful logs or preserves existing logging]
+
+### Generated Test Suite
+
+> *Generated or refreshed by `/plan-test-suite <planning-id> <story-id> <task-id>`. Prefer the generated commands over AI-authored guesses, and fill any gaps manually before execution.*
+
+- **Task suite file:** `test-suites/task-NN-name-test-suite.md`
+- **Required gates:** unit, coverage, integration, acceptance/e2e, static analysis, code style, architecture/design guide review, smoke, security/dependency scan, and mutation/test-strength when applicable.
+- **Architecture guides:** DDD, Hexagonal, DRY, SOLID, GoF pattern use, and project-specific guides under `docs/` or `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/`.
+- **Acceptance environment:** Prefer Docker Compose, Testcontainers, local emulators, sandbox profiles, or disposable fixtures over shared services. For Maven services with Cucumber/Gherkin, prefer `./mvnw -PacceptanceTests verify`, booting the artifact in isolation and mocking external dependencies with local fakes, WireMock, MockServer, Testcontainers, or equivalent fixtures.
+- **Acceptance dependency inventory:** List every internal module, database, migration, seed dataset, external HTTP API, queue/broker, file/object storage, cache, auth provider, SaaS dependency, environment variable, secret, port, readiness check, and teardown action needed for acceptance tests. Each one must have a fake, mock, Testcontainer, Docker Compose service, local fixture, or explicit out-of-scope justification.
+- **Missing acceptance profile:** If Cucumber/Gherkin exists but Maven profile `acceptanceTests` is missing, implement that profile and the artifact-level acceptance harness before using acceptance evidence for this task.
+
 ---
 
 ## Done Criteria
 
 - [ ] Reset-token persistence deliverable exists and can be exercised by tests
 - [ ] All verification checks listed above pass
+- [ ] Code changes include intelligent logging per `.planning/LOGGING.md`, with correlation/trace context and levels chosen by criticality
+- [ ] Task test suite was generated/refreshed and every applicable gate has command output or documented evidence
+- [ ] Acceptance dependency inventory is complete; every dependency needed by acceptance tests has a concrete isolated strategy
 - [ ] For software projects, smoke test plan passes: supporting services, app startup, connectivity or schema checks, and changed-surface smoke checks
 - [ ] If database structure or ORM artifacts changed, static DB/ORM consistency validation passes and local runtime persistence smoke evidence is captured
 - [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review

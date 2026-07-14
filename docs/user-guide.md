@@ -33,13 +33,33 @@ Each initialized project has `.planning/config.yml`. It controls:
 | `execution.requires_tests` | Distinguishes test-backed verification from manual acceptance evidence |
 | `integrations.external_issues` | Records whether external issue IDs come from GitHub, Jira, Linear, or are disabled |
 | `software.smoke_tests_file` | Points to the project smoke test plan file under `.planning/` |
+| `software.test_suite_generator` | Points to the deterministic script that generates planning/story/task test-suite matrices under `.planning/` |
+| `software.logging_file` | Points to the project logging policy under `.planning/` |
 
 For software projects, `.planning/config.yml` can point to a stack-specific smoke test plan file. The default file is `.planning/SMOKE-TESTS.md`, and the plan should describe the supporting services, build/start command, connectivity or schema checks, and the smallest smoke checks that prove the changed surface still works.
 
 ```yaml
 software:
   smoke_tests_file: SMOKE-TESTS.md   # Optional override for the smoke-test plan file under .planning/
+  test_suite_generator: scripts/generate-test-suite.sh
+  logging_file: LOGGING.md
 ```
+
+Software projects must define a logging mechanism in `.planning/LOGGING.md`. Every code task should add or preserve intelligent logging that helps trace execution across calls: correlation or trace ids, key execution milestones, external dependency calls, persistence boundaries, async/event handlers, retries, fallbacks, and errors. Log levels must be selected by criticality: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, and `FATAL` when supported. If no logging mechanism exists, `/plan-task` suggests the best option for the detected stack and waits for the human decision before implementing code logging.
+
+`/plan-test-suite` generates deterministic quality-gate matrices before execution. It writes a plan-level `TEST-SUITE.md`, story-level `TEST-SUITE.md`, or task-level `test-suites/<task>-test-suite.md` by detecting repository tooling first: package scripts, Maven/Gradle tasks, Python/Go/Rust commands, Docker Compose, SonarQube, linters, typecheckers, coverage tools, and architecture-test conventions. The generated gates cover unit tests, coverage, integration, acceptance/e2e, static analysis, code style, architecture/design guide review (DDD, Hexagonal, DRY, SOLID, GoF, and project-specific guides), smoke, security/dependency scans, and mutation/test-strength checks when applicable.
+
+For Maven services that use Cucumber/Gherkin, the preferred acceptance gate is an `acceptanceTests` Maven profile:
+
+```bash
+./mvnw -PacceptanceTests verify
+```
+
+That profile should boot the artifact in isolation and mock external dependencies with local fakes, WireMock, MockServer, Testcontainers, or equivalent fixtures. If `.feature` files or Cucumber/Gherkin dependencies exist without the profile, `/plan-test-suite` records the missing profile as a test-suite gap.
+
+When that gap appears, the generated suite includes a `Maven Acceptance Test Configuration` scaffold with Failsafe includes, packaged-artifact path, `SPRING_PROFILES_ACTIVE=acceptance`, and the environment variables that redirect databases and external services to local fakes or containers. Treat that scaffold as implementation work: add or update a task to create the profile before claiming acceptance evidence.
+
+Acceptance evidence also requires a complete dependency inventory. The generated suite must account for internal modules, sibling artifacts, databases, migrations, seed data, external HTTP APIs, queues, brokers, storage, caches, identity providers, SaaS providers, environment variables, secrets, ports, readiness checks, startup order, teardown, and cleanup. Each dependency must be mapped to real disposable infrastructure, Testcontainers, Docker Compose, WireMock/MockServer, a local fake, an in-memory fixture, or an explicit out-of-scope justification. Unresolved dependencies block acceptance evidence.
 
 When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, and run the smoke checks. For git-enabled tasks, `/plan-task` then commits, pushes, and opens or reuses the task PR before asking for human developer code review, so external reviewers can comment on the PR. Requested corrections are implemented, verified, committed, and pushed to the same PR before review is requested again.
 
@@ -277,6 +297,7 @@ The audit compares expected docs from stories and tasks against actual files, lo
 | `/plan-atomize` | `NNN-slug [story-NN]` | Decompose stories into atomic task files |
 | `/plan-task` | `NNN-slug story-NN task-NN` | Execute a single atomic task |
 | `/plan-task-validate` | `NNN-slug [story-NN] [task-NN]` | Audit atomic tasks |
+| `/plan-test-suite` | `NNN-slug [story-NN] [task-NN] [--all]` | Generate deterministic test-suite matrices |
 | `/plan-story` | `NNN-slug story-NN` | Execute all tasks in a story |
 | `/plan-done` | `NNN-slug story-NN [task-N]` | Mark a task or story done |
 | `/plan-status` | `[NNN-slug]` | Show planning state and story progress |
@@ -305,6 +326,7 @@ See [Command Reference](reference.md) for the complete list, including `/plan-ru
 | You want a detailed audit of a planning | `/plan-validate` |
 | You want to inspect current planning state before choosing | `/plan-status` |
 | A decision affects multiple stories, areas, or future plannings | `/plan-decision` |
+| You need a reproducible test strategy for a plan, story, or task | `/plan-test-suite` |
 | You changed generated documentation and need coverage/freshness checks | `/plan-audit-docs` |
 | You maintain this plugin and need a structural audit | `/plan-doctor` |
 
@@ -386,5 +408,5 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
 - **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
-- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.6.0` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.7.0` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

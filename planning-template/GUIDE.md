@@ -55,7 +55,7 @@ flowchart LR
 |-------|---------|-------------|
 | **INITIAL** | `00-initial.md` | General idea without dimensioning. What needs to be achieved, why, approximate context. Clarity of intent — not exhaustiveness. |
 | **EXPANSION** | `01-expansion.md` | All user stories are identified and listed. Dependencies between them are mapped. Impact per SDLC phase is documented. |
-| **DEEPENING** | `02-deepening/` | One `.md` file per story. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a story into atomic task files under `story-NN-name/`, each with technical design, implementation steps, verification, and software local-runtime checks when applicable. |
+| **DEEPENING** | `02-deepening/` | One `.md` file per story. Each one details its specific tasks with assigned workflow types. Optionally, `/plan-atomize` decomposes a story into atomic task files under `story-NN-name/`, each with technical design, implementation steps, verification, generated test-suite gates, and software local-runtime checks when applicable. |
 
 ---
 
@@ -67,6 +67,7 @@ planning/
 ├── TRACEABILITY-GLOBAL.md           # Global consolidated term matrix
 ├── GUIDE.md                         # This file
 ├── GLOSSARY.md                      # Operational vocabulary
+├── LOGGING.md                       # Software logging policy and task checklist
 ├── PROMPTING.md                     # AI prompting guidelines
 ├── _template/                       # Template for new plannings
 ├── update-version/                  # Versioned migrations for older planning-system structures
@@ -81,9 +82,13 @@ planning/
 │       ├── 00-initial.md
 │       ├── 01-expansion.md
 │       ├── RETROSPECTIVE-RAW.md
+│       ├── TEST-SUITE.md                # Planning-level quality gates from /plan-test-suite
 │       ├── 02-deepening/
 │       │   ├── story-01-[name].md
 │       │   ├── story-01-[name]/         # Atomic tasks (optional, via /plan-atomize)
+│       │   │   ├── TEST-SUITE.md
+│       │   │   ├── test-suites/
+│       │   │   │   └── task-01-[name]-test-suite.md
 │       │   │   ├── task-01-[name].md
 │       │   │   └── task-NN-[name].md
 │       │   └── story-NN-[name].md

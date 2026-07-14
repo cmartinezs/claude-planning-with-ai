@@ -44,6 +44,8 @@ require_file "docs/commands.yml"
 require_file "planning-template/README.md"
 require_file "planning-template/config.yml"
 require_file "planning-template/PDR-TEMPLATE.md"
+require_file "planning-template/LOGGING.md"
+require_file "planning-template/scripts/generate-test-suite.sh"
 require_dir "skills"
 require_dir "planning-template/WORKFLOWS"
 
@@ -91,7 +93,10 @@ for template_check in \
   "Risk Register|planning-template/_template/01-expansion.md" \
   "External Issue|planning-template/_template/01-expansion.md" \
   "## Risk|planning-template/_template/02-deepening/story-NN-name.md" \
-  "**Risk:**|planning-template/_template/02-deepening/task-NN-name.md"; do
+  "**Risk:**|planning-template/_template/02-deepening/task-NN-name.md" \
+  "### Logging / Observability|planning-template/_template/02-deepening/task-NN-name.md" \
+  "### Generated Test Suite|planning-template/_template/02-deepening/task-NN-name.md" \
+  "## Test Suite|planning-template/_template/02-deepening/story-NN-name.md"; do
   needle="${template_check%%|*}"
   path="${template_check#*|}"
   if ! grep -Fq "$needle" "$ROOT/$path"; then

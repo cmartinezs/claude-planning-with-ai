@@ -34,11 +34,26 @@
 
 ---
 
+## Test Suite
+
+> Generated or refreshed with `/plan-test-suite <planning-id> story-NN`. The story-level file is `story-NN-name/TEST-SUITE.md`; each task-level file lives under `story-NN-name/test-suites/`.
+
+- [ ] Story-level test suite covers unit, coverage, integration, acceptance/e2e, static analysis, style, architecture/design guide review, smoke, security, and mutation/test-strength gates as applicable.
+- [ ] Task-level test suites exist for every task before execution.
+- [ ] Acceptance and integration gates use isolated environments when possible: Docker Compose, Testcontainers, local emulators, sandbox profiles, or disposable fixtures.
+- [ ] Acceptance dependency inventory covers every internal module, external service, database, queue, storage dependency, environment variable, port, seed dataset, readiness check, and teardown action needed to run acceptance tests.
+- [ ] For Maven services with Cucumber/Gherkin, acceptance gates use profile `acceptanceTests` to boot the artifact in isolation and mock external dependencies.
+
+---
+
 ## Done Criteria
 
 - [ ] Reset request returns the same public response for known and unknown emails
 - [ ] Used or expired tokens cannot update a password
 - [ ] Automated tests cover success, expiry, reuse, and unknown-email behavior
+- [ ] Code tasks include logging that supports execution tracing and correlation across calls, following `.planning/LOGGING.md`
+- [ ] Story and task test suites are generated/refreshed, and applicable gates have evidence
+- [ ] Acceptance dependency inventory has no unresolved dependency gaps
 - [ ] TRACEABILITY.md updated with new terms from this story
 
 ---

@@ -183,6 +183,17 @@ const commandsPage = {
           ],
           source: 'skills/plan-task-validate/SKILL.md',
         },
+        {
+          name: '/plan-test-suite',
+          usage: '/plan-test-suite <NNN-slug> [story-NN] [task-NN] [--all]',
+          description: 'Generates deterministic test-suite matrices.',
+          details: [
+            'Writes planning, story, or task-level TEST-SUITE artifacts.',
+            'Detects repository tooling before using AI-generated guidance.',
+            'Covers unit, coverage, integration, acceptance, static analysis, style, architecture, smoke, security, and mutation gates.',
+          ],
+          source: 'skills/plan-test-suite/SKILL.md',
+        },
       ],
     },
     {
@@ -328,6 +339,17 @@ const commandsPage = {
             'Use it for manual corrections, blockers, unusual decisions, or surprises outside plugin commands.',
           ],
           source: 'skills/plan-edge-case/SKILL.md',
+        },
+        {
+          name: '/plan-decision',
+          usage: '/plan-decision <NNN-slug> -- <decision title> | <NNN-slug> pdr-NNN-title',
+          description: 'Creates or updates a Project Decision Record.',
+          details: [
+            'Writes PDRs only for accepted or proposed decisions that affect multiple stories, areas, terminology, or future workflows.',
+            'Uses PDR-TEMPLATE.md and preserves existing PDR filenames when updating.',
+            'Keeps routine task-level choices in task design notes instead of creating placeholder records.',
+          ],
+          source: 'skills/plan-decision/SKILL.md',
         },
         {
           name: '/plan-rollback',

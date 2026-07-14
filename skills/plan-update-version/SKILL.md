@@ -21,9 +21,9 @@ Examples:
 
 ```bash
 /plan-update-version 1.4.0 2.0.0
-/plan-update-version 2.1.0 3.6.0
+/plan-update-version 2.1.0 3.7.0
 /plan-update-version 2.1.0 4.0.0
-/plan-update-version 2.4.0 3.6.0 --dry-run
+/plan-update-version 2.4.0 3.7.0 --dry-run
 ```
 
 ## Steps
@@ -44,7 +44,7 @@ Examples:
    - `2 -> 4` uses `2-3.md`, then `3-4.md`
    - `1 -> 4` uses `1-2.md`, then `2-3.md`, then `3-4.md`
 9. For migrations that remove legacy planning terminology, read `CHANGELOG.md` and use the release entry that actually introduced the rename. In this repository, the `Scope → User Story rename` is recorded at `2.0.0`, with the previous compatible release at `1.4.0`; those exact labels resolve to `1-2.md`.
-10. For any `2.x` workspace that needs the current `3.6.0` baseline, the chain contains only `2-3.md`.
+10. For any `2.x` workspace that needs the current `3.7.0` baseline, the chain contains only `2-3.md`.
 
 ### 2 — Locate the planning workspace
 

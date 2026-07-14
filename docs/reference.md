@@ -55,6 +55,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-atomize <NNN-slug> [story-NN]` | Decomposes one story or all pending stories into atomic task files |
 | `/plan-task <NNN-slug> <story-NN> <task-NN>` | Executes one atomic task end to end, opens a task PR, and requires local task branch cleanup after merge |
 | `/plan-task-validate <NNN-slug> [story-NN] [task-NN]` | Audits atomic tasks against the atomicity checklist |
+| `/plan-test-suite <NNN-slug> [story-NN] [task-NN] [--all]` | Generates planning/story/task test-suite matrices from detected repo tooling |
 | `/plan-story <NNN-slug> <story-NN>` | Executes all tasks in a story, cleans merged local task branches, and opens the final story PR |
 
 ### Mid-Execution Adjustments

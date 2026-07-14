@@ -34,6 +34,8 @@ Reference workflows:
    - `execution.requires_git` (default `true`)
    - `docs.output_dir` (default `docs`)
    - `software.smoke_tests_file` (default `SMOKE-TESTS.md`; resolved under `.planning/`)
+   - `software.test_suite_generator` (default `scripts/generate-test-suite.sh`; resolved under `.planning/`)
+   - `software.logging_file` (default `LOGGING.md`; resolved under `.planning/`)
 3c. **Git branch setup** — if `execution.requires_git` is `true`, isolate this task in its own branch. `/plan-task` must work even when `/plan-story` was not run first.
    a. Derive the story branch from the story filename or task folder name: `story-NN-<slug>`.
       - If this is a child planning running in a dedicated sibling worktree, derive `<worktree-prefix>` from the worktree directory name and prefix the branch: `<worktree-prefix>/story-NN-<slug>`.
@@ -88,13 +90,40 @@ Reference workflows:
    b. Every task in `Depends On` must have status `DONE` in its own file. If dependencies are pending, execute `[RECORD-EDGE-CASE]`, list the pending ones, and stop.
    c. Execute `[CHECK-ATOMICITY]` on the task file. If `REJECTED`, execute `[RECORD-EDGE-CASE]`, stop, and suggest `/plan-task-validate <planning-id> <story-id>` — the task definition must be fixed before executing.
    d. Execute `[CHECK-PHASE-CONTEXT]` for the story's area — verify required `docs/` contracts exist and have been read. If missing, execute `[RECORD-EDGE-CASE]` before stopping.
+   e. Ensure the task-level test suite exists:
+      ```bash
+      bash .planning/${software.test_suite_generator} --planning <planning-id> --story <story-id> --task <task-id>
+      ```
+      If the generator is unavailable, invoke `/plan-test-suite <planning-id> <story-id> <task-id>`. Read the generated `test-suites/<task-id>-<slug>-test-suite.md` before implementation. If the suite still cannot be generated, execute `[RECORD-EDGE-CASE]` and stop for software projects with `execution.requires_tests: true`.
+   f. For `project.type: software`, determine whether this task implements or changes code by inspecting `Technical Design → Affected files / components`, implementation steps, and file extensions (`.java`, `.kt`, `.ts`, `.tsx`, `.js`, `.py`, `.go`, `.cs`, `.rs`, `.php`, `.rb`, `.scala`, `.sql`, infrastructure-as-code, workers, CLIs, APIs, services, adapters, repositories, handlers, controllers). If it is a code task:
+      - Read `.planning/${software.logging_file}`.
+      - If the logging file is missing, placeholder-only, or `Status: not confirmed`, inspect stack signals and suggest the best logging mechanism:
+        - Java/Spring/Maven/Gradle: SLF4J with Logback or Log4j2, MDC for correlation ids, structured JSON when logs are machine-consumed.
+        - Node/TypeScript: Pino or Winston with AsyncLocalStorage correlation context.
+        - Python: stdlib `logging` plus `contextvars`, or `structlog` for structured logs.
+        - Go: `log/slog` or Zap with context propagation.
+        - .NET: Microsoft.Extensions.Logging with Serilog when structured logs are needed.
+        - Rust: `tracing` spans and structured fields.
+      - Ask the human to approve, adjust, or explicitly decline the suggested mechanism. Do not implement logging or mark the task `DONE` until the decision is recorded in `.planning/${software.logging_file}` or in the task as an explicit exception.
+      - If a mechanism is defined, use it for this task. Do not introduce a competing logging framework.
 5. Set the task status to `IN PROGRESS` in the task file and in the story's `## Tasks` index. If the story status is `TODO`, set it to `IN PROGRESS` too.
 6. **Execute the task**, governed by its `Workflow`:
    a. Follow the `Technical Design` as written. If reality contradicts the design, update the design section first, stating why — then proceed.
    b. Apply the `Implementation Steps` in order, announcing each one.
    c. Run the checks listed in the `Verification` table. If `execution.requires_tests` is `true`, write and run the listed unit tests for code tasks. If it is `false`, collect the stated manual, documentary, approval, or reproducibility evidence appropriate to `project.type`.
-   d. Run the project's relevant validation command when applicable. If `execution.requires_tests` is `false` and no automated validation exists, do not invent a test runner; include the evidence summary in the report instead.
-   e. For `project.type: software`, execute the smoke test plan before asking for human review:
+   d. For software code tasks, implement or preserve intelligent logging following `.planning/${software.logging_file}`:
+      - log boundary entry/exit and key workflow milestones at INFO where useful
+      - log diagnostic state at DEBUG and detailed flow at TRACE without leaking sensitive data
+      - log recoverable anomalies, retries, fallbacks, and degraded paths at WARN
+      - log failed operations at ERROR with exception type and safe context
+      - use FATAL only for process/system failures that prevent safe continuation, or map to ERROR with a fatal marker when the framework lacks FATAL
+      - propagate and log correlation/trace context across incoming requests, outgoing calls, async/events, persistence boundaries, workers, and CLIs
+      - include dependency name, operation, status/outcome, latency, attempt number, and safe business identifiers where useful
+      - never log secrets, tokens, credentials, passwords, raw personal data, or full payloads unless explicitly approved and redacted
+      - add verification evidence: targeted tests when feasible, log assertion tests when the stack supports them, or a reviewable sample/logging path in the task report
+   e. Run the applicable gates from the generated task test suite. Prefer concrete commands from the suite. Cover unit tests, coverage, integration, acceptance/e2e, static analysis, code style/formatting, architecture/design guide review, runtime smoke, security/dependency scan, and mutation/test-strength checks when they apply. If a gate is not applicable, record why. If a gate has no detected command but is required by risk or changed surface, add or identify the missing command before continuing.
+   f. Run the project's relevant validation command when applicable. If `execution.requires_tests` is `false` and no automated validation exists, do not invent a test runner; include the evidence summary in the report instead.
+   g. For `project.type: software`, execute the smoke test plan before asking for human review:
       1. Read `.planning/${software.smoke_tests_file}` if present. If missing, infer the smoke plan from the repository stack signals (`package.json`, `pom.xml`, `build.gradle*`, `docker-compose.yml`, `compose.yml`, migrations, health endpoints, CLI entrypoints) and write the inferred plan into the report before running it.
       2. Start the supporting services or fixtures required by the smoke plan using the safest non-destructive commands for the detected stack.
       3. Compile or build the application using the project build tool or the task's verification command.
@@ -105,7 +134,7 @@ Reference workflows:
          - schema or migration failure when applicable
          - minimal health/API/CLI checks that prove the changed surface starts correctly
       6. If any smoke check fails, execute `[RECORD-EDGE-CASE]` with the failure logs and correction summary, keep the task `IN PROGRESS`, report the concrete failure logs, implement the correction, and repeat this step before asking for human code review.
-   f. **Database / ORM consistency validation.** If the task changes database structure or ORM artifacts, or if the task is the explicit DB/ORM validation task:
+   h. **Database / ORM consistency validation.** If the task changes database structure or ORM artifacts, or if the task is the explicit DB/ORM validation task:
       1. Identify database artifacts changed by this task or its dependencies: migrations, schema files, seed/bootstrap data, DDL, Prisma/TypeORM/Sequelize/SQLAlchemy/JPA/Hibernate/Django/Rails models, generated clients, repositories, or persistence config.
       2. If an ORM or generated database client exists, run static consistency validation between database artifacts and ORM artifacts. Use the stack's concrete command when available (for example schema diff, migration validate, ORM generate/check, typecheck, compile, model metadata validation). If no command exists, perform a static file-level review and report the exact mappings checked: fields, types, nullability, defaults, enums, indexes, relationships, table/column names, and generated client state.
       3. Start the local environment needed to validate the persistence path. Infer the command from `.planning/${software.smoke_tests_file}`, compose files, package scripts, Maven/Gradle tasks, framework CLIs, `.env.example`, and local docs. If the local environment cannot be inferred, stop and ask the human for the startup command and required services; record the answer in the task report before continuing.
@@ -123,6 +152,8 @@ Reference workflows:
    - the full `## Done Criteria` section exactly as it appears in the task file
    - the files changed/created
    - unit/automated verification results
+   - logging/observability evidence for code tasks: mechanism used, correlation/trace behavior, levels added, sensitive-data guardrails, and tests or reviewable samples
+   - generated test-suite gate evidence: coverage, integration, acceptance/e2e, static analysis, style, architecture/design guide review, smoke, security/dependency scan, and mutation/test-strength when applicable
    - for software projects, smoke-test evidence: supporting services, app/build command, connectivity or schema result, and smoke checks
    - for database/ORM changes, static database-to-ORM consistency evidence and local runtime persistence smoke evidence
 
