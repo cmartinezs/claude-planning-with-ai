@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.1] — 2026-07-15
+
+### Fixed
+
+- Fixed dashed Markdown table column access in deterministic planning scripts so `depends-on`, `external-issue`, and `external-id` columns are read with bracket notation instead of being parsed as subtraction expressions.
+
 ## [3.10.0] — 2026-07-15
 
 ### Added
@@ -330,7 +336,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.1...HEAD
+[3.10.1]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.7.0...v3.8.0

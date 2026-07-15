@@ -129,6 +129,12 @@ if [[ -f "$ROOT/planning-template/_template/pdr-NNN-title.md" ]]; then
   fail "planning-template/_template/pdr-NNN-title.md should not exist; PDRs are optional and use planning-template/PDR-TEMPLATE.md"
 fi
 
+if grep -REq 'row\.[A-Za-z0-9_]+-[A-Za-z0-9_-]+' "$ROOT/planning-template/scripts"; then
+  fail "planning-template/scripts contains dashed table column access with dot notation; use row['column-name']"
+else
+  pass "planning-template/scripts uses bracket notation for dashed table columns"
+fi
+
 if command -v node >/dev/null 2>&1; then
   if node --check "$ROOT/planning-template/scripts/doc-generate.mjs" >/dev/null; then
     pass "planning-template/scripts/doc-generate.mjs syntax is valid"

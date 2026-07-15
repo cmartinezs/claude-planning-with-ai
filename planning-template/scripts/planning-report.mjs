@@ -255,9 +255,9 @@ function storyRows(planning) {
         title: storyText.replace(/\[|\]|\([^)]*\)/g, '').trim() || id,
         area: row.area || '',
         risk: row.risk || '',
-        externalIssue: row.external-issue || row.external-id || row.issue || '',
+        externalIssue: row['external-issue'] || row['external-id'] || row.issue || '',
         status: row.status || '',
-        dependsOn: row.depends-on || row.dependencies || row.depends || '',
+        dependsOn: row['depends-on'] || row.dependencies || row.depends || '',
         notes: row.notes || '',
       };
     })

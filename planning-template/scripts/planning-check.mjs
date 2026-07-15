@@ -311,7 +311,7 @@ function rowsByStoryId(expansionText) {
     row,
     id: storyIdFromValue(row.story || row.id || row.name || row.cells.join(' ')),
     status: row.status || '',
-    dependsOn: row.depends-on || row.dependencies || row.depends || '',
+    dependsOn: row['depends-on'] || row.dependencies || row.depends || '',
   })).filter((item) => item.id);
 }
 
@@ -322,7 +322,7 @@ function rowsByTaskId(storyText) {
     id: taskIdFromValue(row.task || row.id || row.name || row.cells.join(' ')),
     status: row.status || '',
     workflow: row.workflow || '',
-    dependsOn: row.depends-on || row.dependencies || row.depends || '',
+    dependsOn: row['depends-on'] || row.dependencies || row.depends || '',
   })).filter((item) => item.id);
 }
 
