@@ -21,6 +21,7 @@
 > *Decisions made before implementation. If this section cannot be filled, the task is not ready to execute.*
 
 - **Approach:** [Why this solution and not the obvious alternative — argue the design decision in the context of this story. If the obvious approach is correct, say so explicitly. If alternatives were discarded, name them briefly.]
+- **Review-only:** [Yes/No — use Yes when this task only reviews, audits, validates, or summarizes existing work and should not change product code.]
 - **Affected files / components:** [Exact list of files that will be created or modified]
 - **Interfaces / contracts:** [What this task exposes to the rest of the story: types, routes, tokens, schemas. "None" if fully internal.]
 - **Risk:** [Main risk in this task and how the implementation reduces it. Use "Low — routine change" if appropriate.]
@@ -106,6 +107,17 @@ Example:
 
 ---
 
+## Summary Evidence
+
+> *Required for review-only tasks. Summarize what was reviewed, what evidence was inspected, and what conclusion or follow-up was produced. If the review needs a longer artifact, create one and link it here. Use Markdown (`.md`) for prose. For code evidence, use fenced snippets with the language name, for example ` ```ts ` or ` ```java `.*
+
+- **Reviewed scope:** [Files, docs, PRs, plans, commands, or datasets reviewed]
+- **Evidence artifact:** [Inline summary or link to a longer `.md` document, review file, report, ADR, or snippet file]
+- **Conclusion:** [Accepted / blocked / risks found / follow-up tasks]
+- **Code snippets:** [Use fenced language snippets when code is the evidence; write `N/A` for non-code reviews]
+
+---
+
 ## Done Criteria
 
 - [ ] Reset-token persistence deliverable exists and can be exercised by tests
@@ -117,6 +129,7 @@ Example:
 - [ ] If database structure or ORM artifacts changed, static DB/ORM consistency validation passes and local runtime persistence smoke evidence is captured
 - [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review
 - [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed
+- [ ] If this is a review-only task, `## Summary Evidence` captures the review scope, inspected evidence, conclusion, and links to any longer Markdown or snippet artifacts
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
 - [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`
 

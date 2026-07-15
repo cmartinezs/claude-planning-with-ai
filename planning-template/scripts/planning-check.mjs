@@ -400,6 +400,29 @@ function isDbOrmTask(text) {
   return DB_ORM_PATTERN.test(stripNegativeDbOrmLines(text));
 }
 
+function isReviewOnlyTask(text) {
+  return /\*\*Review-only:\*\*\s*(yes|true|si|sí)\b/i.test(text)
+    || /\b(review-only|read-only review|solo de revisi[oó]n|solo revisi[oó]n)\b/i.test(text);
+}
+
+function hasEmptySummaryEvidence(text) {
+  const summary = section(text, 'Summary Evidence').trim();
+  if (!summary) return true;
+  return /\[(Files, docs|Inline summary|Accepted \/ blocked|Use fenced language snippets)/i.test(summary)
+    || /\bFill during execution\b/i.test(summary);
+}
+
+function hasUnlabeledCodeFence(text) {
+  let inFence = false;
+  for (const line of text.split(/\r?\n/)) {
+    const match = /^```\s*([A-Za-z0-9_+.-]*)\s*$/.exec(line);
+    if (!match) continue;
+    if (!inFence && !match[1]) return true;
+    inFence = !inFence;
+  }
+  return false;
+}
+
 function validateRequiredPlanningFiles(planning, results) {
   const initial = path.join(planning.dir, '00-initial.md');
   const expansion = path.join(planning.dir, '01-expansion.md');
@@ -607,6 +630,13 @@ function validateTaskFile(planning, storyFile, taskFile, taskRow, catalog, confi
   }
   if (section(text, 'Verification').trim().length === 0 && !hasHeading(text, 'Unit Tests')) {
     add(results, 'FAIL', `${taskId} has an empty Verification section`, taskFile, lineOf(text, '## Verification'));
+  }
+  if (isReviewOnlyTask(text)) {
+    if (!hasHeading(text, 'Summary Evidence') || hasEmptySummaryEvidence(text)) {
+      add(results, 'FAIL', `${taskId} review-only task missing concrete Summary Evidence`, taskFile, lineOf(text, /Review-only|Summary Evidence/i), 'Add ## Summary Evidence with reviewed scope, evidence artifact, conclusion, and links/snippets as needed.');
+    } else if (hasUnlabeledCodeFence(section(text, 'Summary Evidence'))) {
+      add(results, 'WARN', `${taskId} Summary Evidence has a code fence without a language label`, taskFile, lineOf(text, '## Summary Evidence'), 'Use fenced snippets with a language name, for example ```ts or ```java.');
+    }
   }
   if (/\b(and|plus|also)\b/i.test(section(text, 'Objective'))) {
     add(results, 'WARN', `${taskId} objective may name more than one deliverable`, taskFile, lineOf(text, '## Objective'), 'Consider splitting if the deliverables are independently verifiable.');

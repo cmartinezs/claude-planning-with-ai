@@ -301,6 +301,8 @@ function normalizeTask(task) {
       risk: stringOr(tech.risk, 'Medium - validate scope and evidence during execution.'),
       designNotes: stringOr(tech.designNotes, 'No extra constraints documented.'),
     },
+    reviewOnly: booleanFlag(task.reviewOnly || task.review_only || task.review),
+    summaryEvidence: stringOr(task.summaryEvidence || task.summary_evidence, ''),
     implementationSteps: arrayOr(task.implementationSteps || task.steps, [`Implement ${title}.`, 'Add or update verification evidence.']),
     verification: verificationRows(task.verification),
     smokeChecks: verificationRows(task.smokeChecks),
@@ -320,6 +322,10 @@ function arrayOr(value, fallback) {
   if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
   if (typeof value === 'string') return value.split(/\n|\|/).map((item) => item.trim()).filter(Boolean);
   return fallback;
+}
+
+function booleanFlag(value) {
+  return /^(true|yes|y|si|sí|review-only)$/i.test(String(value || '').trim());
 }
 
 function normalizeDepends(value) {
@@ -376,6 +382,7 @@ ${task.objective}
 ## Technical Design
 
 - **Approach:** ${task.technicalDesign.approach}
+- **Review-only:** ${task.reviewOnly ? 'Yes' : 'No'}
 - **Affected files / components:** ${affected}
 - **Interfaces / contracts:** ${task.technicalDesign.interfaces}
 - **Risk:** ${task.technicalDesign.risk}
@@ -426,9 +433,18 @@ ${rows(dbRows)}
 
 ---
 
+## Summary Evidence
+
+${task.summaryEvidence || (task.reviewOnly
+    ? '- **Reviewed scope:** Fill during execution.\n- **Evidence artifact:** Add inline Markdown summary or link to a longer \`.md\` artifact.\n- **Conclusion:** Fill during execution.\n- **Code snippets:** Use fenced snippets with language names when code is evidence; otherwise write \`N/A\`.'
+    : 'N/A - required only for review-only tasks.')}
+
+---
+
 ## Done Criteria
 
 ${task.doneCriteria.map((item) => `- [ ] ${item}`).join('\n')}
+- [ ] If this is a review-only task, \`## Summary Evidence\` captures the review scope, inspected evidence, conclusion, and links to any longer Markdown or snippet artifacts
 - [ ] Task test suite was generated/refreshed and every applicable gate has command output or documented evidence
 ${config.requiresGit === 'true' ? '- [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review\n- [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed' : '- [ ] Human review completed when required by the planning workflow'}
 

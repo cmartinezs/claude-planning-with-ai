@@ -67,6 +67,8 @@ Before writing, create a temporary JSON file with the approved tasks:
         "risk": "Medium - risk and mitigation.",
         "designNotes": "Constraints and gotchas."
       },
+      "reviewOnly": false,
+      "summaryEvidence": "Required when reviewOnly is true; Markdown prose, links to longer .md artifacts, or language-labeled code snippets.",
       "implementationSteps": ["Edit src/...", "Add tests..."],
       "verification": [{"check": "Tests pass", "how": "Run npm test"}],
       "smokeChecks": [{"check": "App starts", "how": "Run the smoke plan"}],
@@ -99,7 +101,8 @@ Before writing, create a temporary JSON file with the approved tasks:
    - ensure every task targets exactly one verifiable deliverable;
    - if a candidate modifies database structure, migrations, schema files, seed/bootstrap data, ORM models/entities, ORM mappings, generated clients, repositories tied to ORM models, or persistence-layer configuration, add a separate validation task named like `validate-db-orm-consistency`;
    - make the DB/ORM validation task depend on every schema/ORM-changing task;
-   - include static consistency validation and local runtime persistence smoke validation in that validation task.
+   - include static consistency validation and local runtime persistence smoke validation in that validation task;
+   - if a candidate is review-only, set `reviewOnly: true` and include `summaryEvidence` guidance; review-only tasks must produce `## Summary Evidence`, with longer prose in `.md` artifacts when needed and language-labeled fenced snippets when code is the reviewed evidence.
 5. Execute `[CHECK-ATOMICITY]` for each candidate:
    - `REJECTED — too large`: split it;
    - `REJECTED — fragment`: merge it with the task it cannot be verified without;

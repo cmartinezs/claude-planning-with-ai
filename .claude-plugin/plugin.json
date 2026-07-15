@@ -1,7 +1,7 @@
 {
   "name": "claude-planning-with-ai",
   "description": "Markdown-first planning and execution system for Claude Code. Supports project initialization, backlog enrichment, story-based planning, atomic task execution, documentation, release planning, recovery utilities, and autonomous phase agents. Optimized for software repositories, adaptable to general project work.",
-  "version": "3.10.5",
+  "version": "3.10.6",
   "author": {
     "name": "cmartinezs",
     "email": "carlos.f.martinez.s@gmail.com",

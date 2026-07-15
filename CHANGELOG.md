@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.6] — 2026-07-15
+
+### Added
+
+- Review-only tasks now require durable `## Summary Evidence`, with guidance for longer Markdown artifacts and language-labeled code snippets when the review evidence is code.
+
 ## [3.10.5] — 2026-07-15
 
 ### Fixed
@@ -361,7 +367,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.5...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.6...HEAD
+[3.10.6]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.2...v3.10.3

@@ -20,6 +20,8 @@ The smallest executable unit of work, produced by `/plan-atomize`. One task file
 
 For software, verification means unit tests or the project test runner plus the configured local runtime smoke check. For non-software work, use concrete evidence such as a reviewed document, approved checklist, published asset, signed decision, or reproducible manual validation.
 
+Review-only tasks must leave durable `## Summary Evidence` in the task file. When the review is substantial, link a longer Markdown artifact from that section; when code is the reviewed evidence, include fenced snippets with the language label.
+
 ### Project Configuration
 
 Each initialized project has `.planning/config.yml`. It controls:
@@ -408,5 +410,5 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
 - **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
-- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.5` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.6` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

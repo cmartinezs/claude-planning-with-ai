@@ -46,7 +46,7 @@ node .planning/scripts/planning-task.mjs closeout <planning-id> <story-id> <task
    ```bash
    node .planning/scripts/planning-task.mjs start <planning-id> <story-id> <task-id> --write
    ```
-6. Implement the task from the task file's Objective, Technical Design, Implementation Steps, Verification, and Done Criteria. For code tasks, use the configured logging mechanism and preserve correlation/trace behavior. For DB/ORM tasks, include static schema-to-model consistency and local runtime persistence smoke evidence.
+6. Implement the task from the task file's Objective, Technical Design, Implementation Steps, Verification, and Done Criteria. For code tasks, use the configured logging mechanism and preserve correlation/trace behavior. For DB/ORM tasks, include static schema-to-model consistency and local runtime persistence smoke evidence. For review-only tasks (`Review-only: Yes`, `review-only`, or equivalent wording), do not treat chat as the durable output: fill `## Summary Evidence` in the task file with reviewed scope, inspected evidence, conclusion, and follow-up. If the review needs more detail, create or update a longer artifact and link it from `## Summary Evidence`; use `.md` for prose, and fenced snippets with language labels such as ` ```ts `, ` ```java `, or ` ```sql ` when code is the evidence.
 7. Run the generated task test suite gates, smoke plan, and any task-specific verification. Record concrete command output or explain non-applicable gates.
 8. Run contract/traceability checks that require judgment: agnostic boundary, glossary/traceability updates, and any PDR-worthy accepted cross-cutting decision.
 9. Publish implementation for review:
@@ -64,6 +64,6 @@ node .planning/scripts/planning-task.mjs closeout <planning-id> <story-id> <task
     node .planning/scripts/planning-task.mjs closeout <planning-id> <story-id> <task-id> --write
     ```
 12. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If git is enabled, publish the closeout metadata with the same `publish` stage or a focused manual commit using only the task/story/doc files.
-13. Report implementation summary, verification evidence, task branch, PR target, closeout status, docs written, and next task. Remind the user to merge the task PR into the story branch and delete the local task branch with `git branch -d` after merge.
+13. Report implementation summary, verification evidence, Summary Evidence artifacts for review-only tasks, task branch, PR target, closeout status, docs written, and next task. Remind the user to merge the task PR into the story branch and delete the local task branch with `git branch -d` after merge.
 
 The script owns deterministic parsing, branch derivation, git/gh command generation or execution, staging allowlists, commit message derivation, task/story status updates, and closeout checkbox updates. This skill owns implementation, design corrections, test/smoke judgment, human review, and semantic workflow decisions.

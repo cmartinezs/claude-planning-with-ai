@@ -115,6 +115,7 @@ for template_check in \
   "External Issue|planning-template/_template/01-expansion.md" \
   "## Risk|planning-template/_template/02-deepening/story-NN-name.md" \
   "**Risk:**|planning-template/_template/02-deepening/task-NN-name.md" \
+  "## Summary Evidence|planning-template/_template/02-deepening/task-NN-name.md" \
   "### Logging / Observability|planning-template/_template/02-deepening/task-NN-name.md" \
   "### Generated Test Suite|planning-template/_template/02-deepening/task-NN-name.md" \
   "## Test Suite|planning-template/_template/02-deepening/story-NN-name.md"; do
@@ -222,9 +223,11 @@ if command -v node >/dev/null 2>&1; then
   printf '# Demo\n\n## Intent\nDemo\n' > "$tmpdir/.planning/active/001-demo/00-initial.md"
   printf '# Traceability\n' > "$tmpdir/.planning/active/001-demo/TRACEABILITY.md"
   printf '# Demo\n\n## Story Summary\n\n| # | Story | SDLC Phase(s) | Depends On | Risk | External Issue | Status |\n|---|---|---|---|---|---|---|\n| 01 | assessment-creation-ui | WB | - | M | - | TODO |\n\n## External Issue Mapping\n\n| Story | External Issue |\n|-------|----------------|\n| story-02 | - |\n' > "$tmpdir/.planning/active/001-demo/01-expansion.md"
-  printf '# Story 01\n\n> **Status:** TODO\n\n## Objective\nDemo\n\n## Tasks\n\n| # | Task | Status | Workflow | Depends On |\n|---|---|---|---|---|\n| 01 | [Build UI](story-01-assessment-creation-ui/task-01-build-ui.md) | TODO |  | - |\n\n## Done Criteria\n\n- [ ] Demo\n\n## Area\n\nWB\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui.md"
+  printf '# Story 01\n\n> **Status:** TODO\n\n## Objective\nDemo\n\n## Tasks\n\n| # | Task | Status | Workflow | Depends On |\n|---|---|---|---|---|\n| 01 | [Build UI](story-01-assessment-creation-ui/task-01-build-ui.md) | TODO |  | - |\n| 02 | [Review UI evidence](story-01-assessment-creation-ui/task-02-review-ui-evidence.md) | TODO |  | - |\n\n## Done Criteria\n\n- [ ] Demo\n\n## Area\n\nWB\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui.md"
   mkdir -p "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui"
   printf '# Task 01 - Build UI\n\n> **Status:** TODO\n\n## Objective\nBuild UI.\n\n## Technical Design\nN/A - no database involved.\n\n### Software Smoke Test Check\nRun the frontend build smoke.\n\n### Logging / Observability\nUse existing correlation trace handling where events are emitted.\n\n### Generated Test Suite\nGenerated test-suite gate is reviewed.\n\n## Implementation Steps\n- Build UI.\n\n## Verification\n- Run build smoke.\n\n## Done Criteria\n- [ ] Build smoke passes and human review is complete.\n- [ ] Correlation trace logging remains unchanged.\n- [ ] Generated test-suite quality gate reviewed.\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui/task-01-build-ui.md"
+  review_task="$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui/task-02-review-ui-evidence.md"
+  printf '# Task 02 - Review UI evidence\n\n> **Status:** TODO\n\n## Objective\nReview UI evidence.\n\n## Technical Design\n- **Approach:** Read-only review of existing UI evidence.\n- **Review-only:** Yes\n- **Affected files / components:** None - review only.\n- **Interfaces / contracts:** None.\n- **Risk:** Low - false conclusion if evidence is incomplete.\n- **Design notes:** Keep output in Summary Evidence.\n\n## Implementation Steps\n1. Inspect the existing UI evidence.\n2. Write Summary Evidence.\n\n## Verification\n| # | Verification | How to validate |\n|---|-------------|----------------|\n| 1 | Evidence summary exists | Read Summary Evidence |\n\n### Software Smoke Test Check\nReview-only smoke gate is manual.\n\n### Logging / Observability\nCorrelation trace logging is unchanged; review confirms no code changed.\n\n### Generated Test Suite\nGenerated test-suite quality gate reviewed; no executable code added.\n\n## Summary Evidence\n- **Reviewed scope:** Story UI evidence and task notes.\n- **Evidence artifact:** Inline Markdown summary in this task.\n- **Conclusion:** Accepted for smoke fixture.\n- **Code snippets:**\n\n```ts\nconst reviewed = true;\n```\n\n## Done Criteria\n- [ ] Build smoke passes or is documented as review-only N/A, and human review is complete.\n- [ ] Correlation trace logging remains unchanged.\n- [ ] Generated test-suite quality gate reviewed.\n' > "$review_task"
   validation_output="$(cd "$tmpdir" && node .planning/scripts/planning-check.mjs validate 001-demo --format markdown 2>&1)"
   if grep -Fq "story file has no row in Story Summary" <<< "$validation_output"; then
     fail "planning-check.mjs does not derive Story Summary IDs from the numeric # column"
@@ -251,6 +254,16 @@ if command -v node >/dev/null 2>&1; then
   else
     pass "planning-check.mjs ignores explicit no-database task notes for DB/ORM gates"
   fi
+  cp "$review_task" "$review_task.bak"
+  perl -0pi -e 's/\n## Summary Evidence\n.*?\n## Done Criteria\n/\n## Done Criteria\n/s' "$review_task"
+  review_validation_output="$(cd "$tmpdir" && node .planning/scripts/planning-check.mjs validate 001-demo --format markdown 2>&1)"
+  if grep -Fq "review-only task missing concrete Summary Evidence" <<< "$review_validation_output"; then
+    pass "planning-check.mjs requires Summary Evidence for review-only tasks"
+  else
+    fail "planning-check.mjs allowed a review-only task without Summary Evidence"
+    printf '%s\n' "$review_validation_output"
+  fi
+  mv "$review_task.bak" "$review_task"
   task_output="$(cd "$tmpdir" && node .planning/scripts/planning-task.mjs inspect 001-demo story-01 task-01 2>&1)"
   if grep -Fq 'task=`story-01-assessment-creation-ui--task-01-build-ui`' <<< "$task_output" \
     && ! grep -Fq 'task=`story-01-assessment-creation-ui/task-01-build-ui`' <<< "$task_output"; then
