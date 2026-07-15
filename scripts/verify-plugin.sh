@@ -210,6 +210,23 @@ if command -v node >/dev/null 2>&1; then
   else
     fail "planning-template/scripts/update-version.mjs has invalid syntax"
   fi
+
+  tmpdir="$(mktemp -d)"
+  mkdir -p "$tmpdir/.planning/scripts" "$tmpdir/.planning/active/001-demo/02-deepening" "$tmpdir/.planning/WORKFLOWS"
+  cp "$ROOT/planning-template/scripts/planning-check.mjs" "$tmpdir/.planning/scripts/planning-check.mjs"
+  printf '# Workflows\n' > "$tmpdir/.planning/WORKFLOWS/README.md"
+  printf 'project:\n  type: software\nexecution:\n  requires_git: false\n' > "$tmpdir/.planning/config.yml"
+  printf '# Demo\n\n## Intent\nDemo\n' > "$tmpdir/.planning/active/001-demo/00-initial.md"
+  printf '# Traceability\n' > "$tmpdir/.planning/active/001-demo/TRACEABILITY.md"
+  printf '# Demo\n\n## Story Summary\n\n| # | Story | Status | Depends On |\n|---|---|---|---|\n| 01 | assessment-creation-ui | TODO | - |\n' > "$tmpdir/.planning/active/001-demo/01-expansion.md"
+  printf '# Story 01\n\n> **Status:** TODO\n\n## Objective\nDemo\n\n## Tasks\n\n| # | Task | Status | Workflow | Depends On |\n|---|---|---|---|---|\n| 01 | Build UI | TODO | - | - |\n\n## Done Criteria\n\n- [ ] Demo\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui.md"
+  validation_output="$(cd "$tmpdir" && node .planning/scripts/planning-check.mjs validate 001-demo --format markdown 2>&1)"
+  if grep -Fq "story file has no row in Story Summary" <<< "$validation_output"; then
+    fail "planning-check.mjs does not derive Story Summary IDs from the numeric # column"
+  else
+    pass "planning-check.mjs derives Story Summary IDs from the numeric # column"
+  fi
+  rm -rf "$tmpdir"
 else
   warn "node not installed; skipped deterministic script syntax checks"
 fi

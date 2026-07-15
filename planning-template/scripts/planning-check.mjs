@@ -206,6 +206,19 @@ function storyIdFromValue(value) {
   return match ? match[0].toLowerCase() : null;
 }
 
+function storyIdFromOrdinal(value) {
+  const match = /^(?:story-)?(\d+)$/i.exec(String(value || '').trim());
+  if (!match) return null;
+  const number = match[1].length === 1 ? match[1].padStart(2, '0') : match[1];
+  return `story-${number}`;
+}
+
+function storyIdFromSummaryRow(row) {
+  return storyIdFromOrdinal(row[''])
+    || storyIdFromOrdinal(row.cells[0])
+    || storyIdFromValue(row.id || row.name || row.story || row.cells.join(' '));
+}
+
 function taskIdFromValue(value) {
   const match = /task-\d+/i.exec(value || '');
   return match ? match[0].toLowerCase() : null;
@@ -309,7 +322,7 @@ function rowsByStoryId(expansionText) {
   const rows = parseTableAfterHeading(expansionText, 'Story Summary');
   return rows.map((row) => ({
     row,
-    id: storyIdFromValue(row.story || row.id || row.name || row.cells.join(' ')),
+    id: storyIdFromSummaryRow(row),
     status: row.status || '',
     dependsOn: row['depends-on'] || row.dependencies || row.depends || '',
   })).filter((item) => item.id);

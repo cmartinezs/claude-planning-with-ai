@@ -181,6 +181,19 @@ function storyIdFromValue(value) {
   return match ? match[0].toLowerCase() : null;
 }
 
+function storyIdFromOrdinal(value) {
+  const match = /^(?:story-)?(\d+)$/i.exec(String(value || '').trim());
+  if (!match) return null;
+  const number = match[1].length === 1 ? match[1].padStart(2, '0') : match[1];
+  return `story-${number}`;
+}
+
+function storyIdFromSummaryRow(row) {
+  return storyIdFromOrdinal(row[''])
+    || storyIdFromOrdinal(row.cells[0])
+    || storyIdFromValue(row.id || row.name || row.story || row.cells.join(' '));
+}
+
 function taskIdFromValue(value) {
   const match = /task-\d+/i.exec(value || '');
   return match ? match[0].toLowerCase() : null;
@@ -249,7 +262,7 @@ function storyRows(planning) {
   return parseTableAfterHeading(read(file), 'Story Summary')
     .map((row) => {
       const storyText = row.story || row.id || row.name || row.cells.join(' ');
-      const id = storyIdFromValue(storyText);
+      const id = storyIdFromSummaryRow(row);
       return {
         id,
         title: storyText.replace(/\[|\]|\([^)]*\)/g, '').trim() || id,
