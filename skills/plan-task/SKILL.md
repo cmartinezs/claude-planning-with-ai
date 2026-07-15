@@ -1,261 +1,69 @@
 ---
 name: plan-task
-description: Execute a single atomic task from an atomized story — technical design, implementation, verification, and done criteria. Marks the task DONE in both the task file and the story index.
-argument-hint: <NNN-slug> <story-NN> <task-NN>  (e.g. 001-user-auth-api story-01 task-02)
+description: Execute one atomic planning task by using the shared planning-task stage script for deterministic inspection, git setup, status updates, publish/PR automation, correction commits, and closeout while keeping implementation, verification judgment, and human review in the skill.
+argument-hint: <NNN-slug> <story-NN> <task-NN>
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
-Execute one atomic task end to end: verify it is ready, follow its technical design, apply the implementation steps, run the required verification, and verify the done criteria.
-
-Reference workflows:
-- `.planning/WORKFLOWS/02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md`
-- `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-ATOMICITY.md`
-- `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-PHASE-CONTEXT.md`
-- `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md`
-- `.planning/WORKFLOWS/04-SUB-WORKFLOWS/CHECK-TRACEABILITY.md`
-- `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/RECORD-EDGE-CASE.md`
+Execute exactly one atomic task end to end. Use the shared script for repeatable stages and keep contextual implementation, verification judgment, and human review in this skill.
 
 ## Arguments
 
-`$ARGUMENTS` — format: `NNN-slug story-NN task-NN` (e.g. `001-user-auth-api story-01 task-02`)
+`$ARGUMENTS` — format: `NNN-slug story-NN task-NN`.
+
+## Stage Contract
+
+The first script argument is always the stage:
+
+```bash
+node .planning/scripts/planning-task.mjs inspect <planning-id> <story-id> <task-id>
+node .planning/scripts/planning-task.mjs readiness <planning-id> <story-id> <task-id>
+node .planning/scripts/planning-task.mjs git-setup <planning-id> <story-id> <task-id> [--execute]
+node .planning/scripts/planning-task.mjs start <planning-id> <story-id> <task-id> [--write]
+node .planning/scripts/planning-task.mjs publish <planning-id> <story-id> <task-id> [--file <path>] [--execute]
+node .planning/scripts/planning-task.mjs correction <planning-id> <story-id> <task-id> [--file <path>] [--execute]
+node .planning/scripts/planning-task.mjs closeout <planning-id> <story-id> <task-id> [--write]
+```
+
+`git-setup`, `publish`, and `correction` only run git/gh commands with `--execute`. `start` and `closeout` only mutate planning markdown with `--write`.
 
 ## Steps
 
-1. Parse `$ARGUMENTS` to extract planning id, story id, and task id.
-2. Locate `.planning/active/<planning-id>/02-deepening/<story-id>-*/<task-id>-*.md`.
-   - If the file exists: read it completely and continue.
-   - If the story subfolder does not exist: create it, then generate `<task-id>-slug.md` from `_template/02-deepening/task-NN-name.md` filling all sections using the story file, `00-initial.md`, and `01-expansion.md` as context. Update the story's `## Tasks` table to link the task name to its new file. Execute `[RECORD-EDGE-CASE]` noting that task structure had to be recovered during execution. Then continue with the newly created file.
-   - If the subfolder exists but this specific task file is missing: generate it the same way, update the story table link, execute `[RECORD-EDGE-CASE]` noting the missing task file, then continue.
-3. Read the task file completely: objective, technical design, implementation steps, verification (or legacy Unit Tests), done criteria, workflow, dependencies.
-3b. Read `.planning/config.yml` if it exists. Extract:
-   - `git.base_branch` (default `main`)
-   - `project.type` (default `software`)
-   - `execution.requires_tests` (default `true`)
-   - `execution.requires_git` (default `true`)
-   - `docs.output_dir` (default `docs`)
-   - `software.smoke_tests_file` (default `SMOKE-TESTS.md`; resolved under `.planning/`)
-   - `software.test_suite_generator` (default `scripts/generate-test-suite.sh`; resolved under `.planning/`)
-   - `software.logging_file` (default `LOGGING.md`; resolved under `.planning/`)
-3c. **Git branch setup** — if `execution.requires_git` is `true`, isolate this task in its own branch. `/plan-task` must work even when `/plan-story` was not run first.
-   a. Derive the story branch from the story filename or task folder name: `story-NN-<slug>`.
-      - If this is a child planning running in a dedicated sibling worktree, derive `<worktree-prefix>` from the worktree directory name and prefix the branch: `<worktree-prefix>/story-NN-<slug>`.
-      - Preserve an existing worktree prefix if the story branch already has one. The prefix must appear before the rest of the branch name.
-   b. Derive the task branch from the story branch and task filename: `<story-branch>/<task-NN-<slug>>`. For prefixed child worktrees this becomes `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
-   c. Validate the worktree is clean before branching:
-      ```bash
-      git status --porcelain
-      ```
-      If there are uncommitted changes, stop and ask the user to commit, stash, or discard them before starting the task. Do not create a task branch from a dirty worktree.
-   d. Ensure the story integration branch exists and is up to date. This branch receives task PRs incrementally and later opens the final story PR to `git.base_branch`.
-      ```bash
-      git fetch origin
-      ```
-      - If `<story-branch>` exists locally:
-        ```bash
-        git checkout <story-branch>
-        git pull --ff-only origin <story-branch>
-        ```
-      - If it exists only on `origin`:
-        ```bash
-        git checkout -b <story-branch> origin/<story-branch>
-        git pull --ff-only origin <story-branch>
-        ```
-      - If it does not exist locally or on `origin`, create and push it from `git.base_branch`:
-        ```bash
-        git checkout <base_branch>
-        git pull origin <base_branch>
-        git checkout -b <story-branch>
-        git push -u origin <story-branch>
-        ```
-      If any step fails, stop and report the error before touching task files.
-   e. Create or resume the task branch from the current story branch:
-      - If `<task-branch>` exists locally, ask whether to resume it. If yes:
-        ```bash
-        git checkout <task-branch>
-        git pull --ff-only origin <task-branch>
-        ```
-      - If it exists only on `origin`, ask whether to resume it. If yes:
-        ```bash
-        git checkout -b <task-branch> origin/<task-branch>
-        git pull --ff-only origin <task-branch>
-        ```
-      - If it does not exist locally or on `origin`, create and push it from the current story branch:
-        ```bash
-        git checkout -b <task-branch>
-        git push -u origin <task-branch>
-        ```
-      Do not recreate an existing task branch.
-4. **Readiness checks** (stop and report if any fails):
-   a. Task status must not be `DONE`.
-   b. Every task in `Depends On` must have status `DONE` in its own file. If dependencies are pending, execute `[RECORD-EDGE-CASE]`, list the pending ones, and stop.
-   c. Execute `[CHECK-ATOMICITY]` on the task file. If `REJECTED`, execute `[RECORD-EDGE-CASE]`, stop, and suggest `/plan-task-validate <planning-id> <story-id>` — the task definition must be fixed before executing.
-   d. Execute `[CHECK-PHASE-CONTEXT]` for the story's area — verify required `docs/` contracts exist and have been read. If missing, execute `[RECORD-EDGE-CASE]` before stopping.
-   e. Ensure the task-level test suite exists:
-      ```bash
-      bash .planning/${software.test_suite_generator} --planning <planning-id> --story <story-id> --task <task-id>
-      ```
-      If the generator is unavailable, invoke `/plan-test-suite <planning-id> <story-id> <task-id>`. Read the generated `test-suites/<task-id>-<slug>-test-suite.md` before implementation. If the suite still cannot be generated, execute `[RECORD-EDGE-CASE]` and stop for software projects with `execution.requires_tests: true`.
-   f. For `project.type: software`, determine whether this task implements or changes code by inspecting `Technical Design → Affected files / components`, implementation steps, and file extensions (`.java`, `.kt`, `.ts`, `.tsx`, `.js`, `.py`, `.go`, `.cs`, `.rs`, `.php`, `.rb`, `.scala`, `.sql`, infrastructure-as-code, workers, CLIs, APIs, services, adapters, repositories, handlers, controllers). If it is a code task:
-      - Read `.planning/${software.logging_file}`.
-      - If the logging file is missing, placeholder-only, or `Status: not confirmed`, inspect stack signals and suggest the best logging mechanism:
-        - Java/Spring/Maven/Gradle: SLF4J with Logback or Log4j2, MDC for correlation ids, structured JSON when logs are machine-consumed.
-        - Node/TypeScript: Pino or Winston with AsyncLocalStorage correlation context.
-        - Python: stdlib `logging` plus `contextvars`, or `structlog` for structured logs.
-        - Go: `log/slog` or Zap with context propagation.
-        - .NET: Microsoft.Extensions.Logging with Serilog when structured logs are needed.
-        - Rust: `tracing` spans and structured fields.
-      - Ask the human to approve, adjust, or explicitly decline the suggested mechanism. Do not implement logging or mark the task `DONE` until the decision is recorded in `.planning/${software.logging_file}` or in the task as an explicit exception.
-      - If a mechanism is defined, use it for this task. Do not introduce a competing logging framework.
-5. Set the task status to `IN PROGRESS` in the task file and in the story's `## Tasks` index. If the story status is `TODO`, set it to `IN PROGRESS` too.
-6. **Execute the task**, governed by its `Workflow`:
-   a. Follow the `Technical Design` as written. If reality contradicts the design, update the design section first, stating why — then proceed.
-   b. Apply the `Implementation Steps` in order, announcing each one.
-   c. Run the checks listed in the `Verification` table. If `execution.requires_tests` is `true`, write and run the listed unit tests for code tasks. If it is `false`, collect the stated manual, documentary, approval, or reproducibility evidence appropriate to `project.type`.
-   d. For software code tasks, implement or preserve intelligent logging following `.planning/${software.logging_file}`:
-      - log boundary entry/exit and key workflow milestones at INFO where useful
-      - log diagnostic state at DEBUG and detailed flow at TRACE without leaking sensitive data
-      - log recoverable anomalies, retries, fallbacks, and degraded paths at WARN
-      - log failed operations at ERROR with exception type and safe context
-      - use FATAL only for process/system failures that prevent safe continuation, or map to ERROR with a fatal marker when the framework lacks FATAL
-      - propagate and log correlation/trace context across incoming requests, outgoing calls, async/events, persistence boundaries, workers, and CLIs
-      - include dependency name, operation, status/outcome, latency, attempt number, and safe business identifiers where useful
-      - never log secrets, tokens, credentials, passwords, raw personal data, or full payloads unless explicitly approved and redacted
-      - add verification evidence: targeted tests when feasible, log assertion tests when the stack supports them, or a reviewable sample/logging path in the task report
-   e. Run the applicable gates from the generated task test suite. Prefer concrete commands from the suite. Cover unit tests, coverage, integration, acceptance/e2e, static analysis, code style/formatting, architecture/design guide review, runtime smoke, security/dependency scan, and mutation/test-strength checks when they apply. If a gate is not applicable, record why. If a gate has no detected command but is required by risk or changed surface, add or identify the missing command before continuing.
-   f. Run the project's relevant validation command when applicable. If `execution.requires_tests` is `false` and no automated validation exists, do not invent a test runner; include the evidence summary in the report instead.
-   g. For `project.type: software`, execute the smoke test plan before asking for human review:
-      1. Read `.planning/${software.smoke_tests_file}` if present. If missing, infer the smoke plan from the repository stack signals (`package.json`, `pom.xml`, `build.gradle*`, `docker-compose.yml`, `compose.yml`, migrations, health endpoints, CLI entrypoints) and write the inferred plan into the report before running it.
-      2. Start the supporting services or fixtures required by the smoke plan using the safest non-destructive commands for the detected stack.
-      3. Compile or build the application using the project build tool or the task's verification command.
-      4. Start the application or worker using the project-local configuration described by the smoke plan.
-      5. Run the smoke checks focused on real integration failures:
-         - compilation/build failure
-         - dependency or connectivity failure
-         - schema or migration failure when applicable
-         - minimal health/API/CLI checks that prove the changed surface starts correctly
-      6. If any smoke check fails, execute `[RECORD-EDGE-CASE]` with the failure logs and correction summary, keep the task `IN PROGRESS`, report the concrete failure logs, implement the correction, and repeat this step before asking for human code review.
-   h. **Database / ORM consistency validation.** If the task changes database structure or ORM artifacts, or if the task is the explicit DB/ORM validation task:
-      1. Identify database artifacts changed by this task or its dependencies: migrations, schema files, seed/bootstrap data, DDL, Prisma/TypeORM/Sequelize/SQLAlchemy/JPA/Hibernate/Django/Rails models, generated clients, repositories, or persistence config.
-      2. If an ORM or generated database client exists, run static consistency validation between database artifacts and ORM artifacts. Use the stack's concrete command when available (for example schema diff, migration validate, ORM generate/check, typecheck, compile, model metadata validation). If no command exists, perform a static file-level review and report the exact mappings checked: fields, types, nullability, defaults, enums, indexes, relationships, table/column names, and generated client state.
-      3. Start the local environment needed to validate the persistence path. Infer the command from `.planning/${software.smoke_tests_file}`, compose files, package scripts, Maven/Gradle tasks, framework CLIs, `.env.example`, and local docs. If the local environment cannot be inferred, stop and ask the human for the startup command and required services; record the answer in the task report before continuing.
-      4. Run a runtime smoke check that exercises schema/bootstrap/migration startup and at least one minimal persistence path relevant to the changed surface. Keep it non-destructive or use local/test data only.
-      5. Include both static consistency results and runtime smoke evidence in the human review checkpoint.
-7. Execute `[CHECK-AGNOSTIC-BOUNDARY]` — verify the output is consistent with `docs/` contracts.
-8. Execute `[CHECK-TRACEABILITY]` — register any new domain terms introduced.
-9. Verify every `Done Criteria` item that can be satisfied before PR review. If any non-review criterion is unmet, execute `[RECORD-EDGE-CASE]` with the unmet criteria, leave the task `IN PROGRESS`, list what is missing, and stop. If a criterion requires human developer review, keep it unchecked until step 10b.
-
-9b. **Publish implementation for PR review when git is enabled** — before asking the human to review implementation code, publish the task branch and PR so the review can happen on the PR.
-
-   If `execution.requires_git` is `false`, skip this step and use the direct human review checkpoint in step 10.
-
-   a. Present the pre-review implementation summary:
-   - the full `## Done Criteria` section exactly as it appears in the task file
-   - the files changed/created
-   - unit/automated verification results
-   - logging/observability evidence for code tasks: mechanism used, correlation/trace behavior, levels added, sensitive-data guardrails, and tests or reviewable samples
-   - generated test-suite gate evidence: coverage, integration, acceptance/e2e, static analysis, style, architecture/design guide review, smoke, security/dependency scan, and mutation/test-strength when applicable
-   - for software projects, smoke-test evidence: supporting services, app/build command, connectivity or schema result, and smoke checks
-   - for database/ORM changes, static database-to-ORM consistency evidence and local runtime persistence smoke evidence
-
-   b. Derive the **commit type** from the task's `Objective` and `Workflow` field (first match wins):
-
-   | Signal | Type |
-   |--------|------|
-   | Workflow is `GENERATE-DOCUMENT`, or objective contains "document", "write docs", "update docs" | `docs` |
-   | Objective contains "fix", "correct", "resolve", "repair" | `fix` |
-   | Objective contains "refactor", "restructure", "reorganize", "clean" | `refactor` |
-   | Objective contains "test", "spec", "coverage" | `test` |
-   | Objective contains "setup", "configure", "scaffold", "init", "install" | `chore` |
-   | (default) | `feat` |
-
-   c. Derive the **commit scope** from the story filename: strip the `story-NN-` prefix from `story-NN-<slug>` → commit scope is `<slug>`.
-
-   d. Derive the **description** from the task filename: strip the `task-NN-` prefix from `task-NN-<slug>` and replace hyphens with spaces → e.g. `task-02-create-user-model` → `create user model`.
-
-   e. Stage only the files listed in the task's `Technical Design → Affected files / components` field, plus:
-      - the task file itself
-      - any additional files created during implementation
-
-      If the affected-files field is missing or clearly incomplete, execute `[RECORD-EDGE-CASE]`, stop, and ask the user to confirm the exact files to stage. Do **not** use `git add -A` or `git add .`.
-
-      Do not mark the task `DONE` before this commit. The task stays `IN PROGRESS` while the PR is under external review.
-
-   f. Commit:
+1. Parse `$ARGUMENTS`.
+2. Verify `.planning/scripts/planning-task.mjs` exists. If missing, stop and ask the user to update the planning template with `/plan-update-version` or `/plan-init --force`.
+3. Run inspection and readiness:
    ```bash
-   git commit -m "type(scope): description"
+   node .planning/scripts/planning-task.mjs inspect <planning-id> <story-id> <task-id>
+   node .planning/scripts/planning-task.mjs readiness <planning-id> <story-id> <task-id>
    ```
-
-   Example: `feat(user-authentication): create user model`
-
-   If there is nothing to commit but a task PR for `<task-branch>` already exists, continue to step 10 using that PR. If there is nothing to commit and no task PR exists, skip push/PR creation and report that no repository changes were produced for the task.
-
-   g. Push the task branch only if a commit was created:
+   Stop on blockers. Resolve warnings that are required by project policy, especially missing test suite, logging policy, affected-files allowlist, or dependency status.
+4. If `execution.requires_git` is true, run git setup as a plan first:
    ```bash
-   git push -u origin <task-branch>
+   node .planning/scripts/planning-task.mjs git-setup <planning-id> <story-id> <task-id>
    ```
-
-   h. Open or reuse a pull request from `<task-branch>` to `<story-branch>` only if a commit was created:
+   Confirm the commands and touched branch names, then rerun with `--execute`. If git is disabled, skip this stage.
+5. Mark execution started:
    ```bash
-   gh pr create \
-     --title "<task-NN>: <task-name>" \
-     --body "Task <task-id> of story <story-id> in planning <planning-id>." \
-     --base <story-branch> \
-     --head <task-branch>
+   node .planning/scripts/planning-task.mjs start <planning-id> <story-id> <task-id> --write
    ```
-   If a task PR for `<task-branch>` already exists, reuse it instead of creating a duplicate. If `gh` is not available, execute `[RECORD-EDGE-CASE]` noting that task PR creation had to be completed manually, then print the pushed branch and instruct the user to open a PR from `<task-branch>` to `<story-branch>`.
-
-10. **Human developer PR review checkpoint** — after the task PR exists, ask for review on that PR:
-
-   > "The task implementation has been committed, pushed, and published as a PR for review. Please run the external code review on the PR. Reply with **approved** when the PR review passes, or list the requested corrections / point me to the `.code-review/<story-dir>/<task-file>.md` feedback."
-
-   If `execution.requires_git` is `false`, present the evidence listed in step 9b.a and ask for a direct human review instead:
-
-   > "Please perform a human developer code review before this task is marked DONE. Reply with **approved** to mark this task DONE, or list the requested corrections."
-
-   Do not proceed to step 10b until the user approves.
-
-   If the reviewer requests corrections or points to `.code-review` feedback:
-   - read the requested corrections and any referenced `.code-review/<story-dir>/<task-file>.md` artifact
-   - execute `[RECORD-EDGE-CASE]` with the requested corrections
-   - implement the requested changes
-   - rerun the task verification
-   - for software projects, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed
-   - if git is enabled, stage only the corrected implementation files and any task-file evidence updates, commit a focused correction commit on the same `<task-branch>`, push it, and reuse the same PR
-   - treat `.code-review` files as review input; stage them only if the repository policy explicitly wants review artifacts committed
-   - present the updated PR/review summary again
-   - wait for a new human review
-
-   Repeat this loop until the reviewer replies with **approved**. Do not mark the task `DONE` until approval, but do keep pushing correction commits to the same task PR while review is open.
-
-10b. Mark the task `DONE`: check all done criteria boxes, set the status in the task file, and update the row in the story's `## Tasks` index.
-
-10c. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If the story area is DO or W this is a silent no-op. Include any files written in the final report.
-
-10d. **Push final task closeout metadata when git is enabled**:
-
-   If `execution.requires_git` is `false`, skip this step and report that git commit was disabled by `.planning/config.yml`.
-
-   a. Stage only:
-      - the task file with final `DONE` status and checked done criteria
-      - the story file index/status updates
-      - doc files written by `/doc-task`
-
-   b. Commit if there are staged changes:
+6. Implement the task from the task file's Objective, Technical Design, Implementation Steps, Verification, and Done Criteria. For code tasks, use the configured logging mechanism and preserve correlation/trace behavior. For DB/ORM tasks, include static schema-to-model consistency and local runtime persistence smoke evidence.
+7. Run the generated task test suite gates, smoke plan, and any task-specific verification. Record concrete command output or explain non-applicable gates.
+8. Run contract/traceability checks that require judgment: agnostic boundary, glossary/traceability updates, and any PDR-worthy accepted cross-cutting decision.
+9. Publish implementation for review:
    ```bash
-   git commit -m "chore(<scope>): mark <task-id> done"
+   node .planning/scripts/planning-task.mjs publish <planning-id> <story-id> <task-id>
    ```
+   Review the staging allowlist. Add `--file <path>` for approved extra files only. After approval, rerun with `--execute`. Do not use `git add -A` or `git add .`.
+10. Ask for human developer PR review. If corrections are requested, implement them, rerun verification, and publish the correction on the same task branch:
+    ```bash
+    node .planning/scripts/planning-task.mjs correction <planning-id> <story-id> <task-id> --file <path> --execute
+    ```
+    Repeat until the human review is approved.
+11. After approval, mark task closeout:
+    ```bash
+    node .planning/scripts/planning-task.mjs closeout <planning-id> <story-id> <task-id> --write
+    ```
+12. Invoke `/doc-task <planning-id> <story-id> <task-id>`. If git is enabled, publish the closeout metadata with the same `publish` stage or a focused manual commit using only the task/story/doc files.
+13. Report implementation summary, verification evidence, task branch, PR target, closeout status, docs written, and next task. Remind the user to merge the task PR into the story branch and delete the local task branch with `git branch -d` after merge.
 
-   c. Push the task branch again:
-   ```bash
-   git push -u origin <task-branch>
-   ```
-
-11. Report: task completed, files created/changed, test results, implementation commit message used (from step 9b), closeout commit message used when applicable (from step 10d), task branch and task PR status when git is enabled, task PR target `<story-branch>`, doc files written (from step 10c), and the next pending task in the story. Remind the user that the task PR must be reviewed and merged into `<story-branch>` before the next task starts. After that PR is merged, the local task branch must be deleted from the developer workspace:
-   ```bash
-   git checkout <story-branch>
-   git pull --ff-only origin <story-branch>
-   git branch -d <task-branch>
-   ```
-   Use `git branch -d`, not a forced delete. If deletion fails, report that the branch is not recognized as merged locally and ask the user to confirm the PR merge state. Remote branch deletion is left to the repository/PR workflow. If all tasks are `DONE`, remind the user to merge all task PRs into the story branch, clean local task branches, then run `/plan-done <planning-id> <story-id>` to open the final story PR to `git.base_branch`.
-
-> Executes exactly ONE task. To run all tasks of a story in order, use `/plan-story <planning-id> <story-id>`.
+The script owns deterministic parsing, branch derivation, git/gh command generation or execution, staging allowlists, commit message derivation, task/story status updates, and closeout checkbox updates. This skill owns implementation, design corrections, test/smoke judgment, human review, and semantic workflow decisions.

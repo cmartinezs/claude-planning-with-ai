@@ -1,47 +1,28 @@
 ---
 name: plan-history
-description: Show the timeline of status transitions for all stories in a planning, extracted from git history.
+description: Show the timeline of story status transitions for a planning using the deterministic planning-report script and git history.
 argument-hint: <NNN-slug>
-allowed-tools: [Read, Bash, Glob]
+allowed-tools: [Bash, Read]
 ---
 
-Display a chronological log of story status changes for a planning, derived from git commits.
+Display a chronological status-transition history for one planning. Read-only.
 
 ## Arguments
 
-`$ARGUMENTS` — planning id (e.g. `001-jwt-auth-api`)
+`$ARGUMENTS` - planning id, format: `NNN-slug`.
 
 ## Steps
 
-1. Locate the planning in `.planning/` (INITIAL), `.planning/active/`, or `.planning/finished/`. Determine its root path.
+1. Use only `./.planning/` in the current working directory. Do not search parent directories.
+2. If `.planning/scripts/planning-report.mjs` is missing, stop and report:
+   - "This workspace needs the latest planning scripts. Run `/plan-update-version <from> <to>` or re-run `/plan-init --force` from the project root."
+3. Run:
 
-2. Run `git log --all --follow --format="%H %as %s" -- "<planning-root>/02-deepening/*.md"` to get all commits that touched story files. If no commits found, report "no git history found for this planning" and stop.
-
-3. For each commit that touched a story file:
-   a. Run `git show <hash> -- "<story-file>"` to get the diff.
-   b. Parse the diff for `Status:` line changes (e.g., `- Status: TODO` → `+ Status: IN PROGRESS`).
-   c. Record: date, story name, from-status, to-status, commit subject.
-
-4. Also look for the planning folder move (INITIAL → active): run `git log --all --diff-filter=R --summary --format="%as %s" | grep "<planning-id>"` to find the expansion commit date.
-
-5. Sort all events chronologically.
-
-6. Output the history table:
-
-```
-# Planning History — <planning-id>
-
-| Date | Event | Details |
-|------|-------|---------|
-| 2026-06-01 | Planning created | 001-jwt-auth-api in INITIAL |
-| 2026-06-02 | Expanded to ACTIVE | 4 stories created |
-| 2026-06-03 | story-01-docs | TODO → IN PROGRESS |
-| 2026-06-03 | story-01-docs | IN PROGRESS → DONE |
-| 2026-06-04 | story-02-api-domain | TODO → IN PROGRESS |
-| 2026-06-05 | story-02-api-domain | IN PROGRESS → DONE |
-...
+```bash
+node .planning/scripts/planning-report.mjs history $ARGUMENTS --output markdown
 ```
 
-If git history is sparse (e.g., bulk commits), note: "(history may be incomplete — status transitions inferred from available diffs)"
+4. Report the script output verbatim.
+5. If the output says history may be incomplete, mention that sparse git history limits transition reconstruction.
 
 > Read-only. Does not modify any files.

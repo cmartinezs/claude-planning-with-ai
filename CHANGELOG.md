@@ -2,7 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.10.0] — 2026-07-15
+
+### Added
+
+- `.planning/scripts/update-version.mjs` centralizes deterministic `/plan-update-version` preflight: version parsing, adjacent major-pair migration chain selection, migration-file lookup/copying, `.planning/` boundary checks, git dirty preflight, and Markdown/JSON reporting.
+- `.planning/scripts/planning-init.mjs` centralizes deterministic `/plan-init` setup: template copying, non-destructive `--force` refreshes, area detection, AREA file generation, traceability table updates, config generation, and Markdown/JSON reporting.
+- `.planning/scripts/planning-report.mjs` centralizes deterministic reporting and communication views for status, executive reports, exports, standups, and status-transition history.
+- `.planning/scripts/planning-atomize.mjs` centralizes deterministic `/plan-atomize` inspection and writing: atomization worklist discovery, approved breakdown JSON validation, task-file rendering, story task-table rewrites, and test-suite command reporting.
+- `.planning/scripts/planning-story.mjs` centralizes deterministic backlog and active-planning story utilities plus `/plan-story` execution helpers: container inspection, story ID/path allocation, draft rendering, approved section appends, split helpers, expansion table updates, edge-case recording, story execution inspection, start/DONE status updates, and finalize command reporting.
+- `.planning/scripts/planning-task.mjs` centralizes deterministic `/plan-task` stages for inspection, readiness, git setup, start status updates, publish/PR automation, correction commits, and closeout updates.
+- `.planning/scripts/planning-mutate.mjs` provides the shared deterministic lifecycle mutation entrypoint with subcommands for `archive`, `done`, `clone`, `merge`, `rollback`, `retry`, and `story-skip`, each with dry-run reporting where file mutations occur.
+
+### Changed
+
+- `/us-status`, `/plan-audit-docs`, and `/plan-doctor` now delegate repeatable structural audits to `.planning/scripts/planning-check.mjs <subcommand>` instead of carrying embedded parsers in skill context.
+- `/plan-update-version` now delegates repeatable migration setup to `.planning/scripts/update-version.mjs` while keeping semantic migration application in the Markdown migration files.
+- `/plan-init` now delegates repeatable initialization and area-table writing to `.planning/scripts/planning-init.mjs`.
+- `/plan-init --force` now preserves existing project-specific workspace files such as `config.yml`, guide/traceability files, smoke/logging policy, `_template/`, active/finished plannings, and SDLC area guidance instead of overwriting them with bundled template defaults.
+- `/plan-status`, `/plan-report`, `/plan-export`, `/plan-standup`, and `/plan-history` now delegate repeatable reporting, metrics, exports, and timeline rendering to `.planning/scripts/planning-report.mjs <subcommand>` while keeping human follow-up interpretation in the skills.
+- `/plan-atomize` now delegates repeatable worklist inspection, dependency validation, task-file writes, story task-table rewrites, and test-suite command reporting to `.planning/scripts/planning-atomize.mjs` while keeping task decomposition, atomicity judgment, DB/ORM validation-task decisions, traceability, and human approval in the skill.
+- `/us-new`, `/us-enrich`, `/us-split`, `/epic-enrich`, `/plan-enrich-story`, `/plan-enrich-epic`, and `/plan-split-story` now delegate mechanical story operations to `.planning/scripts/planning-story.mjs <subcommand>` while keeping product diagnosis and user approval in the skills.
+- `/plan-task` now delegates deterministic substeps to `.planning/scripts/planning-task.mjs <stage>`, where the first argument is the stage (`inspect`, `readiness`, `git-setup`, `start`, `publish`, `correction`, `closeout`) while the skill keeps implementation, verification judgment, and human review.
+- `/plan-done`, `/plan-clone`, `/plan-merge`, `/plan-rollback`, `/plan-retry`, `/plan-story-skip`, and `/plan-archive` now delegate repeatable lifecycle mutations to `.planning/scripts/planning-mutate.mjs <subcommand>` while keeping human approval, review, milestone feedback, PDR decisions, and command orchestration in the skills.
+- `/plan-story` now delegates repeatable story orchestration reads and status mutations to `.planning/scripts/planning-story.mjs execute-*` helpers while keeping context checks, PR merge judgment, `/plan-task` invocation, final human review, smoke evidence judgment, and git/PR execution in the skill.
 
 ## [3.9.0] — 2026-07-14
 
@@ -307,7 +330,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.9.0...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.0...HEAD
+[3.10.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.6.0...v3.7.0

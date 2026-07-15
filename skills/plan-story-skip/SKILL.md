@@ -16,17 +16,30 @@ Mark a story as SKIPPED when it is no longer applicable. SKIPPED stories do not 
 
 ## Steps
 
-1. Parse `$ARGUMENTS`: extract planning id, story id, and optional reason (text after ` -- `).
-2. Locate `.planning/active/<planning-id>/02-deepening/<story-id>-*.md`. If not found, stop and report.
-3. Read the story file and check its current status:
-   - If `DONE`: stop — "story is already DONE; use `/plan-rollback` first if you want to re-evaluate it".
-   - If `SKIPPED`: stop — "story is already SKIPPED".
-   - Otherwise: continue.
-4. Set the story status to `SKIPPED` in the story file. Append a `Skipped reason:` line below the status with the provided reason (or `"not provided"` if omitted) and today's date.
-5. Update the story's row in `.planning/active/<planning-id>/01-expansion.md` — set its status column to `SKIPPED`.
-6. Execute `[RECORD-EDGE-CASE]` with source `/plan-story-skip`, related story, skipped reason, and whether follow-up planning is needed.
-7. Update `.planning/active/README.md` to reflect the new status.
-8. Check if all stories in the planning are now either `DONE` or `SKIPPED`. If yes, suggest `/plan-retrospective <planning-id>` followed by `/plan-archive <planning-id>`.
-9. Report: story marked SKIPPED, reason recorded, remaining non-DONE/SKIPPED stories (if any).
+1. Parse `$ARGUMENTS`: extract planning ID, story ID, and optional reason after ` -- `.
+
+2. Verify `.planning/scripts/planning-mutate.mjs` exists. If missing, stop:
+
+   > This workspace needs the latest planning scripts. Re-run `/plan-init --force` from the project root or copy the current planning template scripts into `.planning/scripts/`.
+
+3. Dry-run the skip:
+
+   ```bash
+   node .planning/scripts/planning-mutate.mjs story-skip <planning-id> <story-id> --dry-run -- <reason>
+   ```
+
+   If it fails, report the error verbatim and stop.
+
+4. Verify touched paths stay inside `.planning/active/<planning-id>/` and only include story file, `01-expansion.md`, optional `README.md`, and `RETROSPECTIVE-RAW.md`.
+
+5. Apply the skip:
+
+   ```bash
+   node .planning/scripts/planning-mutate.mjs story-skip <planning-id> <story-id> -- <reason>
+   ```
+
+6. Report reason recorded, closeout readiness, remaining non-DONE/SKIPPED stories, and suggested closeout commands if any.
+
+The script owns active preflight, `DONE`/`SKIPPED` rejection, status/reason updates, `01-expansion.md`, optional README, retrospective entry, and closeout readiness.
 
 > SKIPPED stories are treated as closed for planning-closure purposes. To undo, manually reset the status to TODO in the story file.

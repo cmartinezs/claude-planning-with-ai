@@ -7,6 +7,10 @@ allowed-tools: [Bash, Read]
 
 Initialize `.releases/` for release planning. This is a one-time setup command, independent of `/plan-init`.
 
+## Arguments
+
+No arguments.
+
 ## Steps
 
 1. Use only the current working directory. Do not search parent directories.

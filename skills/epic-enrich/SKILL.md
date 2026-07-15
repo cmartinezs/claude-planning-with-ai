@@ -1,60 +1,32 @@
 ---
 name: epic-enrich
-description: Add new stories to an existing story container. Reads the current content, identifies gaps in coverage, and guides the addition of new stories. Works with any directory of story files or single docume
+description: Add missing backlog stories to an existing epic or story container while delegating container inspection, ID assignment, story drafting, and index updates to the shared planning-story script.
 argument-hint: <path/to/epic-dir/> | <path/to/stories.md>
-allowed-tools: [Read, Write, Bash, Glob]
+allowed-tools: [Bash, Read]
 ---
 
-Add new stories to an existing story container. Reads the current content, identifies gaps in coverage, and guides the addition of new stories. Works with any directory of story files or single document with story sections.
-
-Layer boundary: this command edits the product/backlog container. If the missing work belongs to an already active planning, use `/plan-enrich-epic` instead.
+Add new stories to an existing backlog story container after identifying coverage gaps.
 
 ## Arguments
 
-`$ARGUMENTS` — path to the story container:
-- A directory: `docs/02-product/user-stories/epic-05-grading-assistance/`
-- A single file with story sections: `docs/features.md`, `requirements.md`
-- Any directory with story-shaped markdown files
+`$ARGUMENTS` — a story directory or a single markdown file with story sections.
 
 ## Steps
 
-### 1 — Resolve and read the container
+1. Inspect the container:
+   ```bash
+   node .planning/scripts/planning-story.mjs backlog-inspect <container>
+   ```
+2. Read the epic overview or top-level context when present.
+3. Identify product coverage gaps: missing edge paths, missing actor perspectives, epic acceptance criteria without a story, implicit prerequisites, or complementary flows.
+4. Ask which gaps the user wants to add. For each selected story, gather title, narrative, acceptance criteria, and optional enrichment details.
+5. Generate each story as a dry-run using the same shared script:
+   ```bash
+   node .planning/scripts/planning-story.mjs backlog-new <container> --title "<title>" --narrative "<story>" --criteria "<criteria separated by |>"
+   ```
+6. After approval, rerun each accepted command with `--write`.
+7. Report stories added and suggest the next planning command:
+   - No planning exists yet: `/plan-from-epic <name> <container>`
+   - Planning already exists: `/plan-enrich-epic <NNN-slug>`
 
-- If the path does not exist, stop and report.
-- **Directory**: read all markdown files in the directory. Identify story-shaped files (files with a narrative statement + criteria section). Skip pure overview/README files during story reading, but keep them for epic context.
-- **Single file**: identify each story-shaped section within the file.
-- Report: "Found N stories in [container]."
-
-### 2 — Read epic context
-
-Look for an overview file (README, EPIC.md, overview.md, or similar) in the same directory or as the top-level section of a single file. Extract:
-- Goal / narrative of the epic
-- In-scope / out-of-scope items (if defined)
-- Epic-level acceptance criteria or DoD (if defined)
-- Dependencies on other epics or systems (if defined)
-
-### 3 — Identify coverage gaps
-
-Analyze the existing stories against the epic goal and scope. Look for:
-- **Missing error/edge paths**: what happens when an agent fails, a submission is malformed, a required resource doesn't exist
-- **Missing actor perspectives**: roles mentioned in the epic narrative that have no story covering their view
-- **Epic AC items without a story**: acceptance criteria at the epic level that no individual story seems to implement
-- **Implicit prerequisites**: actions that other stories assume are possible but that no story defines
-- **Missing complementary flows**: e.g. "create" exists but "delete" or "edit" does not, if those are in scope
-
-Present gaps as a numbered list. Ask: "¿Cuáles quieres agregar? (números, describe tu propia idea, o 'ninguno')"
-
-### 4 — Add selected stories
-
-For each story the user wants to add, run the `/us-new` interactive flow using the same container path:
-- Mirror the format conventions found in existing stories (ID scheme, section names, filename pattern)
-- Story content, criteria, and optional enrichment sections (DoD, Technical Notes, Dependencies, Complexity)
-- Write the file / section and update any index
-
-### 5 — Report
-
-N stories added, list them with IDs (if applicable) and titles. If the container is linked from a parent index, note whether it was updated. Suggest next step based on context:
-- If no planning exists for this container: `/plan-from-epic NNN path/to/container`
-- If a planning already exists: `/plan-enrich-epic NNN-slug`
-
-> If the user describes a story with more than ~7 acceptance criteria, suggest splitting it into two before writing.
+Layer boundary: this command edits product/backlog containers. If the missing work belongs to an already active planning, use `/plan-enrich-epic`.

@@ -18,34 +18,41 @@ Move a story from one planning to another. Useful when reorganizing work reveals
 
 1. Parse `$ARGUMENTS` into source ID, story ID, and target ID.
 
-2. Verify both plannings exist in `.planning/active/`. If either is not in `active/`, stop and report which one is missing or not in active state.
+2. Verify `.planning/scripts/planning-mutate.mjs` exists. If missing, stop:
 
-3. Locate the story file: `.planning/active/<source-id>/02-deepening/<story-id>-*.md`. If not found, stop and report.
+   > This workspace needs the latest planning scripts. Re-run `/plan-init --force` from the project root or copy the current planning template scripts into `.planning/scripts/`.
 
-4. Read the story file and verify its status is not `DONE`. If DONE, stop: "cannot move a DONE story — it is already part of the source planning's history".
+3. Run the dry run:
 
-5. Determine the new story number in the target planning: read the existing story files in `.planning/active/<target-id>/02-deepening/` to find the highest existing story-NN number, then assign the next one (e.g., if story-03 is highest, the moved story becomes story-04).
+   ```bash
+   node .planning/scripts/planning-mutate.mjs merge <source-id> <story-id> <target-id> --dry-run
+   ```
 
-6. **Confirm before proceeding:**
+   If the script fails, report its error verbatim and stop. Do not manually move files after a failed script run.
+
+4. Verify every touched path from dry-run is inside one of these two planning roots:
+   - `.planning/active/<source-id>/`
+   - `.planning/active/<target-id>/`
+
+   The expected files are `01-expansion.md`, `README.md`, `RETROSPECTIVE-RAW.md`, the old/new story file, and the old/new atomized task folder when present. If any unrelated path appears, stop.
+
+5. **Confirm before proceeding:**
    "Move `<story-id>` from `<source-id>` to `<target-id>` as `<new-story-id>`? (yes/no)"
    Wait for confirmation.
 
-7. **Execute the move:**
-   a. Rename the story file from `<story-id>-<name>.md` to `<new-story-id>-<name>.md` and move it to `.planning/active/<target-id>/02-deepening/`.
-   b. Update the story number reference inside the moved file (header fields, any self-referencing links).
-   c. If a task folder exists (`02-deepening/<story-id>-<name>/`): move it to the target as `02-deepening/<new-story-id>-<name>/` and update internal task file references to the new story ID.
+6. Apply the move:
 
-8. **Update source planning:**
-   a. Remove the story row from `.planning/active/<source-id>/01-expansion.md`.
-   b. Update `.planning/active/<source-id>/README.md` to remove the story entry.
-   c. Check if the source planning now has all remaining stories DONE/SKIPPED. If yes, suggest `/plan-archive <source-id>`.
+   ```bash
+   node .planning/scripts/planning-mutate.mjs merge <source-id> <story-id> <target-id>
+   ```
 
-9. **Update target planning:**
-   a. Add a new row for the moved story in `.planning/active/<target-id>/01-expansion.md`.
-   b. Update `.planning/active/<target-id>/README.md` to add the story entry.
+7. Report the script summary:
+   - old and new story IDs
+   - old and new story paths
+   - whether the task folder was moved
+   - whether source appears ready for `/plan-archive`
+   - any dependency follow-ups from the script
 
-10. Execute `[RECORD-EDGE-CASE]` in both affected plannings' `RETROSPECTIVE-RAW.md` files with source `/plan-merge`, the old/new story IDs, and any dependency follow-up.
-
-11. Report: story moved from `<source-id>/<old-story-id>` to `<target-id>/<new-story-id>`. If task folder was moved, confirm that too. List any follow-up actions needed (e.g., dependency updates if the story depended on other stories in the source planning).
+The script owns the mechanical mutation: active-only preflight, `DONE` rejection, target story numbering, story/task-folder move, internal markdown reference rewrites, `01-expansion.md` row movement, README story index update, and `/plan-merge` entries in both `RETROSPECTIVE-RAW.md` files.
 
 > Dependency references in `Depends On` fields are not automatically updated. Review them manually after the move.

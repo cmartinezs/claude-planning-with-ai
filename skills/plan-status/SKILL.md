@@ -1,33 +1,27 @@
 ---
 name: plan-status
-description: Show the current state of all plannings in the `.planning/` system.
-argument-hint: (no arguments)
-allowed-tools: [Read, Write, Bash, Glob]
+description: Show the current state of all plannings, or one planning, using the deterministic planning-report script.
+argument-hint: [NNN-slug]
+allowed-tools: [Bash, Read]
 ---
 
-Show the current state of all plannings in the `.planning/` system.
+Show the current state of all plannings, or one planning, in the current `.planning/` system. Read-only.
+
+## Arguments
+
+`$ARGUMENTS` - optional planning id, format: `NNN-slug`.
 
 ## Steps
 
-1. Read `.planning/README.md` to get the root index (Initial plannings listed there).
-2. Read `.planning/active/README.md` to get all plannings in EXPANSION or DEEPENING.
-3. Read `.planning/finished/README.md` to get all completed plannings.
-4. For each active planning found, read its `01-expansion.md` (if exists) to extract story statuses.
-5. Report a concise summary table:
+1. Use only `./.planning/` in the current working directory. Do not search parent directories.
+2. If `.planning/scripts/planning-report.mjs` is missing, stop and report:
+   - "This workspace needs the latest planning scripts. Run `/plan-update-version <from> <to>` or re-run `/plan-init --force` from the project root."
+3. Run:
 
-```
-INITIAL
-  NNN-slug — intent
-
-ACTIVE (EXPANSION / DEEPENING)
-  NNN-slug — intent
-    story-01-name [TODO / IN PROGRESS / DONE]
-    story-02-name [TODO / IN PROGRESS / DONE]
-
-COMPLETED
-  NNN-slug — intent
+```bash
+node .planning/scripts/planning-report.mjs status $ARGUMENTS --output markdown
 ```
 
-If no plannings exist in a category, print `(none)`.
+4. Report the script output verbatim.
 
-> This command is read-only. It does not modify any files.
+> Read-only. Does not modify any files.

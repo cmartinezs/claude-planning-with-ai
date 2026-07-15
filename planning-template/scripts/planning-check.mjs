@@ -39,8 +39,11 @@ function usage() {
   node .planning/scripts/planning-check.mjs health [--format markdown|json]
   node .planning/scripts/planning-check.mjs validate [NNN-slug] [--format markdown|json]
   node .planning/scripts/planning-check.mjs task-validate <NNN-slug> [story-NN] [task-NN] [--format markdown|json]
+  node .planning/scripts/planning-check.mjs us-status [path/to/container] [--format markdown|json]
+  node .planning/scripts/planning-check.mjs audit-docs <NNN-slug> [--docs-dir <path>] [--format markdown|json]
+  node .planning/scripts/planning-check.mjs doctor [--plugin-root <path>] [--format markdown|json]
 
-Read-only checks for .planning/ structure, state, story/task indexes, workflow IDs, and validation gaps.`);
+Read-only checks for planning structure, story/task indexes, user-story enrichment, generated docs, plugin metadata, and validation gaps.`);
 }
 
 function failUsage(message) {
@@ -703,6 +706,284 @@ function daysSinceGitActivity(relativePath) {
   }
 }
 
+function optionValue(args, name, fallback = null) {
+  const index = args.indexOf(name);
+  if (index < 0) return fallback;
+  return args[index + 1] || fallback;
+}
+
+function positionalArgs(args, optionsWithValues = []) {
+  const out = [];
+  for (let i = 0; i < args.length; i += 1) {
+    if (optionsWithValues.includes(args[i])) {
+      i += 1;
+    } else {
+      out.push(args[i]);
+    }
+  }
+  return out;
+}
+
+function markdownFilesForTarget(targetValue) {
+  const target = path.resolve(root, targetValue || '.');
+  if (isFile(target)) return /\.md$/i.test(target) ? [target] : [];
+  if (!isDir(target)) return [];
+  const direct = listFiles(target, /\.md$/i);
+  if (direct.length > 0) return direct;
+  return walk(target, (file) => /\.md$/i.test(file)).sort();
+}
+
+function isUserStory(text, filePath) {
+  return /##\s+Acceptance Criteria/i.test(text)
+    || /^\s*(?:##\s+)?As an?\b/im.test(text)
+    || /\*\*As an?\*\*/i.test(text)
+    || /\bUS-\d+\b/i.test(text)
+    || /\bUS-\d+\b/i.test(path.basename(filePath));
+}
+
+function firstHeading(text, fallback) {
+  const match = /^#\s+(.+)$/m.exec(text);
+  return match ? match[1].trim() : fallback;
+}
+
+function storyStatusFor(filePath) {
+  const text = read(filePath);
+  const id = (/\bUS-\d+\b/i.exec(text) || /\bUS-\d+\b/i.exec(path.basename(filePath)) || [null])[0];
+  const title = firstHeading(text, path.basename(filePath, path.extname(filePath)));
+  return {
+    filePath,
+    id: id ? id.toUpperCase() : path.basename(filePath, path.extname(filePath)),
+    title,
+    dod: /##\s+(Definition of Done|DoD)\b/i.test(text),
+    technicalNotes: /##\s+Technical Notes\b/i.test(text),
+    dependencies: /##\s+Dependencies\b/i.test(text),
+    complexity: /\bComplexity\b\s*[:|#-]/i.test(text),
+    planning: linkedPlanningForStory(id, filePath),
+  };
+}
+
+function linkedPlanningForStory(storyId, filePath) {
+  const activeRoot = path.join(planningRoot, 'active');
+  if (!isDir(activeRoot)) return '';
+  const needles = [storyId, path.basename(filePath), rel(filePath)].filter(Boolean).map((item) => item.toLowerCase());
+  for (const dir of listDirs(activeRoot)) {
+    const expansion = path.join(dir, '01-expansion.md');
+    if (!isFile(expansion)) continue;
+    const text = read(expansion).toLowerCase();
+    if (needles.some((needle) => text.includes(needle))) return path.basename(dir);
+  }
+  return '';
+}
+
+function runUsStatus() {
+  const targetValue = positionalArgs(commandArgs)[0] || '.';
+  const files = markdownFilesForTarget(targetValue);
+  const storyFiles = files.filter((file) => isUserStory(read(file), file));
+  const stories = storyFiles.map(storyStatusFor);
+  return baseReport('us-status', [], {
+    target: targetValue,
+    scannedFiles: files.length,
+    stories,
+    summary: {
+      stories: stories.length,
+      dod: stories.filter((story) => story.dod).length,
+      technicalNotes: stories.filter((story) => story.technicalNotes).length,
+      dependencies: stories.filter((story) => story.dependencies).length,
+      complexity: stories.filter((story) => story.complexity).length,
+      linked: stories.filter((story) => story.planning).length,
+    },
+  });
+}
+
+function latestMtime(paths) {
+  let latest = 0;
+  for (const filePath of paths.filter(isFile)) {
+    latest = Math.max(latest, fs.statSync(filePath).mtimeMs);
+  }
+  return latest;
+}
+
+function docRootFromConfig(fallback = 'docs') {
+  const configPath = path.join(planningRoot, 'config.yml');
+  if (!isFile(configPath)) return fallback;
+  const docsSection = sectionFromYaml(read(configPath), 'docs');
+  const outputDir = /^\s*output_dir:\s*(.+)$/m.exec(docsSection);
+  return outputDir ? outputDir[1].trim().replace(/^['"]|['"]$/g, '') : fallback;
+}
+
+function normalizeDocRef(ref, sourceFile, docsRoot) {
+  if (!ref || /^https?:\/\//i.test(ref)) return null;
+  const clean = ref.split('#')[0].replace(/^['"`(<]+|['"`)>]+$/g, '');
+  if (!clean || !/\.md$/i.test(clean)) return null;
+  if (/^(docs|documentation|adr|adrs)\//i.test(clean) || /^(README|CHANGELOG)\.md$/i.test(clean)) return path.resolve(root, clean);
+  const resolved = path.resolve(path.dirname(sourceFile), clean);
+  const docsPath = path.resolve(root, docsRoot);
+  if (resolved === docsPath || resolved.startsWith(`${docsPath}${path.sep}`)) return resolved;
+  return null;
+}
+
+function expectedDocsFromPlanning(planning, docsRoot) {
+  const files = walk(planning.dir, (file) => /\.md$/i.test(file)).sort();
+  const docs = new Map();
+  const markdownLink = /\[[^\]]+\]\(([^)]+\.md(?:#[^)]+)?)\)/gi;
+  const bareDocPath = /\b(?:docs|documentation|adr|adrs)\/[A-Za-z0-9._/-]+\.md\b/gi;
+  const rootDocPath = /\b(?:README|CHANGELOG)\.md\b/g;
+  for (const file of files) {
+    const text = read(file);
+    const refs = [
+      ...[...text.matchAll(markdownLink)].map((match) => match[1]),
+      ...[...text.matchAll(bareDocPath)].map((match) => match[0]),
+      ...[...text.matchAll(rootDocPath)].map((match) => match[0]),
+    ];
+    for (const ref of refs) {
+      const docPath = normalizeDocRef(ref, file, docsRoot);
+      if (docPath && !docs.has(docPath)) docs.set(docPath, { path: docPath, source: file });
+    }
+  }
+  return [...docs.values()].sort((a, b) => rel(a.path).localeCompare(rel(b.path)));
+}
+
+function brokenLocalLinks(filePath) {
+  if (!isFile(filePath)) return [];
+  const text = read(filePath);
+  const findings = [];
+  for (const match of text.matchAll(/\[[^\]]+\]\(([^)]+\.md)(?:#[^)]+)?\)/gi)) {
+    const target = normalizeDocRef(match[1], filePath, '.');
+    if (target && !isFile(target)) {
+      findings.push(result('FAIL', `broken local markdown link to ${match[1]}`, filePath, lineOf(text, match[0])));
+    }
+  }
+  return findings;
+}
+
+function runAuditDocs() {
+  const args = positionalArgs(commandArgs, ['--docs-dir']);
+  const planningId = args[0];
+  if (!planningId) failUsage('audit-docs requires <NNN-slug>');
+  const docsRoot = optionValue(commandArgs, '--docs-dir', docRootFromConfig());
+  const planning = locatePlanning(planningId);
+  if (!planning) return baseReport('audit-docs', [result('FAIL', `Planning ${planningId} not found in .planning/, .planning/active/, or .planning/finished/.`)], { planningId, docsRoot, coverage: [], consistency: [] });
+
+  const planningFiles = walk(planning.dir, (file) => /\.md$/i.test(file)).sort();
+  const planningLatest = latestMtime(planningFiles);
+  const expected = expectedDocsFromPlanning(planning, docsRoot);
+  const coverage = [];
+  const consistency = [];
+
+  if (expected.length === 0) {
+    consistency.push(result('WARN', `No expected documentation references were found in ${planningId}.`, planning.dir));
+  }
+
+  for (const item of expected) {
+    if (!isFile(item.path)) {
+      coverage.push({ doc: rel(item.path), source: rel(item.source), status: 'FAIL', notes: 'Missing expected document' });
+      continue;
+    }
+    const text = read(item.path);
+    const stale = fs.statSync(item.path).mtimeMs + 1000 < planningLatest;
+    const placeholder = /\[(?:TODO|Document title|Describe|TBD|placeholder)[^\]]*\]/i.test(text);
+    const status = placeholder ? 'WARN' : stale ? 'WARN' : 'PASS';
+    const notes = placeholder ? 'Contains placeholder text' : stale ? 'Older than latest planning artifact' : '-';
+    coverage.push({ doc: rel(item.path), source: rel(item.source), status, notes });
+    consistency.push(...brokenLocalLinks(item.path));
+  }
+
+  return baseReport('audit-docs', [], { planningId, docsRoot, coverage, consistency });
+}
+
+function runDoctor() {
+  const pluginRoot = path.resolve(root, optionValue(commandArgs, '--plugin-root', '.'));
+  const checks = [];
+  const requiredFiles = [
+    '.claude-plugin/plugin.json',
+    'README.md',
+    'docs/reference.md',
+    'docs/commands.yml',
+    'planning-template/README.md',
+    'planning-template/config.yml',
+    'planning-template/PDR-TEMPLATE.md',
+    'planning-template/scripts/planning-check.mjs',
+  ];
+
+  const requiredMissing = requiredFiles.filter((file) => !isFile(path.join(pluginRoot, file)));
+  checks.push({
+    name: 'Required files',
+    status: requiredMissing.length ? 'FAIL' : 'PASS',
+    notes: requiredMissing.length ? `Missing: ${requiredMissing.join(', ')}` : '-',
+  });
+
+  const skillsDir = path.join(pluginRoot, 'skills');
+  const commandsFile = path.join(pluginRoot, 'docs/commands.yml');
+  const commandText = isFile(commandsFile) ? read(commandsFile) : '';
+  const skillFindings = [];
+  if (!isDir(skillsDir)) {
+    skillFindings.push('skills/ directory missing');
+  } else {
+    for (const dir of listDirs(skillsDir)) {
+      const skillName = path.basename(dir);
+      const skillFile = path.join(dir, 'SKILL.md');
+      if (!isFile(skillFile)) {
+        skillFindings.push(`${skillName}: missing SKILL.md`);
+        continue;
+      }
+      const text = read(skillFile);
+      for (const field of ['name', 'description', 'argument-hint', 'allowed-tools']) {
+        if (!new RegExp(`^${field}:`, 'm').test(text)) skillFindings.push(`${skillName}: missing ${field}`);
+      }
+      if (!new RegExp(`^name:\\s*${escapeRegex(skillName)}$`, 'm').test(text)) skillFindings.push(`${skillName}: name mismatch`);
+      if (commandText && !new RegExp(`name:\\s*${escapeRegex(skillName)}\\b`).test(commandText)) skillFindings.push(`${skillName}: missing from docs/commands.yml`);
+    }
+  }
+  checks.push({
+    name: 'Skill metadata',
+    status: skillFindings.length ? 'FAIL' : 'PASS',
+    notes: skillFindings.length ? skillFindings.slice(0, 8).join('; ') : '-',
+  });
+
+  const templateChecks = [
+    'planning-template/WORKFLOWS/README.md',
+    'planning-template/update-version/README.md',
+    'planning-template/_template/01-expansion.md',
+    'planning-template/_template/02-deepening/story-NN-name.md',
+    'planning-template/_template/02-deepening/task-NN-name.md',
+  ];
+  const templateMissing = templateChecks.filter((file) => !isFile(path.join(pluginRoot, file)));
+  checks.push({
+    name: 'Template integrity',
+    status: templateMissing.length ? 'FAIL' : 'PASS',
+    notes: templateMissing.length ? `Missing: ${templateMissing.join(', ')}` : '-',
+  });
+
+  const legacyFindings = [];
+  for (const file of [
+    path.join(pluginRoot, 'README.md'),
+    path.join(pluginRoot, 'docs/reference.md'),
+    ...walk(path.join(pluginRoot, 'planning-template/TUTORIAL'), (item) => /\.md$/i.test(item)),
+  ].filter(isFile)) {
+    const text = read(file);
+    if (/\b(plan-scope|doc-scope|scope-NN)\b/.test(text)) legacyFindings.push(rel(file));
+  }
+  checks.push({
+    name: 'Legacy drift',
+    status: legacyFindings.length ? 'WARN' : 'PASS',
+    notes: legacyFindings.length ? `Legacy scope references: ${legacyFindings.join(', ')}` : '-',
+  });
+
+  const verifyScript = path.join(pluginRoot, 'scripts/verify-plugin.sh');
+  if (isFile(verifyScript)) {
+    try {
+      execFileSync('bash', [verifyScript], { cwd: pluginRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      checks.push({ name: 'verify-plugin.sh', status: 'PASS', notes: '-' });
+    } catch (error) {
+      checks.push({ name: 'verify-plugin.sh', status: 'FAIL', notes: String(error.stdout || error.stderr || error.message).trim().split(/\r?\n/).slice(-5).join(' | ') });
+    }
+  } else {
+    checks.push({ name: 'verify-plugin.sh', status: 'WARN', notes: 'scripts/verify-plugin.sh not found' });
+  }
+
+  return baseReport('doctor', [], { pluginRoot, checks });
+}
+
 function runValidate() {
   if (!isDir(planningRoot)) return baseReport('validate', [result('FAIL', 'No .planning/ directory found. Run /plan-init first.', planningRoot)], {});
   const target = commandArgs[0];
@@ -808,6 +1089,9 @@ function renderMarkdown(report) {
   if (report.kind === 'health') return renderHealth(report);
   if (report.kind === 'validate') return renderValidate(report);
   if (report.kind === 'task-validate') return renderTaskValidate(report);
+  if (report.kind === 'us-status') return renderUsStatus(report);
+  if (report.kind === 'audit-docs') return renderAuditDocs(report);
+  if (report.kind === 'doctor') return renderDoctor(report);
   return JSON.stringify(report, null, 2);
 }
 
@@ -880,6 +1164,107 @@ function renderTaskValidate(report) {
   return lines.join('\n');
 }
 
+function check(value) {
+  return value ? 'yes' : 'no';
+}
+
+function renderUsStatus(report) {
+  const lines = [
+    `## Story Status - ${report.target}`,
+    '',
+  ];
+  if ((report.stories || []).length === 0) {
+    lines.push(`No story-shaped markdown files found. Scanned ${report.scannedFiles || 0} markdown files.`);
+    lines.push('', 'Read-only: no files were modified.');
+    return lines.join('\n');
+  }
+  lines.push('| Story | DoD | Tech Notes | Deps | Complexity | Planning |');
+  lines.push('|-------|-----|------------|------|------------|----------|');
+  for (const story of report.stories) {
+    lines.push(`| ${story.id} ${story.title} | ${check(story.dod)} | ${check(story.technicalNotes)} | ${check(story.dependencies)} | ${check(story.complexity)} | ${story.planning || '-'} |`);
+  }
+  const s = report.summary || {};
+  lines.push('', `Summary: ${s.stories || 0} stories - ${s.dod || 0} have DoD, ${s.technicalNotes || 0} have Technical Notes, ${s.dependencies || 0} have Dependencies, ${s.complexity || 0} have Complexity, ${s.linked || 0} linked to active planning.`);
+  const needing = report.stories.filter((story) => !story.dod || !story.technicalNotes || !story.dependencies || !story.complexity);
+  if (needing.length > 0) {
+    lines.push('', `Stories needing enrichment: ${needing.map((story) => story.id).join(', ')}`);
+    lines.push(`Suggestion: ${needing.slice(0, 3).map((story) => `/us-enrich ${story.id}`).join(' | ')}`);
+  }
+  lines.push('', 'Read-only: no files were modified.');
+  return lines.join('\n');
+}
+
+function renderAuditDocs(report) {
+  const lines = [
+    `# Documentation Audit - ${report.planningId || 'unknown'}`,
+    '',
+  ];
+  const topLevel = report.results || [];
+  const coverage = report.coverage || [];
+  const consistency = report.consistency || [];
+  const fail = topLevel.filter((item) => item.status === 'FAIL').length + coverage.filter((item) => item.status === 'FAIL').length + consistency.filter((item) => item.status === 'FAIL').length;
+  const warn = topLevel.filter((item) => item.status === 'WARN').length + coverage.filter((item) => item.status === 'WARN').length + consistency.filter((item) => item.status === 'WARN').length;
+  lines.push('## Result');
+  lines.push(fail > 0 ? 'FAIL' : warn > 0 ? 'WARN' : 'PASS');
+  if (topLevel.length > 0) {
+    lines.push('', '## Planning Findings');
+    lines.push(...topLevel.map(formatFinding));
+  }
+  lines.push('', '## Coverage');
+  if (coverage.length === 0) {
+    lines.push('- WARN: no expected documentation files were discovered from planning references.');
+  } else {
+    lines.push('| Expected document | Source | Result | Notes |');
+    lines.push('|-------------------|--------|--------|-------|');
+    for (const row of coverage) {
+      lines.push(`| ${row.doc} | ${row.source} | ${row.status} | ${row.notes} |`);
+    }
+  }
+  lines.push('', '## Consistency Findings');
+  if (consistency.length === 0) lines.push('- PASS: no consistency findings.');
+  else lines.push(...consistency.map(formatFinding));
+  const missing = coverage.filter((item) => item.status !== 'PASS');
+  lines.push('', '## Missing or Stale Docs');
+  if (missing.length === 0) lines.push('- PASS: no missing or stale docs detected.');
+  else lines.push(...missing.map((item) => `- ${item.status}: ${item.doc} - ${item.notes}`));
+  lines.push('', '## Recommended Next Commands');
+  lines.push(`- /plan-validate ${report.planningId || '<planning-id>'}`);
+  lines.push(`- /doc-generate ${report.planningId || '<planning-id>'}`);
+  lines.push('', 'Read-only: no files were modified.');
+  return lines.join('\n');
+}
+
+function renderDoctor(report) {
+  const checks = report.checks || [];
+  const fail = checks.filter((item) => item.status === 'FAIL').length;
+  const warn = checks.filter((item) => item.status === 'WARN').length;
+  const lines = [
+    '# Plugin Doctor Report',
+    '',
+    `Plugin root: ${report.pluginRoot}`,
+    '',
+    '## Result',
+    fail > 0 ? 'FAIL' : warn > 0 ? 'WARN' : 'PASS',
+    '',
+    '## Checks',
+    '| Check | Result | Notes |',
+    '|-------|--------|-------|',
+  ];
+  for (const checkItem of checks) {
+    lines.push(`| ${checkItem.name} | ${checkItem.status} | ${checkItem.notes || '-'} |`);
+  }
+  const required = checks.filter((item) => item.status === 'FAIL');
+  lines.push('', '## Required Fixes');
+  if (required.length === 0) lines.push('- None.');
+  else lines.push(...required.map((item) => `- ${item.name}: ${item.notes}`));
+  const improvements = checks.filter((item) => item.status === 'WARN');
+  lines.push('', '## Recommended Improvements');
+  if (improvements.length === 0) lines.push('- None.');
+  else lines.push(...improvements.map((item) => `- ${item.name}: ${item.notes}`));
+  lines.push('', 'Read-only: no files were modified.');
+  return lines.join('\n');
+}
+
 function appendReviewPrompt(lines, findings) {
   const referenced = [...new Map(findings.filter((item) => item.path && item.status !== 'PASS').map((item) => [item.path, item])).values()];
   if (referenced.length === 0) return;
@@ -893,6 +1278,9 @@ let report;
 if (command === 'health') report = runHealth();
 else if (command === 'validate') report = runValidate();
 else if (command === 'task-validate') report = runTaskValidate();
+else if (command === 'us-status') report = runUsStatus();
+else if (command === 'audit-docs') report = runAuditDocs();
+else if (command === 'doctor') report = runDoctor();
 else failUsage(`Unknown command: ${command}`);
 
 if (format === 'json') {

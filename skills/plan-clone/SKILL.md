@@ -17,30 +17,47 @@ Clone an existing planning into a new INITIAL-state planning, preserving story d
 
 1. Parse `$ARGUMENTS` into source ID and target ID.
 
-2. Locate the source planning in `.planning/` (INITIAL), `.planning/active/`, or `.planning/finished/`. If not found, stop and report. Record its root path.
+2. Verify `.planning/scripts/planning-mutate.mjs` exists. If missing, stop and report:
 
-3. Verify the target ID does not already exist in any of the three locations. If it does, stop: "target ID already exists".
+   > This workspace needs the latest planning scripts. Re-run `/plan-init --force` from the project root or copy the current planning template scripts into `.planning/scripts/`.
 
-4. Copy `.planning/_template/` to `.planning/<target-id>/` to create a fresh scaffold.
+3. Run a dry run first:
 
-5. **Copy and reset `00-initial.md`:**
-   - Copy the source's `00-initial.md` to `.planning/<target-id>/00-initial.md`.
-   - Update the title to use the target slug.
-   - Set `Date` to today's date.
-   - Add a note at the top: `> Cloned from: <source-id>` so the lineage is traceable.
+   ```bash
+   node .planning/scripts/planning-mutate.mjs clone <source-id> <target-id> --dry-run
+   ```
 
-6. **Copy and reset `01-expansion.md`** (if the source has one):
-   - Copy to `.planning/<target-id>/01-expansion.md`.
-   - Reset all story status columns to `TODO`.
+   If the script fails, report the error verbatim and stop. Do not manually recreate clone steps after a failed script run.
 
-7. **Copy story files** from the source's `02-deepening/*.md` to `.planning/<target-id>/02-deepening/`:
-   - For each story file: copy it, reset `Status: TODO`, uncheck all task checkboxes (`[x]` → `[ ]`).
-   - Do NOT copy task folders (`02-deepening/story-NN-*/`) — the clone starts unatomized.
+4. Read the dry-run touched paths. Confirm they are limited to:
+   - `.planning/<target-id>/`
+   - `.planning/<target-id>/**`
+   - `.planning/README.md`
 
-8. **Copy `TRACEABILITY.md`** if present (it provides domain term context useful to reuse).
+   If any other path appears, stop and report it as unexpected.
 
-9. Update `.planning/README.md`: add the new planning under `### 🆕 Initial` with entry `- [<target-id>](<target-id>/00-initial.md) — <intent> (cloned from <source-id>)`.
+5. Apply the clone:
 
-10. Report: new planning created at `.planning/<target-id>/`, N stories copied, all statuses reset to TODO. Suggest `/plan-expand <target-id>` if the source was in INITIAL state, or `/plan-story <target-id> story-01` to start executing directly.
+   ```bash
+   node .planning/scripts/planning-mutate.mjs clone <source-id> <target-id>
+   ```
+
+6. Report the script summary:
+   - source path
+   - target path
+   - number of story files copied
+   - whether `.planning/README.md` was updated
+   - next command suggestion from the script
+
+The script performs the mechanical mutation:
+- locate source in `.planning/`, `.planning/active/`, or `.planning/finished/`;
+- reject an existing target in any planning state;
+- copy `.planning/_template/` to `.planning/<target-id>/`;
+- copy and reset `00-initial.md`;
+- copy and reset `01-expansion.md` when present;
+- copy only story markdown files from `02-deepening/` and reset task/story statuses;
+- skip task folders so the clone starts unatomized;
+- copy `TRACEABILITY.md` when present;
+- update the root `.planning/README.md` initial section.
 
 > The clone is placed in INITIAL state regardless of the source's state. Run `/plan-expand` to re-expand it if needed.

@@ -7,6 +7,10 @@ allowed-tools: [Bash, Read]
 
 Add one or more plannings to a release's `## Included Plannings` table. Planning summaries and live statuses are read from `.planning/`.
 
+## Arguments
+
+`$ARGUMENTS` — format: `vX.Y.Z NNN-slug [NNN-slug ...]`.
+
 ## Steps
 
 1. Use only the current working directory. Do not search parent directories.

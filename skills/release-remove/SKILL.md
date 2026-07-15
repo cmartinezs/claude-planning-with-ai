@@ -7,6 +7,10 @@ allowed-tools: [Bash, Read]
 
 Remove a planning from a release's `## Included Plannings` table, renumber remaining rows, and update release progress.
 
+## Arguments
+
+`$ARGUMENTS` — format: `vX.Y.Z NNN-slug`.
+
 ## Steps
 
 1. Use only the current working directory. Do not search parent directories.

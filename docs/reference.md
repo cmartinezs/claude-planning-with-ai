@@ -23,7 +23,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/us-new <path/to/container> [--interactive\|--blank]` | Adds a new user story to a directory or markdown file |
 | `/us-enrich <path/to/story.md \| story-id>` | Adds DoD, Technical Notes, Dependencies, and Complexity |
 | `/us-split <path/to/story.md>` | Splits an oversized user story into focused stories |
-| `/us-status <path/to/container>` | Shows enrichment/readiness status for stories in a container |
+| `/us-status [path/to/container \| path/to/story.md]` | Shows enrichment/readiness status for stories in a container, one file, or discovered stories |
 | `/epic-enrich <path/to/container>` | Detects coverage gaps and adds missing stories |
 
 ### Product To Execution Bridge
@@ -37,10 +37,9 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | Command | What it does |
 |---------|-------------|
 | `/plan-template [slug] [--interactive\|--blank]` | Generates an idea document in `.planning/ideas/` |
-| `/plan-new <NNN-slug> -- <intent>` | Creates a planning in INITIAL state from inline intent |
-| `/plan-new <NNN-slug> @<path.md>` | Creates a planning in INITIAL state from an idea document |
+| `/plan-new <NNN-slug> -- <intent> \| <NNN-slug> @<path.md>` | Creates a planning in INITIAL state from inline intent or an idea document |
 | `/plan-expand <NNN-slug>` | Advances INITIAL -> EXPANSION and creates planning stories |
-| `/plan-status` | Shows all plannings and story statuses |
+| `/plan-status [NNN-slug]` | Shows all plannings and story statuses, or one planning |
 | `/plan-validate [NNN-slug]` | Checks structural integrity for one or all plannings |
 | `/plan-decision <NNN-slug> -- <decision title>` | Creates or updates an optional PDR for a cross-cutting planning decision |
 | `/plan-done <NNN-slug> <story-NN> [task-N]` | Marks one task or a whole story done; for full stories, verifies task PR merges, cleans local task branches, and opens the story PR |
@@ -53,7 +52,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | Command | What it does |
 |---------|-------------|
 | `/plan-atomize <NNN-slug> [story-NN]` | Decomposes one story or all pending stories into atomic task files |
-| `/plan-task <NNN-slug> <story-NN> <task-NN>` | Executes one atomic task end to end, opens a task PR, and requires local task branch cleanup after merge |
+| `/plan-task <NNN-slug> <story-NN> <task-NN>` | Executes one atomic task end to end using deterministic stages for inspect/readiness/git/publish/closeout, opens a task PR, and requires local task branch cleanup after merge |
 | `/plan-task-validate <NNN-slug> [story-NN] [task-NN]` | Audits atomic tasks against the atomicity checklist |
 | `/plan-test-suite <NNN-slug> [story-NN] [task-NN] [--all]` | Generates planning/story/task test-suite matrices from detected repo tooling |
 | `/plan-story <NNN-slug> <story-NN>` | Executes all tasks in a story, cleans merged local task branches, and opens the final story PR |
@@ -65,8 +64,8 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-enrich-epic <NNN-slug>` | Adds new stories to an active planning |
 | `/plan-enrich-story <NNN-slug> <story-NN>` | Deepens an underspecified planning story |
 | `/plan-split-story <NNN-slug> <story-NN>` | Splits an oversized planning story |
-| `/plan-story-skip <NNN-slug> <story-NN> -- <reason>` | Marks a no-longer-applicable story as SKIPPED |
-| `/plan-merge <source-planning> <target-planning> <story-NN>` | Moves a story between active plannings |
+| `/plan-story-skip <NNN-slug> <story-NN> [-- reason]` | Marks a no-longer-applicable story as SKIPPED |
+| `/plan-merge <NNN-source> <story-NN> <NNN-target>` | Moves a story between active plannings |
 
 ### Automation Agents
 
@@ -91,10 +90,10 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | Command | What it does |
 |---------|-------------|
 | `/release-init` | Initializes optional `.releases/` release planning |
-| `/release-new <version> -- <purpose>` | Creates a release in DRAFT status |
-| `/release-add <version> <planning-id...>` | Adds plannings to a release |
-| `/release-remove <version> <planning-id>` | Removes a planning from a release |
-| `/release-status [version] [--mark-*]` | Shows or updates release status |
+| `/release-new <vX.Y.Z> -- <purpose>` | Creates a release in DRAFT status |
+| `/release-add <vX.Y.Z> <NNN-slug...>` | Adds plannings to a release |
+| `/release-remove <vX.Y.Z> <NNN-slug>` | Removes a planning from a release |
+| `/release-status [vX.Y.Z] [--mark-*]` | Shows or updates release status |
 
 ### Maintenance And Recovery
 
@@ -103,11 +102,10 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | `/plan-health` | Scans the whole `.planning/` system for anomalies |
 | `/plan-doctor [--plugin-root <path>]` | Audits plugin command inventory, skill metadata, template integrity, and legacy drift |
 | `/plan-report <NNN-slug> [--metrics]` | Generates an executive planning summary with optional metrics and risk coverage |
-| `/plan-decision <NNN-slug> -- <decision title>` | Records a durable Project Decision Record when a decision affects multiple stories, areas, or future planning |
 | `/plan-history <NNN-slug>` | Shows status transitions from git history |
 | `/plan-standup <NNN-slug>` | Generates standup text |
-| `/plan-export <NNN-slug> --format <format>` | Exports a planning as PR text, ticket list, external issue draft, or markdown summary |
-| `/plan-clone <source-id> <target-id>` | Clones a planning structure into a fresh ID |
+| `/plan-export <NNN-slug> [--format <format>]` | Exports a planning as PR text, ticket list, external issue draft, or markdown summary |
+| `/plan-clone <NNN-source-slug> <NNN-target-slug>` | Clones a planning structure into a fresh ID |
 | `/plan-retry <NNN-slug>` | Retries BLOCKED stories after blockers are resolved |
 | `/plan-rollback <NNN-slug> <story-NN>` | Reverts story planning state from DONE to TODO |
 | `/plan-update-version <from> <to> [--dry-run] [--allow-dirty]` | Applies a major-version planning-system migration from `.planning/update-version/` |

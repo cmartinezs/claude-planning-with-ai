@@ -1,32 +1,42 @@
 ---
 name: plan-archive
-description: Audit a completed planning and archive it to `finished/`. Runs AUDIT-PLANNING then moves the folder.
-argument-hint: the planning id to archive (e.g. `001-user-auth-api`)
-allowed-tools: [Read, Write, Bash, Glob]
+description: Audit a completed planning and archive it to finished/ by delegating deterministic file moves and index updates to the shared planning-mutate lifecycle script.
+argument-hint: <NNN-slug>
+allowed-tools: [Bash, Read]
 ---
 
-Audit a completed planning and archive it to `finished/`. Runs AUDIT-PLANNING then moves the folder.
-
-Reference workflow: `.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/AUDIT-PLANNING.md`
+Archive a completed active planning after auditing closeout conditions.
 
 ## Arguments
 
-`$ARGUMENTS` — the planning id to archive (e.g. `001-user-auth-api`)
+`$ARGUMENTS` — planning ID, for example `001-user-auth-api`.
 
 ## Steps
 
-1. Locate `.planning/active/$ARGUMENTS/`. If it doesn't exist, stop and report.
-2. **Audit — AUDIT-PLANNING workflow:**
-   a. Verify all stories in `02-deepening/` have status `DONE`. If any are not → stop, list pending stories.
-   b. Verify all tasks in each story have their documented output. If any are missing → list them and stop.
-   c. Verify `TRACEABILITY.md` is fully populated (no empty cells for evaluated terms).
-   d. Verify no open inconsistencies remain unaddressed.
-   e. Verify `README.md` has a completed `## Retrospective` section. If missing or still placeholder-only, read `RETROSPECTIVE-RAW.md`; if raw entries exist, invoke `/plan-retrospective $ARGUMENTS` and re-check. If the retrospective is still missing or placeholder-only, ask the user to complete it before proceeding.
-   f. Execute `MILESTONE-FEEDBACK` (`.planning/WORKFLOWS/03-MAINTENANCE-WORKFLOWS/MILESTONE-FEEDBACK.md`) if not already done — summarize key outcomes and decisions in the retrospective, and invoke `/plan-decision` for accepted cross-cutting decisions that still lack a PDR.
-3. **Archive:**
-   a. Move `.planning/active/$ARGUMENTS/` to `.planning/finished/$ARGUMENTS/`.
-   b. Update `.planning/active/README.md` — remove the entry for this planning.
-   c. Update `.planning/finished/README.md` — add entry: `- [NNN-slug](NNN-slug/) — <intent> (COMPLETED <date>)`.
-   d. Update `.planning/README.md` root index — move from active section to `### ✅ Completed`.
-4. Update `.planning/TRACEABILITY-GLOBAL.md` with any final terms from this planning.
-5. Report: planning archived to `finished/`, indexes updated.
+1. Parse `$ARGUMENTS` as the planning ID.
+2. Use only `./.planning/` in the current working directory. Do not search parent directories.
+3. Verify `.planning/scripts/planning-mutate.mjs` exists. If missing, stop:
+   > This workspace needs the latest planning scripts. Re-run `/plan-init --force` from the project root or copy the current planning template scripts into `.planning/scripts/`.
+4. Run the dry-run archive audit:
+   ```bash
+   node .planning/scripts/planning-mutate.mjs archive <planning-id> --dry-run
+   ```
+5. Report blockers verbatim. If the retrospective is missing or placeholder-only and raw notes exist, invoke `/plan-retrospective <planning-id>`, then rerun the dry-run.
+6. Before applying, execute the human-maintained closeout checks:
+   - Run MILESTONE-FEEDBACK if it has not been captured.
+   - Invoke `/plan-decision` for accepted cross-cutting decisions that still lack a PDR.
+   - Review warnings about traceability, open inconsistencies, or weak task output evidence.
+7. Verify the dry-run touched paths are limited to:
+   - `.planning/active/<planning-id>/`
+   - `.planning/finished/<planning-id>/`
+   - `.planning/active/README.md`
+   - `.planning/finished/README.md`
+   - `.planning/README.md`
+8. Ask for approval to archive. Do not proceed without confirmation.
+9. Apply the archive:
+   ```bash
+   node .planning/scripts/planning-mutate.mjs archive <planning-id>
+   ```
+10. Report the archive path and updated indexes.
+
+The script owns deterministic audit checks, folder move from `active/` to `finished/`, planning README completion metadata, and index updates. The skill owns milestone feedback, PDR decisions, warning interpretation, and approval.

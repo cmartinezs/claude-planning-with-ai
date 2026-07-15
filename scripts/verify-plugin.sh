@@ -47,10 +47,28 @@ require_file "planning-template/PDR-TEMPLATE.md"
 require_file "planning-template/LOGGING.md"
 require_file "planning-template/scripts/doc-generate.mjs"
 require_file "planning-template/scripts/generate-test-suite.sh"
+require_file "planning-template/scripts/planning-mutate.mjs"
+require_file "planning-template/scripts/planning-init.mjs"
 require_file "planning-template/scripts/planning-check.mjs"
+require_file "planning-template/scripts/planning-report.mjs"
+require_file "planning-template/scripts/planning-atomize.mjs"
+require_file "planning-template/scripts/planning-story.mjs"
+require_file "planning-template/scripts/planning-task.mjs"
 require_file "planning-template/scripts/release.mjs"
+require_file "planning-template/scripts/update-version.mjs"
 require_dir "skills"
 require_dir "planning-template/WORKFLOWS"
+
+for mutate_impl in \
+  "planning-archive.mjs" \
+  "planning-clone.mjs" \
+  "planning-done.mjs" \
+  "planning-merge.mjs" \
+  "planning-rollback.mjs" \
+  "planning-retry.mjs" \
+  "planning-story-skip.mjs"; do
+  require_file "planning-template/scripts/$mutate_impl"
+done
 
 while IFS= read -r skill_dir; do
   skill_name="$(basename "$skill_dir")"
@@ -124,13 +142,76 @@ if command -v node >/dev/null 2>&1; then
     fail "planning-template/scripts/planning-check.mjs has invalid syntax"
   fi
 
+  if node --check "$ROOT/planning-template/scripts/planning-report.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-report.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-report.mjs has invalid syntax"
+  fi
+
+  if node --check "$ROOT/planning-template/scripts/planning-atomize.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-atomize.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-atomize.mjs has invalid syntax"
+  fi
+
+  if node --check "$ROOT/planning-template/scripts/planning-story.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-story.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-story.mjs has invalid syntax"
+  fi
+
+  if node --check "$ROOT/planning-template/scripts/planning-task.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-task.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-task.mjs has invalid syntax"
+  fi
+
+  if node --check "$ROOT/planning-template/scripts/planning-mutate.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-mutate.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-mutate.mjs has invalid syntax"
+  fi
+
+  if node --check "$ROOT/planning-template/scripts/planning-init.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-init.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-init.mjs has invalid syntax"
+  fi
+
+  for mutate_impl in \
+    "planning-archive.mjs" \
+    "planning-clone.mjs" \
+    "planning-done.mjs" \
+    "planning-merge.mjs" \
+    "planning-rollback.mjs" \
+    "planning-retry.mjs" \
+    "planning-story-skip.mjs"; do
+    if node --check "$ROOT/planning-template/scripts/$mutate_impl" >/dev/null; then
+      pass "planning-template/scripts/$mutate_impl mutation implementation syntax is valid"
+    else
+      fail "planning-template/scripts/$mutate_impl has invalid syntax"
+    fi
+  done
+
   if node --check "$ROOT/planning-template/scripts/release.mjs" >/dev/null; then
     pass "planning-template/scripts/release.mjs syntax is valid"
   else
     fail "planning-template/scripts/release.mjs has invalid syntax"
   fi
+
+  if node --check "$ROOT/planning-template/scripts/update-version.mjs" >/dev/null; then
+    pass "planning-template/scripts/update-version.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/update-version.mjs has invalid syntax"
+  fi
 else
   warn "node not installed; skipped deterministic script syntax checks"
+fi
+
+if bash -n "$ROOT/planning-template/scripts/generate-test-suite.sh"; then
+  pass "planning-template/scripts/generate-test-suite.sh syntax is valid"
+else
+  fail "planning-template/scripts/generate-test-suite.sh has invalid syntax"
 fi
 
 if command -v rg >/dev/null 2>&1; then

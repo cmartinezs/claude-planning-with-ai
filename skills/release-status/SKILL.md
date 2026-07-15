@@ -7,6 +7,10 @@ allowed-tools: [Bash, Read]
 
 Show release status with live planning states read from `.planning/`. Optionally transition a release with `--mark-*` flags.
 
+## Arguments
+
+`$ARGUMENTS` — format: `[vX.Y.Z] [--mark-planned | --mark-in-progress | --mark-blocked | --mark-released | --mark-cancelled]`.
+
 ## Steps
 
 1. Use only the current working directory. Do not search parent directories.

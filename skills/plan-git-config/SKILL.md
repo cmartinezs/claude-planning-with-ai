@@ -11,7 +11,8 @@ View or update `.planning/config.yml`. Use this on projects where `.planning/` w
 
 ## Arguments
 
-`$ARGUMENTS` (optional)
+`$ARGUMENTS` — format: `[--base-branch <branch>]`
+
 - `--base-branch <branch>` — set the base branch (e.g. `--base-branch develop`)
 - *(no arguments)* — show current configuration and offer to change it
 

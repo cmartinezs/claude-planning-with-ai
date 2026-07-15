@@ -1,45 +1,29 @@
 ---
 name: us-split
-description: Split a user story into two — the original keeps its core flow, a new story gets the extracted behaviour. Both get cross-references.
+description: Split an oversized backlog user story by delegating mechanical acceptance-criteria movement, new filename allocation, cross-reference writing, and index updates to the shared planning-story script.
 argument-hint: <path/to/story.md>
-allowed-tools: [Read, Write, Bash, Glob]
+allowed-tools: [Bash, Read]
 ---
 
-Split an oversized or mixed-concern user story into two focused stories. The counterpart of `/plan-split-story` at the product backlog layer.
-
-Layer boundary: this command edits source backlog story files. If the story has already been copied into an active planning, use `/plan-split-story` for the planning story and then decide whether the backlog also needs `/us-split`.
+Split an oversized or mixed-concern backlog story into two focused stories. The original keeps the core flow; the new story receives the extracted behavior.
 
 ## Arguments
 
-`$ARGUMENTS` — path to the story file to split (e.g. `docs/product/user-stories/epic-01-auth/03-teacher-login.md`)
+`$ARGUMENTS` — path or unambiguous reference to the backlog story file.
 
 ## Steps
 
-1. Read the story file at `$ARGUMENTS`. If not found, stop and report.
+1. Inspect the target story and its container:
+   ```bash
+   node .planning/scripts/planning-story.mjs backlog-inspect <story-ref>
+   ```
+2. Read the story content and decide the product split: what stays, what moves, and the title of the new story.
+3. Ask the user to confirm the split, including the acceptance criteria numbers that will move.
+4. Generate the dry-run:
+   ```bash
+   node .planning/scripts/planning-story.mjs backlog-split <story-ref> --new-title "<title>" --move-ac "<1,2>"
+   ```
+5. After approval, run the same command with `--write`.
+6. Report the original file, new file, moved acceptance criteria, and whether follow-up `/us-enrich` is needed.
 
-2. Identify the story's container directory (the parent directory of the file). Look for a container index (`README.md` or a file listing stories) to understand existing IDs and naming conventions.
-
-3. Analyse the story content and identify the natural split point — sections of the Acceptance Criteria, Description, or Technical Notes that address a distinct concern from the rest.
-
-4. Ask the user: "I suggest splitting into:
-   - **Story A (keep):** <summary of what stays>
-   - **Story B (new):** <summary of what goes to the new story>
-   Split point: <which AC items / sections move>
-   Confirm? (yes / describe a different split)"
-   Wait for confirmation before writing anything.
-
-5. Once confirmed:
-   a. Determine the new story's filename: follow the container's numbering convention (e.g., if the highest story is `05-*.md`, new one is `06-*.md`). Derive a kebab-case name from the new story's topic.
-   b. Create the new story file at `<container>/<new-number>-<slug>.md`. Populate it with:
-      - The extracted AC items, description sections, or Technical Notes.
-      - Copy the header fields (Epic, Priority, etc.) from the original, adjusting the title.
-      - Add: `Split from: [<original-filename>](<original-filename>)`.
-   c. Update the original story file:
-      - Remove the extracted content.
-      - Add a cross-reference at the bottom: `Related: [<new-story-title>](<new-filename>)`.
-
-6. If the container has an index (`README.md` with a story table): add an entry for the new story. If no index exists, skip this step.
-
-7. Report: two story files now exist. List which AC items stayed and which moved. If either story now looks underspecified, suggest `/us-enrich <path>`.
-
-> Does NOT touch the `.planning/` system. If this story is already linked to a planning story, you may need to run `/plan-enrich-epic` to add a story for the new story.
+Layer boundary: this command edits source backlog artifacts only. If the story is already copied into an active planning, use `/plan-split-story` for the planning story.

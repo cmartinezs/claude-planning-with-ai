@@ -5,7 +5,11 @@ argument-hint: <NNN-slug> [<story-NN> [<task-NN>]]
 allowed-tools: [Bash, Read]
 ---
 
-Generate documentation from `.planning/` artifacts into `docs/`. The deterministic script detects the level from the number of arguments:
+Generate documentation from `.planning/` artifacts into `docs/`.
+
+## Arguments
+
+`$ARGUMENTS` — one of:
 
 - `NNN-slug story-NN task-NN` — task-level inline docs and/or ADR.
 - `NNN-slug story-NN` — story-level changelog, guide, or consolidated ADR.

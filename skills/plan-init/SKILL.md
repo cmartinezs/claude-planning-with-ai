@@ -2,7 +2,7 @@
 name: plan-init
 description: Initialize the planning system in the current project. Creates the .planning/ directory structure (workflows, templates, tutorial, glossary) from the plugin's planning-template/, then discovers the project structure to configure area codes. Run once per project before using any other plan-* commands.
 argument-hint: [--blank] [--force]
-allowed-tools: [Read, Write, Bash, Glob]
+allowed-tools: [Read, Write, Bash]
 ---
 
 # plan-init
@@ -11,303 +11,78 @@ Initialize the `.planning/` directory structure in the current project.
 
 ## Arguments
 
-`$ARGUMENTS`
+`$ARGUMENTS` — format: `[--blank] [--force]`
+
 - *(no arguments)* — initialize `.planning/` and run interactive area discovery
 - `--blank` — initialize without area discovery; area tables left as placeholders for manual editing
-- `--force` — reinitialize system files even if `.planning/` already exists (preserves `active/`, `finished/`, and existing area configuration)
+- `--force` — refresh system files even if `.planning/` already exists. It preserves project-specific workspace files such as `active/`, `finished/`, `config.yml`, `GUIDE.md`, `TRACEABILITY-GLOBAL.md`, `SMOKE-TESTS.md`, `LOGGING.md`, `_template/`, and SDLC area guidance.
 
 ## Steps
 
-### 1 — Determine context
-
-Determine the current working directory. Note the project name (last segment of the path).
+### 1 — Workspace boundary
 
 Use the current directory as the only initialization target:
+
 - Create or reinitialize only `./.planning/`.
 - Do not search parent directories for an existing `.planning/`.
 - Do not reuse a parent `.planning/` when the current directory is a monorepo child artifact.
 - If a parent directory also has `.planning/`, treat it as a separate coordinating workspace.
 
-### 2 — Check existing state
+### 2 — Locate the init script
 
-- If `.planning/` already exists and `--force` was NOT passed → stop and report: "`.planning/` already exists. Use `--force` to reinitialize system files without touching active plannings or area configuration."
-- If `.planning/` already exists and `--force` was passed → proceed, but do NOT touch `.planning/active/`, `.planning/finished/`, or any `AREA-*.md` files in `WORKFLOWS/05-SDLC-PHASE-GUIDANCE/`.
-
-### 3 — Locate the plugin template
-
-Find the plugin's `planning-template/` directory:
-```bash
-cat ~/.claude/plugins/installed_plugins.json \
-  | python3 -c "import json,sys; d=json.load(sys.stdin)['plugins']; \
-    matches=[p['installPath'] for k,v in d.items() for p in v if 'claude-planning-with-ai' in k]; \
-    print(matches[0] if matches else '')"
-```
-If not found, fall back to:
-```bash
-find ~/.claude -name "planning-template" -type d 2>/dev/null | grep claude-planning-with-ai | head -1
-```
-
-### 4 — Copy template files
-
-Copy all files from `planning-template/` to `.planning/` in the current project:
-- Use `cp -r` for the full directory tree.
-- If `--force`: skip `active/`, `finished/`, and `WORKFLOWS/05-SDLC-PHASE-GUIDANCE/AREA-*.md` during copy (preserve existing user configuration).
-- Preserve directory structure exactly.
-
-### 5 — Initialize index files
-
-Create `.planning/active/README.md` and `.planning/finished/README.md` if they don't exist (do not overwrite if they do).
-
-### 6 — Set project metadata
-
-Update `.planning/README.md`: set the project name to the current directory name, set the date to today.
-
-### 7 — Project area discovery
-
-**Skip this step if:**
-- `--blank` was passed, OR
-- `--force` was passed (area config already exists from original init)
-
-Otherwise, run the interactive area discovery:
-
-#### 7a — Scan top-level directories
+Find the plugin template directory, then use its init script:
 
 ```bash
-find . -maxdepth 1 -mindepth 1 -type d \
-  ! -name '.*' \
-  ! -name '.planning' \
-  ! -name 'node_modules' \
-  ! -name '__pycache__' \
-  ! -name 'target' \
-  ! -name 'build' \
-  ! -name 'dist' \
-  ! -name 'out' \
-  ! -name '.next' \
-  | sed 's|^\./||' \
-  | sort
+node <planning-template>/scripts/planning-init.mjs $ARGUMENTS --format markdown
 ```
 
-#### 7b — Detect technology context per directory
+When developing this plugin repo directly, `<planning-template>` is `./planning-template`.
+When installed, locate it from the installed plugin path or fall back to a `~/.claude` search for `claude-planning-with-ai/.../planning-template`.
 
-For each directory found, check for indicator files:
+### 3 — Review areas before writing
 
-| Indicator | Detected stack |
-|-----------|---------------|
-| `package.json` | JavaScript / TypeScript — check `package.json` for Next.js, Express, Vite, etc. |
-| `pom.xml` or `build.gradle*` | Java / JVM |
-| `pyproject.toml` or `requirements.txt` | Python |
-| `go.mod` | Go |
-| `*.tf` files or a `terraform/` subdirectory | Infrastructure (Terraform) |
-| Only `*.md` or `*.rst` files, no code | Documentation |
-| None of the above | Generic code area |
+If neither `--blank` nor `--force` was passed, first run:
 
-#### 7c — Propose area codes
-
-Derive a 2–4 uppercase letter code for each directory using these default mappings (first match wins):
-
-| Directory name contains | Proposed code |
-|------------------------|--------------|
-| `api`, `backend`, `server` | `AP` |
-| `web`, `frontend`, `ui`, `client` | `WB` |
-| `docs`, `documentation`, `doc` | `DO` |
-| `infra`, `infrastructure`, `terraform`, `deploy` | `IN` |
-| `agent`, `agents`, `ai`, `ml` | `AG` |
-| `mobile`, `ios`, `android` | `MB` |
-| `lib`, `shared`, `common`, `core` | `LB` |
-| `services`, `svc` | `SV` |
-| `packages` (monorepo root) | scan subdirectories and propose one code per package |
-| (no match) | first 2 letters of directory name, uppercased |
-
-If two directories would get the same code, append a digit to disambiguate (e.g. `AP1`, `AP2`).
-
-Always append `W | .planning/ — planning system (this directory)` as the last area.
-
-#### 7d — Present and confirm
-
-Display the proposed mapping:
-
-```
-Estructura del proyecto detectada:
-
-  DO | docs/        — documentación (markdown)
-  AP | api/         — Java / Spring Boot backend
-  WB | web/         — Next.js frontend
-  IN | infra/       — Terraform infrastructure
-  W  | .planning/   — planning system (este directorio)
-
-¿Es correcta esta configuración? (Enter para confirmar, o describe los cambios)
-Ejemplos: "renombra AP a BE", "elimina IN", "agrega SV para services/", "los codes están bien pero web/ es React no Next.js"
-```
-
-Apply any adjustments the user requests. Wait for final confirmation before proceeding.
-
-#### 7e — Generate AREA files
-
-For each confirmed area (all except `W`), create `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/AREA-<CODE>-<dirname>.md`:
-
-```markdown
-# Area <CODE> — <dirname>/
-
-> [← README](README.md)
->
-> **Generated by plan-init.** Update the stack details, doc references, and rules to match your project.
-
-**What This Area Is**: <one-line description based on detected stack and directory name>
-
----
-
-| Item | Value |
-|------|-------|
-| Area code | `<CODE>` |
-| Directory | `<dirname>/` |
-| Stack | <detected stack, or "[fill in your stack]"> |
-| Key doc references | [Which docs govern contracts for this area? Fill in.] |
-
-**Key Checks**: [`[CHECK-AGNOSTIC-BOUNDARY]`](../04-SUB-WORKFLOWS/CHECK-AGNOSTIC-BOUNDARY.md)
-
----
-
-## Done Criteria
-
-- [ ] Output placed in the correct directory under `<dirname>/`
-- [ ] Follows the naming and structure conventions of `<dirname>/`
-- [ ] No contradictions introduced with existing documentation
-- [ ] TRACEABILITY.md updated with any new terms introduced
-
----
-
-## Key Rules
-
-- [Add the architectural rules and constraints that govern this area]
-
----
-
-> [← README](README.md)
-```
-
-#### 7f — Update WORKFLOWS/05-SDLC-PHASE-GUIDANCE/README.md
-
-Replace the "Area Quick Reference" placeholder table with the project's actual areas:
-
-```markdown
-| Code | Area | Key Doc References | File |
-|------|------|--------------------|------|
-| DO  | `docs/` — documentation          | [fill in] | [AREA-DO-docs.md](AREA-DO-docs.md) |
-| AP  | `api/` — backend service          | [fill in] | [AREA-AP-api.md](AREA-AP-api.md)   |
-| ...  | ...                              | ...       | ...                                |
-| W   | `.planning/` — meta-workflow      | *(built-in)* | *(built-in)*                    |
-```
-
-#### 7g — Update .planning/GUIDE.md
-
-Replace the `<!-- AREAS-TABLE -->` placeholder table with the project's actual area codes and descriptions.
-
-#### 7h — Update .planning/TRACEABILITY-GLOBAL.md
-
-- Replace the `<!-- AREAS-REF -->` placeholder table with the project's actual area codes.
-- Replace the `<!-- MATRIX-HEADER -->` placeholder matrix header with actual area columns — insert one column per area (in the same order as GUIDE.md) between `Source Planning` and the `W` column.
-- Update any existing rows (bootstrap rows) to add `N/A` in the new area columns.
-
-#### 7i — Update .planning/_template/TRACEABILITY.md
-
-- Replace the `<!-- AREAS-REF -->` placeholder table with the project's actual area codes.
-- Replace the `<!-- MATRIX-HEADER -->` placeholder matrix header to include one column per area between `Term / Concept` and `Notes`.
-
-### 8 — Git configuration
-
-Ask the user which project mode should be written to `.planning/config.yml`:
-
-```
-Project mode [software]:
-  software      Source code, services, apps, infrastructure, automation
-  general       General project delivery
-  documentation Docs, guides, content, knowledge bases
-  research      Discovery, analysis, experiments
-  operations    Process, support, rollout, coordination
-```
-
-Accept Enter as `software`. If the user selects `general`, `documentation`, `research`, or `operations`, set `execution.requires_tests: false`. For `general`, `research`, and `operations`, set `execution.requires_git: false` unless the user explicitly asks to keep git required.
-
-Detect the project's default remote branch:
 ```bash
-git remote show origin 2>/dev/null | grep "HEAD branch" | awk '{print $NF}'
-```
-Use the detected value as default; fall back to `main` if the command fails or the repo has no remote yet.
-
-Ask the user:
-```
-Base git branch for story branches [<detected-or-main>]:
-```
-Accept Enter to keep the default.
-
-Write (or overwrite) `.planning/config.yml`:
-```yaml
-# Planning system configuration — edit as needed.
-# Generated by /plan-init.
-
-git:
-  base_branch: <confirmed-value>
-
-project:
-  type: <confirmed-project-mode>      # software | general | documentation | research | operations
-
-terminology:
-  planning_item: story          # story | workstream | deliverable | experiment | initiative
-  verification_label: Verification
-
-autonomy:
-  level: assisted       # manual | assisted | autonomous
-
-execution:
-  requires_git: <true-or-false>
-  requires_tests: <true-or-false>
-
-software:
-  smoke_tests_file: SMOKE-TESTS.md   # Optional override for the smoke-test plan file under .planning/
-
-integrations:
-  external_issues: disabled     # disabled | github | jira | linear
-
-docs:
-  output_dir: docs
+node <planning-template>/scripts/planning-init.mjs --detect-only --format markdown
 ```
 
-### 9 — Report
+Show the proposed area mapping to the user. If the user accepts it, continue with the normal init command.
 
-```
-.planning/ initialized in [project path]
+If the user asks for changes, write a temporary JSON array with the confirmed areas and pass it as `--areas-file <path>`. Each item must have:
 
-Areas configured:
-  <CODE> | <dirname>/  — <description>
-  <CODE> | <dirname>/  — <description>
-  W      | .planning/  — planning system
-
-Structure created:
-  .planning/
-  ├── _template/
-  │   ├── README.md
-  │   ├── RETROSPECTIVE-RAW.md
-  │   └── ...
-  ├── WORKFLOWS/
-  │   └── 05-SDLC-PHASE-GUIDANCE/
-  │       ├── AREA-<CODE>-<dirname>.md   ← one per area
-  │       └── ...
-  ├── TUTORIAL/
-  ├── update-version/   (migration instructions for older .planning workspaces)
-  ├── PDR-TEMPLATE.md   (optional decision-record template used by /plan-decision)
-  ├── active/          (empty — ready for plannings)
-  ├── finished/        (empty)
-  ├── GUIDE.md         ← area table filled in
-  ├── GLOSSARY.md
-  └── README.md
-
-Next steps:
-  /plan-new NNN-slug -- intent          Start a planning from scratch
-  /plan-from-epic NNN path/to/epic/     Generate planning from existing stories
+```json
+{ "code": "AP", "dir": "api", "stack": "Java / Maven", "description": "backend service" }
 ```
 
-If `--blank` was passed, omit the "Areas configured" section and add:
+### 4 — Run initialization
+
+Run the script with the original arguments and any confirmed options:
+
+```bash
+node <planning-template>/scripts/planning-init.mjs $ARGUMENTS [--areas-file <path>] [--project-mode <mode>] [--base-branch <branch>] --format markdown
 ```
-  Area configuration skipped (--blank). Edit GUIDE.md and WORKFLOWS/05-SDLC-PHASE-GUIDANCE/ manually,
-  or delete .planning/ and run /plan-init again without --blank.
-```
+
+The script owns:
+
+- `.planning/` existence checks
+- template copying
+- `--force` preservation of existing project-specific files, including `active/`, `finished/`, `config.yml`, `GUIDE.md`, `TRACEABILITY-GLOBAL.md`, `SMOKE-TESTS.md`, `LOGGING.md`, `_template/`, and SDLC area guidance
+- top-level directory scan and area code proposal
+- AREA file generation
+- GUIDE, TRACEABILITY-GLOBAL, local TRACEABILITY template, and SDLC area README table updates
+- `.planning/config.yml` generation
+- active/finished index initialization
+
+If the script fails, report its error verbatim and stop. Do not manually recreate partial initialization steps after a failed script run.
+
+### 5 — Report
+
+Report the script output verbatim, then add:
+
+- `.planning/` path initialized
+- configured areas, or that area configuration was skipped
+- base branch and project mode from `.planning/config.yml`
+- next suggested command:
+  - `/plan-new NNN-slug -- intent`
+  - `/plan-from-epic NNN path/to/epic/`

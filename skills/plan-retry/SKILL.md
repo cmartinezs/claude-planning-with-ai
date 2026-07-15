@@ -13,16 +13,36 @@ Retry all stories with status BLOCKED in a planning. Resets each to TODO and inv
 
 ## Steps
 
-1. Locate `.planning/active/$ARGUMENTS/`. If not found, stop and report.
-2. Read all story files under `.planning/active/$ARGUMENTS/02-deepening/*.md`. Collect every story whose status line is `BLOCKED`. If none found, report "no BLOCKED stories — nothing to retry" and stop.
-3. List the BLOCKED stories and announce: "Retrying N stories: story-01, story-03…"
-4. For each BLOCKED story (in dependency order — check `Depends On` fields to avoid retrying a story before its dependency):
-   a. Verify all stories it depends on are `DONE`. If not, execute `[RECORD-EDGE-CASE]` with the dependency blocker, then skip it with a warning: "story-NN skipped — dependency story-MM is not DONE".
-   b. Set the story status from `BLOCKED` to `TODO` in its file.
-   c. Invoke `/plan-story $ARGUMENTS <story-id>`.
-   d. If the story completes successfully, note it as DONE.
-   e. If it fails again, mark it BLOCKED again with the new failure reason and execute `[RECORD-EDGE-CASE]` with the retry failure.
-5. Update `.planning/active/README.md` to reflect new story statuses.
-6. Report: N stories retried — N now DONE, N still BLOCKED (with reasons), N skipped (dependency not met).
+1. Parse `$ARGUMENTS` as planning ID.
+
+2. Verify `.planning/scripts/planning-mutate.mjs` exists. If missing, stop:
+
+   > This workspace needs the latest planning scripts. Re-run `/plan-init --force` from the project root or copy the current planning template scripts into `.planning/scripts/`.
+
+3. Dry-run retry preparation:
+
+   ```bash
+   node .planning/scripts/planning-mutate.mjs retry <planning-id> --dry-run
+   ```
+
+   If it fails, report the error verbatim and stop.
+
+4. Verify touched paths stay inside `.planning/active/<planning-id>/` and are limited to story files, `01-expansion.md`, optional `README.md`, and `RETROSPECTIVE-RAW.md`.
+
+5. Apply retry preparation:
+
+   ```bash
+   node .planning/scripts/planning-mutate.mjs retry <planning-id>
+   ```
+
+6. If no BLOCKED stories are reported, say "no BLOCKED stories — nothing to retry" and stop.
+
+7. Invoke each reported `retryCommands` entry in order.
+   - If `/plan-story` completes successfully, note it as DONE.
+   - If it fails again, leave/report the story as BLOCKED with the new failure reason and execute `[RECORD-EDGE-CASE]` for the retry failure.
+
+8. Report: N stories retried, N now DONE, N still BLOCKED, N skipped because dependencies were not DONE.
+
+The script owns active preflight, BLOCKED collection, dependency checks, TODO reset, expansion/README updates, skipped dependency notes, and retry command emission.
 
 > Use after manually fixing a blocker. To retry a single story, use `/plan-story NNN-slug story-NN` directly.

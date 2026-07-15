@@ -4,8 +4,8 @@ set -u
 usage() {
   cat <<'EOF'
 Usage:
-  bash .planning/scripts/generate-test-suite.sh --planning <NNN-slug> [--story story-NN] [--task task-NN]
-  bash .planning/scripts/generate-test-suite.sh --planning <NNN-slug> --all
+  bash .planning/scripts/generate-test-suite.sh --planning <NNN-slug> [--story story-NN] [--task task-NN] [--format markdown|json]
+  bash .planning/scripts/generate-test-suite.sh --planning <NNN-slug> --all [--format markdown|json]
 
 Generates deterministic TEST-SUITE.md artifacts from repository signals.
 It does not execute tests.
@@ -16,6 +16,9 @@ planning_id=""
 story_id=""
 task_id=""
 all_scopes=false
+format="markdown"
+generated_files=()
+generation_failed=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -35,6 +38,10 @@ while [[ $# -gt 0 ]]; do
       all_scopes=true
       shift
       ;;
+    --format)
+      format="${2:-}"
+      shift 2
+      ;;
     -h|--help)
       usage
       exit 0
@@ -52,6 +59,15 @@ if [[ -z "$planning_id" ]]; then
   usage >&2
   exit 2
 fi
+
+case "$format" in
+  markdown|json) ;;
+  *)
+    printf 'Invalid --format: %s\n' "$format" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
 
 root="$(pwd)"
 planning_dir="$root/.planning/active/$planning_id"
@@ -499,7 +515,7 @@ $maven_acceptance
 EOF
 
   rm -rf "$tmpdir"
-  printf '%s\n' "$output"
+  generated_files+=("$output")
 }
 
 generate_for_scope() {
@@ -544,31 +560,84 @@ generate_for_scope() {
 if [[ "$all_scopes" == true ]]; then
   if [[ -n "$story_id" ]]; then
     selected_story="$story_id"
-    generate_for_scope "$selected_story" ""
+    generate_for_scope "$selected_story" "" || generation_failed=true
     selected_story_dir="$(first_existing_story_dir "$selected_story")"
-    while IFS= read -r task; do
-      task_base="$(basename "$task")"
-      if [[ "$task_base" =~ ^(task-[0-9]+)- ]]; then
-        generate_for_scope "$selected_story" "${BASH_REMATCH[1]}"
-      fi
-    done < <(find "$selected_story_dir" -maxdepth 1 -type f -name 'task-*.md' 2>/dev/null | sort)
-    exit 0
-  fi
-
-  generate_for_scope "" ""
-  while IFS= read -r dir; do
-    base="$(basename "$dir")"
-    if [[ "$base" =~ ^(story-[0-9]+)- ]]; then
-      sid="${BASH_REMATCH[1]}"
-      generate_for_scope "$sid" ""
+    if [[ -n "$selected_story_dir" ]]; then
       while IFS= read -r task; do
         task_base="$(basename "$task")"
         if [[ "$task_base" =~ ^(task-[0-9]+)- ]]; then
-          generate_for_scope "$sid" "${BASH_REMATCH[1]}"
+          generate_for_scope "$selected_story" "${BASH_REMATCH[1]}" || generation_failed=true
         fi
-      done < <(find "$dir" -maxdepth 1 -type f -name 'task-*.md' | sort)
+      done < <(find "$selected_story_dir" -maxdepth 1 -type f -name 'task-*.md' 2>/dev/null | sort)
     fi
-  done < <(find "$planning_dir/02-deepening" -maxdepth 1 -type d -name 'story-*' 2>/dev/null | sort)
+  else
+    generate_for_scope "" "" || generation_failed=true
+    while IFS= read -r dir; do
+      base="$(basename "$dir")"
+      if [[ "$base" =~ ^(story-[0-9]+)- ]]; then
+        sid="${BASH_REMATCH[1]}"
+        generate_for_scope "$sid" "" || generation_failed=true
+        while IFS= read -r task; do
+          task_base="$(basename "$task")"
+          if [[ "$task_base" =~ ^(task-[0-9]+)- ]]; then
+            generate_for_scope "$sid" "${BASH_REMATCH[1]}" || generation_failed=true
+          fi
+        done < <(find "$dir" -maxdepth 1 -type f -name 'task-*.md' | sort)
+      fi
+    done < <(find "$planning_dir/02-deepening" -maxdepth 1 -type d -name 'story-*' 2>/dev/null | sort)
+  fi
 else
-  generate_for_scope "$story_id" "$task_id"
+  generate_for_scope "$story_id" "$task_id" || generation_failed=true
+fi
+
+json_escape() {
+  local value="$1"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\n'/\\n}"
+  printf '%s' "$value"
+}
+
+rel_path() {
+  local path="$1"
+  printf '%s' "${path#$root/}"
+}
+
+print_report() {
+  local file rel i
+
+  if [[ "$format" == "json" ]]; then
+    printf '{'
+    printf '"planning":"%s",' "$(json_escape "$planning_id")"
+    printf '"story":"%s",' "$(json_escape "$story_id")"
+    printf '"task":"%s",' "$(json_escape "$task_id")"
+    printf '"all":%s,' "$all_scopes"
+    printf '"generated":['
+    for i in "${!generated_files[@]}"; do
+      [[ "$i" == "0" ]] || printf ','
+      rel="$(rel_path "${generated_files[$i]}")"
+      printf '"%s"' "$(json_escape "$rel")"
+    done
+    printf ']}'
+    printf '\n'
+    return
+  fi
+
+  printf '# Test Suite Generation\n\n'
+  printf 'Planning: `%s`\n\n' "$planning_id"
+  if [[ "${#generated_files[@]}" -eq 0 ]]; then
+    printf 'No files generated.\n'
+    return
+  fi
+  printf 'Generated or refreshed files:\n\n'
+  for file in "${generated_files[@]}"; do
+    printf '%s\n' "- \`$(rel_path "$file")\`"
+  done
+  printf '\nReview each file and fill any repository-specific gaps before relying on the suite as execution evidence.\n'
+}
+
+print_report
+
+if [[ "$generation_failed" == true ]]; then
+  exit 1
 fi

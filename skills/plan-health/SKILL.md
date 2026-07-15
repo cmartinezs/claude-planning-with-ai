@@ -9,6 +9,10 @@ Full-system health check of the current directory's `.planning/` workspace. Read
 
 Use `/plan-health` when the whole planning system may be inconsistent. Use `/plan-validate [NNN-slug]` when one planning needs a detailed structural audit.
 
+## Arguments
+
+No arguments.
+
 ## Steps
 
 1. Use only `./.planning/` in the current working directory. Do not search parent directories.
