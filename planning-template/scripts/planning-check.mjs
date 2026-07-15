@@ -401,8 +401,26 @@ function isDbOrmTask(text) {
 }
 
 function isReviewOnlyTask(text) {
-  return /\*\*Review-only:\*\*\s*(yes|true|si|sí)\b/i.test(text)
-    || /\b(review-only|read-only review|solo de revisi[oó]n|solo revisi[oó]n)\b/i.test(text);
+  const field = /\*\*Review-only:\*\*\s*([^\n\r]+)/i.exec(text);
+  if (field) return /^(yes|true|si|sí)\b/i.test(field[1].trim());
+  return /\b(read-only review|solo de revisi[oó]n|solo revisi[oó]n|this is a review-only task|review-only task)\b/i.test(text);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function isFrontendTask(text) {
+  if (isReviewOnlyTask(text)) return false;
+  const field = /\*\*Frontend task:\*\*\s*([^\n\r]+)/i.exec(text);
+  if (field) return /^(yes|true|si|sí)\b/i.test(field[1].trim());
+  const scan = [
+    text.split(/\r?\n/).slice(0, 8).join('\n'),
+    section(text, 'Objective'),
+    section(text, 'Technical Design'),
+    section(text, 'Implementation Steps'),
+  ].join('\n');
+  return /\b(frontend|front-end|ui|ux|web|client|browser|page|view|screen|route|component|layout|form|modal|dashboard|react|vue|angular|svelte|jsx|tsx|css|tailwind)\b/i.test(scan);
 }
 
 function hasEmptySummaryEvidence(text) {
@@ -410,6 +428,33 @@ function hasEmptySummaryEvidence(text) {
   if (!summary) return true;
   return /\[(Files, docs|Inline summary|Accepted \/ blocked|Use fenced language snippets)/i.test(summary)
     || /\bFill during execution\b/i.test(summary);
+}
+
+function missingFrontendDesignLabels(text) {
+  const design = section(text, 'Frontend Design Plan').trim();
+  if (!design) return ['Frontend Design Plan'];
+  const required = [
+    'Frontend task',
+    'Idea to implementation path',
+    'View description',
+    'UI/UX principles',
+    'Wireframe / representation',
+    'Functional mockup before real activity',
+    'Component pattern',
+    'Page logic layer',
+    'Business logic layer',
+    'External communication layer',
+    'Reuse / modify / create decision',
+  ];
+  return required.filter((label) => !new RegExp(`\\*\\*${escapeRegExp(label)}:\\*\\*`, 'i').test(design));
+}
+
+function hasPlaceholderFrontendDesign(text) {
+  const design = section(text, 'Frontend Design Plan').trim();
+  if (!design) return true;
+  return /\[(Problem\/intent|What the user sees|Hierarchy|ASCII wireframe|Static or locally mocked|Existing component|Routing|Validation|Services, APIs|For each affected)/i.test(design)
+    || /\b(Describe problem\/intent|Describe visible layout|Document hierarchy|Add an ASCII wireframe|Plan static or locally mocked|Identify existing component|Define routing|Define validation|Define services|State which view)\b/i.test(design)
+    || /\bN\/A\b/i.test(design);
 }
 
 function hasUnlabeledCodeFence(text) {
@@ -636,6 +681,13 @@ function validateTaskFile(planning, storyFile, taskFile, taskRow, catalog, confi
       add(results, 'FAIL', `${taskId} review-only task missing concrete Summary Evidence`, taskFile, lineOf(text, /Review-only|Summary Evidence/i), 'Add ## Summary Evidence with reviewed scope, evidence artifact, conclusion, and links/snippets as needed.');
     } else if (hasUnlabeledCodeFence(section(text, 'Summary Evidence'))) {
       add(results, 'WARN', `${taskId} Summary Evidence has a code fence without a language label`, taskFile, lineOf(text, '## Summary Evidence'), 'Use fenced snippets with a language name, for example ```ts or ```java.');
+    }
+  }
+  if (isFrontendTask(text)) {
+    const missingLabels = missingFrontendDesignLabels(text);
+    if (!hasHeading(text, 'Frontend Design Plan') || missingLabels.length > 0 || hasPlaceholderFrontendDesign(text)) {
+      const details = missingLabels.length > 0 ? ` Missing fields: ${missingLabels.join(', ')}.` : '';
+      add(results, 'FAIL', `${taskId} frontend task missing complete Frontend Design Plan`, taskFile, lineOf(text, /Frontend Design Plan|Frontend task|frontend|ui/i), `Add ## Frontend Design Plan with idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions.${details}`);
     }
   }
   if (/\b(and|plus|also)\b/i.test(section(text, 'Objective'))) {

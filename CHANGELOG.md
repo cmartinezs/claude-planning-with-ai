@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.7] — 2026-07-15
+
+### Added
+
+- Frontend/UI implementation tasks now require `## Frontend Design Plan`, covering idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions.
+
 ## [3.10.6] — 2026-07-15
 
 ### Added
@@ -367,7 +373,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.6...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.7...HEAD
+[3.10.7]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.6...v3.10.7
 [3.10.6]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.3...v3.10.4

@@ -287,6 +287,8 @@ function normalizeTask(task) {
   const title = String(task.title || task.name || '').trim();
   if (!title) fail('Every task needs a title.');
   const tech = task.technicalDesign || {};
+  const frontendTask = frontendFlag(task, title, tech);
+  const frontend = task.frontendDesign || task.frontend_design || {};
   return {
     title,
     slug: slugify(title),
@@ -303,6 +305,19 @@ function normalizeTask(task) {
     },
     reviewOnly: booleanFlag(task.reviewOnly || task.review_only || task.review),
     summaryEvidence: stringOr(task.summaryEvidence || task.summary_evidence, ''),
+    frontendTask,
+    frontendDesign: {
+      ideaToImplementation: stringOr(frontend.ideaToImplementation || frontend.idea_to_implementation, frontendTask ? 'Describe problem/intent -> UX concept -> representation -> functional markup -> component implementation -> verification.' : 'N/A'),
+      viewDescription: stringOr(frontend.viewDescription || frontend.view_description, frontendTask ? 'Describe visible layout, primary states, empty/loading/error states, responsive behavior, and accessibility expectations.' : 'N/A'),
+      uiUxPrinciples: stringOr(frontend.uiUxPrinciples || frontend.ui_ux_principles, frontendTask ? 'Document hierarchy, clarity, feedback, consistency, keyboard/screen-reader behavior, and error prevention.' : 'N/A'),
+      wireframe: stringOr(frontend.wireframe || frontend.representation, frontendTask ? 'Add an ASCII wireframe, state diagram, flow outline, or link to a design artifact.' : 'N/A'),
+      functionalMockup: stringOr(frontend.functionalMockup || frontend.functional_mockup, frontendTask ? 'Plan static or locally mocked markup/state before connecting real backend or external activity.' : 'N/A'),
+      componentPattern: stringOr(frontend.componentPattern || frontend.component_pattern, frontendTask ? 'Identify existing component/pattern reuse or define new component boundary, props/events/state ownership, composition, and styling convention.' : 'N/A'),
+      pageLogicLayer: stringOr(frontend.pageLogicLayer || frontend.page_logic_layer, frontendTask ? 'Define routing, page/container state, loading/error handling, permissions, and orchestration.' : 'N/A'),
+      businessLogicLayer: stringOr(frontend.businessLogicLayer || frontend.business_logic_layer, frontendTask ? 'Define validation, derived state, transformations, rules, and domain decisions outside presentation where applicable.' : 'N/A'),
+      externalCommunicationLayer: stringOr(frontend.externalCommunicationLayer || frontend.external_communication_layer, frontendTask ? 'Define services, APIs, clients, libraries, generated SDKs, cache/query layer, auth headers, retries, and error mapping.' : 'N/A'),
+      reuseDecision: stringOr(frontend.reuseDecision || frontend.reuse_decision, frontendTask ? 'State which view/component/service/lib is reused, modified, or created and why.' : 'N/A'),
+    },
     implementationSteps: arrayOr(task.implementationSteps || task.steps, [`Implement ${title}.`, 'Add or update verification evidence.']),
     verification: verificationRows(task.verification),
     smokeChecks: verificationRows(task.smokeChecks),
@@ -326,6 +341,18 @@ function arrayOr(value, fallback) {
 
 function booleanFlag(value) {
   return /^(true|yes|y|si|sí|review-only)$/i.test(String(value || '').trim());
+}
+
+function frontendFlag(task, title, tech) {
+  if (booleanFlag(task.frontend || task.frontendTask || task.frontend_task || task.uiTask || task.ui_task)) return true;
+  const fields = [
+    title,
+    task.objective,
+    task.deliverable,
+    task.output,
+    ...(Array.isArray(tech.affectedFiles || task.affectedFiles) ? (tech.affectedFiles || task.affectedFiles) : []),
+  ].join(' ');
+  return /\b(frontend|front-end|ui|ux|web|client|browser|page|view|screen|route|component|layout|form|modal|dashboard|react|vue|angular|svelte|jsx|tsx|css|tailwind)\b/i.test(fields);
 }
 
 function normalizeDepends(value) {
@@ -390,6 +417,22 @@ ${task.objective}
 
 ---
 
+## Frontend Design Plan
+
+- **Frontend task:** ${task.frontendTask ? 'Yes' : 'No'}
+- **Idea to implementation path:** ${task.frontendDesign.ideaToImplementation}
+- **View description:** ${task.frontendDesign.viewDescription}
+- **UI/UX principles:** ${task.frontendDesign.uiUxPrinciples}
+- **Wireframe / representation:** ${task.frontendDesign.wireframe}
+- **Functional mockup before real activity:** ${task.frontendDesign.functionalMockup}
+- **Component pattern:** ${task.frontendDesign.componentPattern}
+- **Page logic layer:** ${task.frontendDesign.pageLogicLayer}
+- **Business logic layer:** ${task.frontendDesign.businessLogicLayer}
+- **External communication layer:** ${task.frontendDesign.externalCommunicationLayer}
+- **Reuse / modify / create decision:** ${task.frontendDesign.reuseDecision}
+
+---
+
 ## Implementation Steps
 
 ${task.implementationSteps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
@@ -445,6 +488,7 @@ ${task.summaryEvidence || (task.reviewOnly
 
 ${task.doneCriteria.map((item) => `- [ ] ${item}`).join('\n')}
 - [ ] If this is a review-only task, \`## Summary Evidence\` captures the review scope, inspected evidence, conclusion, and links to any longer Markdown or snippet artifacts
+- [ ] If this is a frontend/UI task, \`## Frontend Design Plan\` documents idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions
 - [ ] Task test suite was generated/refreshed and every applicable gate has command output or documented evidence
 ${config.requiresGit === 'true' ? '- [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review\n- [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed' : '- [ ] Human review completed when required by the planning workflow'}
 

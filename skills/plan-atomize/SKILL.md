@@ -69,6 +69,19 @@ Before writing, create a temporary JSON file with the approved tasks:
       },
       "reviewOnly": false,
       "summaryEvidence": "Required when reviewOnly is true; Markdown prose, links to longer .md artifacts, or language-labeled code snippets.",
+      "frontendTask": false,
+      "frontendDesign": {
+        "ideaToImplementation": "Problem/intent -> UX concept -> representation -> functional markup -> component implementation -> verification.",
+        "viewDescription": "Visible layout, primary states, empty/loading/error states, responsive behavior, and accessibility expectations.",
+        "uiUxPrinciples": "Hierarchy, clarity, density, feedback, consistency with design system, keyboard/screen-reader behavior, and error prevention.",
+        "wireframe": "ASCII wireframe, state diagram, flow outline, or link to design artifact.",
+        "functionalMockup": "Static or locally mocked markup/state before real backend or external activity.",
+        "componentPattern": "Existing pattern reuse or new component boundary, props/events/state ownership, composition, and styling convention.",
+        "pageLogicLayer": "Routing, page/container state, loading/error handling, permissions, and orchestration.",
+        "businessLogicLayer": "Validation, derived state, transformations, rules, and domain decisions outside presentation where applicable.",
+        "externalCommunicationLayer": "Services, APIs, clients, libraries, generated SDKs, cache/query layer, auth headers, retries, and error mapping.",
+        "reuseDecision": "For each affected view/component/service/lib, state reuse, modification, or creation and why."
+      },
       "implementationSteps": ["Edit src/...", "Add tests..."],
       "verification": [{"check": "Tests pass", "how": "Run npm test"}],
       "smokeChecks": [{"check": "App starts", "how": "Run the smoke plan"}],
@@ -103,6 +116,7 @@ Before writing, create a temporary JSON file with the approved tasks:
    - make the DB/ORM validation task depend on every schema/ORM-changing task;
    - include static consistency validation and local runtime persistence smoke validation in that validation task;
    - if a candidate is review-only, set `reviewOnly: true` and include `summaryEvidence` guidance; review-only tasks must produce `## Summary Evidence`, with longer prose in `.md` artifacts when needed and language-labeled fenced snippets when code is the reviewed evidence.
+   - if a candidate is frontend/UI work, set `frontendTask: true` and fill `frontendDesign` before writing; include the idea-to-code path, view description, UI/UX principles, wireframe or equivalent representation, functional mockup before real activity, component pattern, page logic, business logic, external communication/services/APIs/libs, and reuse/modify/create decisions for every affected view/component/service/lib.
 5. Execute `[CHECK-ATOMICITY]` for each candidate:
    - `REJECTED — too large`: split it;
    - `REJECTED — fragment`: merge it with the task it cannot be verified without;

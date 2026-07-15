@@ -37,6 +37,34 @@ Example:
 
 ---
 
+## Frontend Design Plan
+
+> *Required for frontend/UI implementation tasks before code changes. Use `N/A` only when the task is not frontend-facing. Capture the full path from idea to coded implementation, including the visible experience, UI/UX reasoning, representation before code, component pattern, and data/communication layers.*
+
+- **Frontend task:** [Yes/No]
+- **Idea to implementation path:** [Problem/intent -> UX concept -> representation -> functional markup -> component implementation -> verification]
+- **View description:** [What the user sees, primary states, empty/loading/error states, responsive behavior, and accessibility expectations]
+- **UI/UX principles:** [Hierarchy, clarity, density, feedback, consistency with the design system, keyboard/screen-reader behavior, and error prevention]
+- **Wireframe / representation:** [ASCII wireframe, state diagram, flow outline, or link to the design artifact. Use fenced `text` blocks for ASCII wireframes.]
+- **Functional mockup before real activity:** [Static or locally mocked markup/state that proves layout and interactions before real backend/external calls]
+- **Component pattern:** [Existing component/pattern to reuse or new component boundary, props/events/state ownership, composition, and styling convention]
+- **Page logic layer:** [Routing, page/container state, loading/error handling, permissions, and orchestration]
+- **Business logic layer:** [Validation, derived state, transformations, rules, and domain decisions kept outside presentation where applicable]
+- **External communication layer:** [Services, APIs, clients, libraries, generated SDKs, cache/query layer, auth headers, retries, and error mapping]
+- **Reuse / modify / create decision:** [For each affected view/component/service/lib, state whether it is reused, modified, or created and why]
+
+Example:
+
+```text
++--------------------------------------------------+
+| Reset Password                                   |
+| Email [____________________] [Send link]         |
+| Success/error feedback region                    |
++--------------------------------------------------+
+```
+
+---
+
 ## Implementation Steps
 
 > *Concrete, ordered steps naming real files or components — no abstract verbs.*
@@ -130,6 +158,7 @@ Example:
 - [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review
 - [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed
 - [ ] If this is a review-only task, `## Summary Evidence` captures the review scope, inspected evidence, conclusion, and links to any longer Markdown or snippet artifacts
+- [ ] If this is a frontend/UI task, `## Frontend Design Plan` documents idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
 - [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`
 
