@@ -215,12 +215,15 @@ if command -v node >/dev/null 2>&1; then
   mkdir -p "$tmpdir/.planning/scripts" "$tmpdir/.planning/active/001-demo/02-deepening" "$tmpdir/.planning/WORKFLOWS"
   cp "$ROOT/planning-template/scripts/planning-check.mjs" "$tmpdir/.planning/scripts/planning-check.mjs"
   cp "$ROOT/planning-template/scripts/planning-report.mjs" "$tmpdir/.planning/scripts/planning-report.mjs"
-  printf '# Workflows\n' > "$tmpdir/.planning/WORKFLOWS/README.md"
+  cp "$ROOT/planning-template/scripts/planning-story.mjs" "$tmpdir/.planning/scripts/planning-story.mjs"
+  printf '# Workflows\n\n| Workflow | Purpose |\n|----------|---------|\n| [GENERATE-DOCUMENT](02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md) | Generate implementation output |\n' > "$tmpdir/.planning/WORKFLOWS/README.md"
   printf 'project:\n  type: software\nexecution:\n  requires_git: false\n' > "$tmpdir/.planning/config.yml"
   printf '# Demo\n\n## Intent\nDemo\n' > "$tmpdir/.planning/active/001-demo/00-initial.md"
   printf '# Traceability\n' > "$tmpdir/.planning/active/001-demo/TRACEABILITY.md"
-  printf '# Demo\n\n## Story Summary\n\n| # | Story | SDLC Phase(s) | Depends On | Risk | External Issue | Status |\n|---|---|---|---|---|---|---|\n| 01 | assessment-creation-ui | WB | - | M | - | TODO |\n' > "$tmpdir/.planning/active/001-demo/01-expansion.md"
-  printf '# Story 01\n\n> **Status:** TODO\n\n## Objective\nDemo\n\n## Tasks\n\n| # | Task | Status | Workflow | Depends On |\n|---|---|---|---|---|\n| 01 | Build UI | TODO | - | - |\n\n## Done Criteria\n\n- [ ] Demo\n\n## Area\n\nWB\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui.md"
+  printf '# Demo\n\n## Story Summary\n\n| # | Story | SDLC Phase(s) | Depends On | Risk | External Issue | Status |\n|---|---|---|---|---|---|---|\n| 01 | assessment-creation-ui | WB | - | M | - | TODO |\n\n## External Issue Mapping\n\n| Story | External Issue |\n|-------|----------------|\n| story-02 | - |\n' > "$tmpdir/.planning/active/001-demo/01-expansion.md"
+  printf '# Story 01\n\n> **Status:** TODO\n\n## Objective\nDemo\n\n## Tasks\n\n| # | Task | Status | Workflow | Depends On |\n|---|---|---|---|---|\n| 01 | [Build UI](story-01-assessment-creation-ui/task-01-build-ui.md) | TODO |  | - |\n\n## Done Criteria\n\n- [ ] Demo\n\n## Area\n\nWB\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui.md"
+  mkdir -p "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui"
+  printf '# Task 01 - Build UI\n\n> **Status:** TODO\n\n## Objective\nBuild UI.\n\n## Technical Design\nN/A - no database involved.\n\n### Software Smoke Test Check\nRun the frontend build smoke.\n\n### Logging / Observability\nUse existing correlation trace handling where events are emitted.\n\n### Generated Test Suite\nGenerated test-suite gate is reviewed.\n\n## Implementation Steps\n- Build UI.\n\n## Verification\n- Run build smoke.\n\n## Done Criteria\n- [ ] Build smoke passes and human review is complete.\n- [ ] Correlation trace logging remains unchanged.\n- [ ] Generated test-suite quality gate reviewed.\n' > "$tmpdir/.planning/active/001-demo/02-deepening/story-01-assessment-creation-ui/task-01-build-ui.md"
   validation_output="$(cd "$tmpdir" && node .planning/scripts/planning-check.mjs validate 001-demo --format markdown 2>&1)"
   if grep -Fq "story file has no row in Story Summary" <<< "$validation_output"; then
     fail "planning-check.mjs does not derive Story Summary IDs from the numeric # column"
@@ -232,6 +235,20 @@ if command -v node >/dev/null 2>&1; then
     pass "planning-report.mjs renders area from Story Summary SDLC Phase(s)"
   else
     fail "planning-report.mjs does not render area from Story Summary SDLC Phase(s)"
+  fi
+  story_output="$(cd "$tmpdir" && node .planning/scripts/planning-story.mjs planning-add-story 001-demo --title 'Second UI story' --area WB --write 2>&1)"
+  if grep -Fq "| 02 | second-ui-story | WB |" "$tmpdir/.planning/active/001-demo/01-expansion.md" \
+    && ! awk '/^## External Issue Mapping/{flag=1} flag && /second-ui-story/{found=1} END{exit found ? 0 : 1}' "$tmpdir/.planning/active/001-demo/01-expansion.md"; then
+    pass "planning-story.mjs inserts new stories inside Story Summary only"
+  else
+    fail "planning-story.mjs inserted a new story outside Story Summary"
+    printf '%s\n' "$story_output"
+  fi
+  validation_output="$(cd "$tmpdir" && node .planning/scripts/planning-check.mjs validate 001-demo --format markdown 2>&1)"
+  if grep -Fq "missing DB/ORM" <<< "$validation_output"; then
+    fail "planning-check.mjs treats explicit no-database task notes as DB/ORM changes"
+  else
+    pass "planning-check.mjs ignores explicit no-database task notes for DB/ORM gates"
   fi
   rm -rf "$tmpdir"
 else

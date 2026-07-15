@@ -6,7 +6,7 @@ import path from 'node:path';
 const VALID_STORY_STATUSES = new Set(['TODO', 'IN PROGRESS', 'DONE', 'BLOCKED', 'SKIPPED', 'STANDBY']);
 const VALID_TASK_STATUSES = new Set(['TODO', 'IN PROGRESS', 'DONE', 'BLOCKED']);
 const CODE_EXTENSIONS = /\.(java|kt|ts|tsx|js|jsx|mjs|cjs|py|go|cs|rs|php|rb|scala|sql|tf|yaml|yml|json)$/i;
-const DB_ORM_PATTERN = /\b(migration|schema|database|db|table|column|index|seed|prisma|typeorm|sequelize|sqlalchemy|hibernate|jpa|entity|model|repository|generated client|persistence|ddl|flyway|liquibase)\b/i;
+const DB_ORM_PATTERN = /\b(migration|database|db|prisma|typeorm|sequelize|sqlalchemy|hibernate|jpa|persistence|ddl|flyway|liquibase)\b|(?:\b(schema|table|column|index|seed|entity|model|repository|generated client)\b.{0,60}\b(database|db|orm|persistence|sql|jpa|hibernate|prisma|typeorm|sequelize|sqlalchemy|flyway|liquibase)\b)|(?:\b(database|db|orm|persistence|sql|jpa|hibernate|prisma|typeorm|sequelize|sqlalchemy|flyway|liquibase)\b.{0,60}\b(schema|table|column|index|seed|entity|model|repository|generated client)\b)/i;
 
 const root = process.cwd();
 const planningRoot = path.join(root, '.planning');
@@ -385,8 +385,19 @@ function isCodeTask(text) {
   return CODE_EXTENSIONS.test(text) || /\b(code|api|endpoint|service|controller|component|repository|migration|schema|database|cli|worker|adapter|module)\b/i.test(text);
 }
 
+function stripNegativeDbOrmLines(text) {
+  return text.split(/\r?\n/)
+    .filter((line) => {
+      const normalized = line.toLowerCase();
+      const mentionsDbOrm = /\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b/.test(normalized);
+      const negatesDbOrm = /\b(no|not|none|n\/a|na|without)\b.*\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b|\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b.*\b(not involved|not required|not applicable|no changes|unchanged|not touched|not changed|without changes)\b/.test(normalized);
+      return !(mentionsDbOrm && negatesDbOrm);
+    })
+    .join('\n');
+}
+
 function isDbOrmTask(text) {
-  return DB_ORM_PATTERN.test(text);
+  return DB_ORM_PATTERN.test(stripNegativeDbOrmLines(text));
 }
 
 function validateRequiredPlanningFiles(planning, results) {

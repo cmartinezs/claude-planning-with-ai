@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.4] — 2026-07-15
+
+### Fixed
+
+- Fixed `planning-add-story` so new story rows are inserted only inside the `Story Summary` section instead of the last numeric table elsewhere in `01-expansion.md`.
+- Reduced DB/ORM validation false positives by ignoring explicit no-database/no-ORM task notes and requiring generic terms such as `repository`, `table`, or `column` to appear near DB/ORM context.
+
 ## [3.10.3] — 2026-07-15
 
 ### Fixed
@@ -348,7 +355,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.3...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.4...HEAD
+[3.10.4]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.0...v3.10.1
