@@ -65,6 +65,23 @@ Example:
 
 ---
 
+## Backend/API Design Plan
+
+> *Required for backend/API implementation tasks before code changes. Use `N/A` only when the task is not backend/API-facing. First locate the repository's own style/coding guide under `docs/`, `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/`, `AGENTS.md`, `CONTRIBUTING.md`, or equivalent. If no guide exists, ask for it. If the project has none, create a prior task that proposes a technology-appropriate guide before implementation tasks depend on it.*
+
+- **Backend/API task:** [Yes/No]
+- **Style/coding guide source:** [Existing guide path(s), or prerequisite `task-NN` that creates/proposes the guide before this implementation task. Do not write `N/A` for backend/API tasks.]
+- **Functional design:** [Use case, actor/system trigger, inputs, outputs, state changes, success path, alternate/error paths, idempotency, permissions, and business rules]
+- **Technical design:** [Language/framework conventions, module/package placement, architectural pattern, transaction/async boundaries, error handling, observability, and why this approach fits the guide]
+- **Contract definition:** [Endpoints, commands/events, DTOs/schemas, status codes, validation rules, headers, versioning, compatibility, and examples]
+- **Layer design:** [Controller/handler/route layer, application/use-case layer, domain/business layer, persistence/integration layer, and where each responsibility lives]
+- **Data and persistence design:** [Entities/models, migrations/schema changes, repositories/queries, indexes, constraints, generated clients, and DB/ORM consistency approach; write `N/A` only if no data layer changes]
+- **External communication:** [Internal/external services, APIs, clients/libs/SDKs, queues/events, auth, retries/timeouts, circuit/fallback behavior, and error mapping]
+- **Reuse / modify / create decision:** [For each affected module/service/API/lib, state whether it is reused, modified, or created and why]
+- **Guide compliance checks:** [Style/lint/format/architecture commands or checklist items proving the implementation follows the backend guide and language conventions]
+
+---
+
 ## Implementation Steps
 
 > *Concrete, ordered steps naming real files or components — no abstract verbs.*
@@ -159,6 +176,7 @@ Example:
 - [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed
 - [ ] If this is a review-only task, `## Summary Evidence` captures the review scope, inspected evidence, conclusion, and links to any longer Markdown or snippet artifacts
 - [ ] If this is a frontend/UI task, `## Frontend Design Plan` documents idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions
+- [ ] If this is a backend/API task, `## Backend/API Design Plan` documents the style/coding guide source or prerequisite guide task, functional design, technical design, contracts, layers, data/persistence, external communication, reuse/modify/create decisions, and guide compliance checks
 - [ ] `npm run dev` / `./mvnw test` / equivalent runs without errors
 - [ ] No unintended expansion: the task satisfies `[CHECK-ATOMICITY]`
 

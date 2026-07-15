@@ -24,6 +24,8 @@ Review-only tasks must leave durable `## Summary Evidence` in the task file. Whe
 
 Frontend/UI implementation tasks must include `## Frontend Design Plan` before code changes. That plan captures the full idea-to-code path, visible view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup with local/static state before real activity, component pattern, page logic, business logic, external communication/services/APIs/libs, and explicit reuse/modify/create decisions for each affected view, component, service, or library.
 
+Backend/API implementation tasks must include `## Backend/API Design Plan` before code changes. The agent must first locate the project style/coding guide; if it cannot find one, it must ask for it, and if the project has none, create a prior task to propose a technology-appropriate backend guide before implementation tasks depend on it. The backend plan captures functional design, technical design, contract definition, layer design, data/persistence design, external communication/services/APIs/libs, reuse/modify/create decisions, and guide compliance checks for the backend language and project conventions.
+
 ### Project Configuration
 
 Each initialized project has `.planning/config.yml`. It controls:
@@ -412,5 +414,5 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
 - **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
-- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.7` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.8` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

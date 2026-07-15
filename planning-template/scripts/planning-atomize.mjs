@@ -289,6 +289,8 @@ function normalizeTask(task) {
   const tech = task.technicalDesign || {};
   const frontendTask = frontendFlag(task, title, tech);
   const frontend = task.frontendDesign || task.frontend_design || {};
+  const backendTask = backendFlag(task, title, tech);
+  const backend = task.backendDesign || task.backend_design || {};
   return {
     title,
     slug: slugify(title),
@@ -317,6 +319,18 @@ function normalizeTask(task) {
       businessLogicLayer: stringOr(frontend.businessLogicLayer || frontend.business_logic_layer, frontendTask ? 'Define validation, derived state, transformations, rules, and domain decisions outside presentation where applicable.' : 'N/A'),
       externalCommunicationLayer: stringOr(frontend.externalCommunicationLayer || frontend.external_communication_layer, frontendTask ? 'Define services, APIs, clients, libraries, generated SDKs, cache/query layer, auth headers, retries, and error mapping.' : 'N/A'),
       reuseDecision: stringOr(frontend.reuseDecision || frontend.reuse_decision, frontendTask ? 'State which view/component/service/lib is reused, modified, or created and why.' : 'N/A'),
+    },
+    backendTask,
+    backendDesign: {
+      styleGuideSource: stringOr(backend.styleGuideSource || backend.style_guide_source, backendTask ? 'Existing backend style/coding guide path(s), or prerequisite task-NN that creates/proposes one before implementation.' : 'N/A'),
+      functionalDesign: stringOr(backend.functionalDesign || backend.functional_design, backendTask ? 'Define use case, actor/system trigger, inputs, outputs, state changes, success path, alternate/error paths, idempotency, permissions, and business rules.' : 'N/A'),
+      technicalDesign: stringOr(backend.technicalDesign || backend.technical_design, backendTask ? 'Define language/framework conventions, module/package placement, architectural pattern, transaction/async boundaries, error handling, observability, and fit with the guide.' : 'N/A'),
+      contractDefinition: stringOr(backend.contractDefinition || backend.contract_definition || backend.contracts, backendTask ? 'Define endpoints, commands/events, DTOs/schemas, status codes, validation rules, headers, versioning, compatibility, and examples.' : 'N/A'),
+      layerDesign: stringOr(backend.layerDesign || backend.layer_design, backendTask ? 'Define controller/handler/route, application/use-case, domain/business, persistence/integration responsibilities.' : 'N/A'),
+      dataPersistenceDesign: stringOr(backend.dataPersistenceDesign || backend.data_persistence_design, backendTask ? 'Define entities/models, migrations/schema changes, repositories/queries, indexes, constraints, generated clients, and DB/ORM consistency approach; write N/A only if no data changes.' : 'N/A'),
+      externalCommunication: stringOr(backend.externalCommunication || backend.external_communication, backendTask ? 'Define services, APIs, clients/libs/SDKs, queues/events, auth, retries/timeouts, fallback behavior, and error mapping.' : 'N/A'),
+      reuseDecision: stringOr(backend.reuseDecision || backend.reuse_decision, backendTask ? 'State which module/service/API/lib is reused, modified, or created and why.' : 'N/A'),
+      guideComplianceChecks: stringOr(backend.guideComplianceChecks || backend.guide_compliance_checks, backendTask ? 'List style/lint/format/architecture commands or checklist items proving guide and language convention compliance.' : 'N/A'),
     },
     implementationSteps: arrayOr(task.implementationSteps || task.steps, [`Implement ${title}.`, 'Add or update verification evidence.']),
     verification: verificationRows(task.verification),
@@ -353,6 +367,18 @@ function frontendFlag(task, title, tech) {
     ...(Array.isArray(tech.affectedFiles || task.affectedFiles) ? (tech.affectedFiles || task.affectedFiles) : []),
   ].join(' ');
   return /\b(frontend|front-end|ui|ux|web|client|browser|page|view|screen|route|component|layout|form|modal|dashboard|react|vue|angular|svelte|jsx|tsx|css|tailwind)\b/i.test(fields);
+}
+
+function backendFlag(task, title, tech) {
+  if (booleanFlag(task.backend || task.backendTask || task.backend_task || task.apiTask || task.api_task)) return true;
+  const fields = [
+    title,
+    task.objective,
+    task.deliverable,
+    task.output,
+    ...(Array.isArray(tech.affectedFiles || task.affectedFiles) ? (tech.affectedFiles || task.affectedFiles) : []),
+  ].join(' ');
+  return /\b(backend|back-end|api|server|endpoint|controller|handler|route|use-?case|repository|dao|adapter|port|dto|schema|migration|entity|model|database|persistence|queue|event|worker|spring|express|fastapi|django|rails|nestjs|maven|gradle)\b/i.test(fields);
 }
 
 function normalizeDepends(value) {
@@ -433,6 +459,21 @@ ${task.objective}
 
 ---
 
+## Backend/API Design Plan
+
+- **Backend/API task:** ${task.backendTask ? 'Yes' : 'No'}
+- **Style/coding guide source:** ${task.backendDesign.styleGuideSource}
+- **Functional design:** ${task.backendDesign.functionalDesign}
+- **Technical design:** ${task.backendDesign.technicalDesign}
+- **Contract definition:** ${task.backendDesign.contractDefinition}
+- **Layer design:** ${task.backendDesign.layerDesign}
+- **Data and persistence design:** ${task.backendDesign.dataPersistenceDesign}
+- **External communication:** ${task.backendDesign.externalCommunication}
+- **Reuse / modify / create decision:** ${task.backendDesign.reuseDecision}
+- **Guide compliance checks:** ${task.backendDesign.guideComplianceChecks}
+
+---
+
 ## Implementation Steps
 
 ${task.implementationSteps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
@@ -489,6 +530,7 @@ ${task.summaryEvidence || (task.reviewOnly
 ${task.doneCriteria.map((item) => `- [ ] ${item}`).join('\n')}
 - [ ] If this is a review-only task, \`## Summary Evidence\` captures the review scope, inspected evidence, conclusion, and links to any longer Markdown or snippet artifacts
 - [ ] If this is a frontend/UI task, \`## Frontend Design Plan\` documents idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions
+- [ ] If this is a backend/API task, \`## Backend/API Design Plan\` documents the style/coding guide source or prerequisite guide task, functional design, technical design, contracts, layers, data/persistence, external communication, reuse/modify/create decisions, and guide compliance checks
 - [ ] Task test suite was generated/refreshed and every applicable gate has command output or documented evidence
 ${config.requiresGit === 'true' ? '- [ ] For git-enabled tasks, implementation was committed, pushed, and published in a task PR before human review\n- [ ] Human developer PR review completed; requested corrections, if any, were implemented, pushed to the same PR, and re-reviewed' : '- [ ] Human review completed when required by the planning workflow'}
 

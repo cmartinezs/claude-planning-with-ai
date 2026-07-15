@@ -389,6 +389,10 @@ function stripNegativeDbOrmLines(text) {
   return text.split(/\r?\n/)
     .filter((line) => {
       const normalized = line.toLowerCase();
+      if (/^\s*-\s*\*\*(layer design|data and persistence design):\*\*/i.test(line)
+        && /\b(no|not|none|n\/a|na|without)\b.*\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b|\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b.*\b(not involved|not required|not applicable|no changes|unchanged|not touched|not changed|without changes)\b/.test(normalized)) {
+        return false;
+      }
       const mentionsDbOrm = /\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b/.test(normalized);
       const negatesDbOrm = /\b(no|not|none|n\/a|na|without)\b.*\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b|\b(database|db|orm|persistence|schema|migration|migrations|table|tables|column|columns|entity|entities|repository|repositories|generated client)\b.*\b(not involved|not required|not applicable|no changes|unchanged|not touched|not changed|without changes)\b/.test(normalized);
       return !(mentionsDbOrm && negatesDbOrm);
@@ -423,6 +427,19 @@ function isFrontendTask(text) {
   return /\b(frontend|front-end|ui|ux|web|client|browser|page|view|screen|route|component|layout|form|modal|dashboard|react|vue|angular|svelte|jsx|tsx|css|tailwind)\b/i.test(scan);
 }
 
+function isBackendTask(text) {
+  if (isReviewOnlyTask(text)) return false;
+  const field = /\*\*Backend\/API task:\*\*\s*([^\n\r]+)/i.exec(text);
+  if (field) return /^(yes|true|si|sí)\b/i.test(field[1].trim());
+  const scan = [
+    text.split(/\r?\n/).slice(0, 8).join('\n'),
+    section(text, 'Objective'),
+    section(text, 'Technical Design'),
+    section(text, 'Implementation Steps'),
+  ].join('\n');
+  return /\b(backend|back-end|api|server|endpoint|controller|handler|route|use-?case|repository|dao|adapter|port|dto|schema|migration|entity|model|database|persistence|queue|event|worker|spring|express|fastapi|django|rails|nestjs|maven|gradle)\b/i.test(scan);
+}
+
 function hasEmptySummaryEvidence(text) {
   const summary = section(text, 'Summary Evidence').trim();
   if (!summary) return true;
@@ -455,6 +472,40 @@ function hasPlaceholderFrontendDesign(text) {
   return /\[(Problem\/intent|What the user sees|Hierarchy|ASCII wireframe|Static or locally mocked|Existing component|Routing|Validation|Services, APIs|For each affected)/i.test(design)
     || /\b(Describe problem\/intent|Describe visible layout|Document hierarchy|Add an ASCII wireframe|Plan static or locally mocked|Identify existing component|Define routing|Define validation|Define services|State which view)\b/i.test(design)
     || /\bN\/A\b/i.test(design);
+}
+
+function missingBackendDesignLabels(text) {
+  const design = section(text, 'Backend/API Design Plan').trim();
+  if (!design) return ['Backend/API Design Plan'];
+  const required = [
+    'Backend/API task',
+    'Style/coding guide source',
+    'Functional design',
+    'Technical design',
+    'Contract definition',
+    'Layer design',
+    'Data and persistence design',
+    'External communication',
+    'Reuse / modify / create decision',
+    'Guide compliance checks',
+  ];
+  return required.filter((label) => !new RegExp(`\\*\\*${escapeRegExp(label)}:\\*\\*`, 'i').test(design));
+}
+
+function backendStyleGuideSource(text) {
+  const design = section(text, 'Backend/API Design Plan');
+  const match = /\*\*Style\/coding guide source:\*\*\s*([^\n\r]+)/i.exec(design);
+  return match ? match[1].trim() : '';
+}
+
+function hasPlaceholderBackendDesign(text) {
+  const design = section(text, 'Backend/API Design Plan').trim();
+  if (!design) return true;
+  const styleSource = backendStyleGuideSource(text);
+  return /\[(Existing guide|Use case|Language\/framework|Endpoints|Controller\/handler|Entities\/models|Internal\/external|For each affected|Style\/lint)/i.test(design)
+    || /\b(Existing backend style\/coding guide path|Define use case|Define language\/framework|Define endpoints|Define controller\/handler|Define entities\/models|Define services|State which module|List style\/lint)\b/i.test(design)
+    || !styleSource
+    || /\bN\/A\b/i.test(styleSource);
 }
 
 function hasUnlabeledCodeFence(text) {
@@ -688,6 +739,13 @@ function validateTaskFile(planning, storyFile, taskFile, taskRow, catalog, confi
     if (!hasHeading(text, 'Frontend Design Plan') || missingLabels.length > 0 || hasPlaceholderFrontendDesign(text)) {
       const details = missingLabels.length > 0 ? ` Missing fields: ${missingLabels.join(', ')}.` : '';
       add(results, 'FAIL', `${taskId} frontend task missing complete Frontend Design Plan`, taskFile, lineOf(text, /Frontend Design Plan|Frontend task|frontend|ui/i), `Add ## Frontend Design Plan with idea-to-code flow, view behavior, UI/UX principles, wireframe or equivalent representation, functional mockup, component pattern, page/business/external communication layers, services/APIs/libs, and reuse/modify/create decisions.${details}`);
+    }
+  }
+  if (isBackendTask(text)) {
+    const missingLabels = missingBackendDesignLabels(text);
+    if (!hasHeading(text, 'Backend/API Design Plan') || missingLabels.length > 0 || hasPlaceholderBackendDesign(text)) {
+      const details = missingLabels.length > 0 ? ` Missing fields: ${missingLabels.join(', ')}.` : '';
+      add(results, 'FAIL', `${taskId} backend/API task missing complete Backend/API Design Plan`, taskFile, lineOf(text, /Backend\/API Design Plan|Backend\/API task|backend|api/i), `Add ## Backend/API Design Plan with style/coding guide source or prerequisite guide task, functional design, technical design, contracts, layers, data/persistence, external communication, reuse/modify/create decisions, and guide compliance checks.${details}`);
     }
   }
   if (/\b(and|plus|also)\b/i.test(section(text, 'Objective'))) {

@@ -82,6 +82,18 @@ Before writing, create a temporary JSON file with the approved tasks:
         "externalCommunicationLayer": "Services, APIs, clients, libraries, generated SDKs, cache/query layer, auth headers, retries, and error mapping.",
         "reuseDecision": "For each affected view/component/service/lib, state reuse, modification, or creation and why."
       },
+      "backendTask": false,
+      "backendDesign": {
+        "styleGuideSource": "Existing backend style/coding guide path(s), or prerequisite task-NN that creates/proposes one before implementation.",
+        "functionalDesign": "Use case, actor/system trigger, inputs, outputs, state changes, success path, alternate/error paths, idempotency, permissions, and business rules.",
+        "technicalDesign": "Language/framework conventions, module/package placement, architectural pattern, transaction/async boundaries, error handling, observability, and fit with the guide.",
+        "contractDefinition": "Endpoints, commands/events, DTOs/schemas, status codes, validation rules, headers, versioning, compatibility, and examples.",
+        "layerDesign": "Controller/handler/route, application/use-case, domain/business, persistence/integration responsibilities.",
+        "dataPersistenceDesign": "Entities/models, migrations/schema changes, repositories/queries, indexes, constraints, generated clients, and DB/ORM consistency approach.",
+        "externalCommunication": "Services, APIs, clients/libs/SDKs, queues/events, auth, retries/timeouts, fallback behavior, and error mapping.",
+        "reuseDecision": "For each affected module/service/API/lib, state reuse, modification, or creation and why.",
+        "guideComplianceChecks": "Style/lint/format/architecture commands or checklist items proving guide and language convention compliance."
+      },
       "implementationSteps": ["Edit src/...", "Add tests..."],
       "verification": [{"check": "Tests pass", "how": "Run npm test"}],
       "smokeChecks": [{"check": "App starts", "how": "Run the smoke plan"}],
@@ -117,6 +129,8 @@ Before writing, create a temporary JSON file with the approved tasks:
    - include static consistency validation and local runtime persistence smoke validation in that validation task;
    - if a candidate is review-only, set `reviewOnly: true` and include `summaryEvidence` guidance; review-only tasks must produce `## Summary Evidence`, with longer prose in `.md` artifacts when needed and language-labeled fenced snippets when code is the reviewed evidence.
    - if a candidate is frontend/UI work, set `frontendTask: true` and fill `frontendDesign` before writing; include the idea-to-code path, view description, UI/UX principles, wireframe or equivalent representation, functional mockup before real activity, component pattern, page logic, business logic, external communication/services/APIs/libs, and reuse/modify/create decisions for every affected view/component/service/lib.
+   - if a candidate is backend/API work, search for an existing project style/coding guide before writing tasks: check `docs/`, `.planning/WORKFLOWS/05-SDLC-PHASE-GUIDANCE/`, `AGENTS.md`, `CONTRIBUTING.md`, `STYLEGUIDE*`, language-specific guideline folders, formatter/linter configs, and architecture docs. If a guide exists, set `backendTask: true` and fill `backendDesign.styleGuideSource` with the exact path(s). If no guide exists, ask the user for the guide; if the project has none, create an earlier prerequisite task that proposes a technology-appropriate backend style/coding guide, make backend implementation tasks depend on it, and reference that prerequisite task in `styleGuideSource`.
+   - for every backend/API task, fill `backendDesign` with functional design, technical design, contract definition, layer design, data/persistence design, external communication/services/APIs/libs, reuse/modify/create decisions, and guide compliance checks according to the backend language and project guide.
 5. Execute `[CHECK-ATOMICITY]` for each candidate:
    - `REJECTED — too large`: split it;
    - `REJECTED — fragment`: merge it with the task it cannot be verified without;

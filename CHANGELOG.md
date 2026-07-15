@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.8] — 2026-07-15
+
+### Added
+
+- Backend/API implementation tasks now require `## Backend/API Design Plan`, including style/coding guide discovery or a prerequisite guide task, functional and technical design, contracts, layer design, data/persistence, external communication, reuse/modify/create decisions, and guide compliance checks.
+
 ## [3.10.7] — 2026-07-15
 
 ### Added
@@ -373,7 +379,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.7...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.8...HEAD
+[3.10.8]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.7...v3.10.8
 [3.10.7]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.6...v3.10.7
 [3.10.6]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.4...v3.10.5
