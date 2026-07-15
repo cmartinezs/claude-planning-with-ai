@@ -194,6 +194,22 @@ function storyIdFromSummaryRow(row) {
     || storyIdFromValue(row.id || row.name || row.story || row.cells.join(' '));
 }
 
+function meaningfulValue(value) {
+  const text = String(value || '').trim();
+  if (!text || /^(-|—|none|n\/a|na)$/i.test(text)) return '';
+  return text;
+}
+
+function areaFromSummaryRow(row) {
+  return meaningfulValue(row.area)
+    || meaningfulValue(row['repository-area'])
+    || meaningfulValue(row['sdlc-phase-s'])
+    || meaningfulValue(row['sdlc-phases'])
+    || meaningfulValue(row.phase)
+    || meaningfulValue(row.phases)
+    || meaningfulValue(row.cells[2]);
+}
+
 function taskIdFromValue(value) {
   const match = /task-\d+/i.exec(value || '');
   return match ? match[0].toLowerCase() : null;
@@ -266,7 +282,7 @@ function storyRows(planning) {
       return {
         id,
         title: storyText.replace(/\[|\]|\([^)]*\)/g, '').trim() || id,
-        area: row.area || '',
+        area: areaFromSummaryRow(row),
         risk: row.risk || '',
         externalIssue: row['external-issue'] || row['external-id'] || row.issue || '',
         status: row.status || '',
@@ -311,6 +327,7 @@ function storyDetails(planning) {
     row.file = rel(file);
     row.title = firstHeading(text, row.title);
     row.status = extractStatus(text) !== 'UNKNOWN' ? extractStatus(text) : row.status;
+    row.area = row.area || meaningfulValue(firstLine(section(text, 'Area')));
     row.objective = firstSentence(section(text, 'Objective'));
     row.doneCriteria = doneCriteria(text);
     row.tasks = taskFilesFor(planning, id).map((taskFile) => taskSummary(taskFile));

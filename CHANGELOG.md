@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.3] — 2026-07-15
+
+### Fixed
+
+- Fixed planning reports so Story Detail area values are read from the documented `SDLC Phase(s)` Story Summary column and from story-file `## Area` fallback, instead of rendering `-`.
+
 ## [3.10.2] — 2026-07-15
 
 ### Fixed
@@ -342,7 +348,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.2...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.3...HEAD
+[3.10.3]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.9.0...v3.10.0

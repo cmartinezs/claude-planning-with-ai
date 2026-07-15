@@ -21,9 +21,9 @@ Examples:
 
 ```bash
 /plan-update-version 1.4.0 2.0.0
-/plan-update-version 2.1.0 3.10.2
+/plan-update-version 2.1.0 3.10.3
 /plan-update-version 2.1.0 4.0.0
-/plan-update-version 2.4.0 3.10.2 --dry-run
+/plan-update-version 2.4.0 3.10.3 --dry-run
 ```
 
 ## Steps
