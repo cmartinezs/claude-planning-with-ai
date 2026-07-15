@@ -235,7 +235,7 @@ function deriveBranches(storyFile, taskFile, config) {
   const storyIndex = branch.indexOf(storyBase);
   if (storyIndex > 0) storyBranch = branch.slice(0, storyIndex + storyBase.length);
   if (branch === storyBase || branch.endsWith(`/${storyBase}`)) storyBranch = branch;
-  const taskBranch = `${storyBranch}/${taskBase}`;
+  const taskBranch = `${storyBranch}--${taskBase}`;
   return { baseBranch: config.baseBranch, currentBranch: branch, storyBranch, taskBranch, storyBase, taskBase };
 }
 

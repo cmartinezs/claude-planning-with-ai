@@ -857,7 +857,7 @@ function dependencyIds(taskText) {
 
 function taskBranchName(branches, taskFile, taskId) {
   const base = taskFile ? path.basename(taskFile, '.md') : taskId;
-  return `${branches.storyBranch}/${base}`;
+  return `${branches.storyBranch}--${base}`;
 }
 
 function storyExecutionContext(planningId, storyIdArg) {

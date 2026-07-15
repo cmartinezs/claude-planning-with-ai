@@ -24,7 +24,7 @@ When git execution is enabled, the planning system uses a layered branch model:
 
 - Story branches start from `git.base_branch`.
 - Task branches start from the story branch and open task PRs back into that story branch.
-- Child planning branches created in a dedicated worktree preserve the worktree prefix before the story/task name: `<worktree-prefix>/story-NN-<slug>` and `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
+- Child planning branches created in a dedicated worktree preserve the worktree prefix before the story/task name: story branch `<worktree-prefix>/story-NN-<slug>` and task branch `<worktree-prefix>/story-NN-<slug>--task-NN-<slug>`. Task branches use a sibling `--task-...` suffix because Git cannot keep both `<story-branch>` and `<story-branch>/task-...` refs.
 - After a task PR is merged into the story branch, delete the local task branch from an updated story branch checkout with `git branch -d <task-branch>`.
 - After the final story PR is merged into `git.base_branch`, delete the local story branch from an updated base branch checkout with `git branch -d <story-branch>`.
 - Do not force-delete these branches. If `git branch -d` refuses, confirm the PR merge state first.

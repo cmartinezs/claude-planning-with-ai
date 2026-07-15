@@ -12,7 +12,7 @@
 **Structured lifecycle planning for software projects**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-3.10.4-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-3.10.5-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
 [![Platform](https://img.shields.io/badge/Claude%20Code-plugin-7C3AED?style=flat-square)](https://claude.ai/code)
 [![Storage](https://img.shields.io/badge/storage-plain%20markdown-6B7280?style=flat-square)](planning-template/)
 [![Author](https://img.shields.io/badge/author-cmartinezs-0EA5E9?style=flat-square)](https://cmartinezs.github.io)
@@ -87,7 +87,7 @@ Or generate a planning directly from existing stories:
 - **Atomic task decomposition** — `/plan-atomize` turns a story into session-sized tasks, each with technical design, implementation steps, verification, generated test-suite gates, and software smoke tests when applicable.
 - **Software logging policy** — code tasks follow `.planning/LOGGING.md`, including correlation/trace context, criticality-based levels, safe context, and stack-specific logger selection when no mechanism exists.
 - **Deterministic test-suite generation** — `/plan-test-suite` writes planning/story/task test matrices from repository tooling first: unit, coverage, integration, acceptance, static analysis, style, architecture guide review, smoke, security, and mutation gates.
-- **Layered git workflow** — story branches start from `git.base_branch`; each task gets its own branch and PR into the story branch; child worktree branches keep the worktree prefix before `story-...`; task PRs merge incrementally into the story branch; final story PRs target the base branch; merged task/story branches are cleaned locally.
+- **Layered git workflow** — story branches start from `git.base_branch`; each task gets its own sibling branch with a `--task-...` suffix and PR into the story branch; child worktree branches keep the worktree prefix before `story-...`; task PRs merge incrementally into the story branch; final story PRs target the base branch; merged task/story branches are cleaned locally.
 - **Mid-execution adjustments** — enrich, split, or deepen stories without losing history. Switching context triggers git-state validation and safe alternatives (stash, WIP commit, STANDBY).
 - **Self-checking** — `/plan-validate` audits structure, dependencies, and workflow references at any time.
 - **Pure markdown** — no lock-in, readable in any editor, version-controlled with your code.

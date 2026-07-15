@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.10.5] — 2026-07-15
+
+### Fixed
+
+- Fixed layered git task branch naming so task branches use sibling refs like `<story-branch>--task-NN-<slug>` instead of impossible nested refs like `<story-branch>/task-NN-<slug>`.
+
 ## [3.10.4] — 2026-07-15
 
 ### Fixed
@@ -355,7 +361,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.4...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.5...HEAD
+[3.10.5]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.1...v3.10.2

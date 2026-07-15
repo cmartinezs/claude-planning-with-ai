@@ -68,9 +68,9 @@ When a story changes database structure or ORM artifacts, `/plan-atomize` must a
 When `execution.requires_git` is `true`, the git flow is layered:
 
 - The story integration branch starts from `git.base_branch` (for example `develop`). `/plan-story` ensures it exists when orchestrating a story, and `/plan-task` also creates or reuses it when you start directly from a task.
-- `/plan-task` creates and pushes a task branch from the story branch, commits the implementation, and opens or reuses a PR back to the story branch before human code review. The task remains in progress while the PR is under review; after approval, `/plan-task` marks it `DONE` and pushes the closeout metadata to the same branch.
+- `/plan-task` creates and pushes a task branch from the story branch, commits the implementation, and opens or reuses a PR back to the story branch before human code review. Task branches are sibling refs named like `<story-branch>--task-NN-<slug>`, not nested under the story branch, because Git cannot keep both `refs/heads/<story-branch>` and `refs/heads/<story-branch>/task-NN-<slug>` at the same time. The task remains in progress while the PR is under review; after approval, `/plan-task` marks it `DONE` and pushes the closeout metadata to the same branch.
 - For child plannings coordinated by a parent, run each child planning in a dedicated sibling worktree created with its own branch: `git worktree add ../<worktree-prefix> <branch>` for an existing branch, or `git worktree add -b <branch> ../<worktree-prefix> <base_branch>` for a new branch.
-- Child worktree branches preserve the worktree prefix before the story/task portion, for example `<worktree-prefix>/story-NN-<slug>` and `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
+- Child worktree branches preserve the worktree prefix before the story/task portion, for example story branch `<worktree-prefix>/story-NN-<slug>` and task branch `<worktree-prefix>/story-NN-<slug>--task-NN-<slug>`.
 - Task PRs are reviewed and merged into the story branch one by one before the next dependent task starts. After each task PR is merged, delete the local task branch with `git branch -d <task-branch>` from an updated story branch checkout.
 - The story is closed only after all task PRs are merged into the story branch.
 - The final story PR targets `git.base_branch`, so partial planning progress can still be released from the base branch without waiting for every story in the planning. After the story PR is merged into the base branch, delete the local story branch with `git branch -d <story-branch>` from an updated base branch checkout.
@@ -408,5 +408,5 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
 - **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
-- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.4` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.5` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

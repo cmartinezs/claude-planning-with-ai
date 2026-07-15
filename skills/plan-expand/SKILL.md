@@ -22,7 +22,7 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/CREATE-PLANNING.m
 3b. **Monorepo child planning split.** Before writing `01-expansion.md`, identify whether any affected path belongs to a child artifact with its own planning workspace (`<child>/.planning/`), excluding the current `./.planning/`.
    - If this is a child artifact workspace, keep the whole planning local to the current child. Never create or update the parent workspace.
    - If this is a parent workspace and affected child artifacts have their own `.planning/`, create or reuse one sibling git worktree per affected child, then create one child planning inside that worktree. The child planning owns implementation inside that child; the parent planning owns only parent-scope work and synchronization.
-   - Derive a stable `<worktree-prefix>` for each child from the child worktree directory name. Use that prefix at the start of the child branch name before the story/task branch portion. Example story branch: `<worktree-prefix>/story-NN-<slug>`.
+   - Derive a stable `<worktree-prefix>` for each child from the child worktree directory name. Use that prefix at the start of the child branch name before the story/task branch portion. Example story branch: `<worktree-prefix>/story-NN-<slug>`; task branches use sibling names such as `<worktree-prefix>/story-NN-<slug>--task-NN-<slug>`, not nested refs.
    - For an existing child planning branch, create the sibling worktree with:
      ```bash
      git worktree add ../<worktree-prefix> <branch>

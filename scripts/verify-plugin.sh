@@ -216,6 +216,7 @@ if command -v node >/dev/null 2>&1; then
   cp "$ROOT/planning-template/scripts/planning-check.mjs" "$tmpdir/.planning/scripts/planning-check.mjs"
   cp "$ROOT/planning-template/scripts/planning-report.mjs" "$tmpdir/.planning/scripts/planning-report.mjs"
   cp "$ROOT/planning-template/scripts/planning-story.mjs" "$tmpdir/.planning/scripts/planning-story.mjs"
+  cp "$ROOT/planning-template/scripts/planning-task.mjs" "$tmpdir/.planning/scripts/planning-task.mjs"
   printf '# Workflows\n\n| Workflow | Purpose |\n|----------|---------|\n| [GENERATE-DOCUMENT](02-EXECUTION-WORKFLOWS/GENERATE-DOCUMENT.md) | Generate implementation output |\n' > "$tmpdir/.planning/WORKFLOWS/README.md"
   printf 'project:\n  type: software\nexecution:\n  requires_git: false\n' > "$tmpdir/.planning/config.yml"
   printf '# Demo\n\n## Intent\nDemo\n' > "$tmpdir/.planning/active/001-demo/00-initial.md"
@@ -249,6 +250,14 @@ if command -v node >/dev/null 2>&1; then
     fail "planning-check.mjs treats explicit no-database task notes as DB/ORM changes"
   else
     pass "planning-check.mjs ignores explicit no-database task notes for DB/ORM gates"
+  fi
+  task_output="$(cd "$tmpdir" && node .planning/scripts/planning-task.mjs inspect 001-demo story-01 task-01 2>&1)"
+  if grep -Fq 'task=`story-01-assessment-creation-ui--task-01-build-ui`' <<< "$task_output" \
+    && ! grep -Fq 'task=`story-01-assessment-creation-ui/task-01-build-ui`' <<< "$task_output"; then
+    pass "planning-task.mjs derives git-compatible sibling task branch names"
+  else
+    fail "planning-task.mjs derives nested task branch names that conflict with story refs"
+    printf '%s\n' "$task_output"
   fi
   rm -rf "$tmpdir"
 else

@@ -161,7 +161,7 @@ Areas are the columns of the traceability matrix. Every planning story records w
 
 In monorepos, parent and child artifact workspaces can each have their own `.planning/`. Parent plans coordinate linked child plannings; child plans own child implementation. Do not create skip-level implementation stories in the parent for a child that has its own planning workspace.
 
-When git is enabled, child plannings coordinated from a parent run in dedicated sibling worktrees, for example `git worktree add ../<worktree-prefix> <branch>`. Branch names preserve the worktree prefix before the story/task portion, such as `<worktree-prefix>/story-NN-<slug>` and `<worktree-prefix>/story-NN-<slug>/task-NN-<slug>`.
+When git is enabled, child plannings coordinated from a parent run in dedicated sibling worktrees, for example `git worktree add ../<worktree-prefix> <branch>`. Branch names preserve the worktree prefix before the story/task portion, such as story branch `<worktree-prefix>/story-NN-<slug>` and task branch `<worktree-prefix>/story-NN-<slug>--task-NN-<slug>`. Task branches use a sibling `--task-...` suffix because Git cannot keep both `<story-branch>` and `<story-branch>/task-...` refs.
 
 ### Area code mapping
 
