@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+## [3.10.9] — 2026-07-16
+
+### Fixed
+
+- Hardened `/plan-task` story-branch detection so legacy task branches such as `tasks/<story>/<task>` only keep a sliced prefix when that prefix exists as a local or `origin/*` branch; otherwise task PRs target the real `<story>` branch.
+
 ## [3.10.8] — 2026-07-15
 
 ### Added
@@ -379,7 +387,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.8...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.9...HEAD
+[3.10.9]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.8...v3.10.9
 [3.10.8]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.7...v3.10.8
 [3.10.7]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.6...v3.10.7
 [3.10.6]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.5...v3.10.6

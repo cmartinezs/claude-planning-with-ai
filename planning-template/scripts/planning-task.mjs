@@ -227,14 +227,28 @@ function currentBranch() {
   return result.status === 0 ? result.stdout.trim() : '';
 }
 
+function branchExists(name) {
+  if (!name) return false;
+  const local = git(['show-ref', '--verify', '--quiet', `refs/heads/${name}`], { allowFail: true });
+  if (local.status === 0) return true;
+  const remote = git(['show-ref', '--verify', '--quiet', `refs/remotes/origin/${name}`], { allowFail: true });
+  return remote.status === 0;
+}
+
 function deriveBranches(storyFile, taskFile, config) {
   const storyBase = path.basename(storyFile, '.md');
   const taskBase = path.basename(taskFile, '.md');
   const branch = currentBranch();
   let storyBranch = storyBase;
-  const storyIndex = branch.indexOf(storyBase);
-  if (storyIndex > 0) storyBranch = branch.slice(0, storyIndex + storyBase.length);
-  if (branch === storyBase || branch.endsWith(`/${storyBase}`)) storyBranch = branch;
+  if (branch === storyBase || branch.endsWith(`/${storyBase}`)) {
+    storyBranch = branch;
+  } else {
+    const storyIndex = branch.indexOf(storyBase);
+    if (storyIndex > 0) {
+      const prefixed = branch.slice(0, storyIndex + storyBase.length);
+      storyBranch = branchExists(prefixed) ? prefixed : storyBase;
+    }
+  }
   const taskBranch = `${storyBranch}--${taskBase}`;
   return { baseBranch: config.baseBranch, currentBranch: branch, storyBranch, taskBranch, storyBase, taskBase };
 }
@@ -270,7 +284,7 @@ function commitMeta(taskText, storyBase, taskBase, correction = false) {
 function dependencyStatuses(storyFile, taskText) {
   const depends = extractField(taskText, 'Depends On');
   if (!depends || ['—', '-', 'none'].includes(depends.toLowerCase())) return [];
-  const taskDir = path.dirname(storyFile).replace(/\.md$/, '');
+  const taskDir = storyFile.replace(/\.md$/, '');
   return depends.split(',').map((item) => item.trim()).filter(Boolean).map((item) => {
     const id = normalizeTaskId(item);
     const variants = taskIdVariants(id);
