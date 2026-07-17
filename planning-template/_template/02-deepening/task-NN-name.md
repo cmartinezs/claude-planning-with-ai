@@ -150,6 +150,16 @@ Example:
 - **Acceptance dependency inventory:** List every internal module, database, migration, seed dataset, external HTTP API, queue/broker, file/object storage, cache, auth provider, SaaS dependency, environment variable, secret, port, readiness check, and teardown action needed for acceptance tests. Each one must have a fake, mock, Testcontainer, Docker Compose service, local fixture, or explicit out-of-scope justification.
 - **Missing acceptance profile:** If Cucumber/Gherkin exists but Maven profile `acceptanceTests` is missing, implement that profile and the artifact-level acceptance harness before using acceptance evidence for this task.
 
+### Test Execution Evidence
+
+> *Required for every applicable generated, detected, or manually supplied test gate. Use the generated suite when it exists. If the user ran tests manually, copy or link the same evidence fields before treating the run as proof.*
+
+| Type | Source | Command | Parameters / profile / env | Environment | Config / scripts | Output log / report | Result |
+|------|--------|---------|----------------------------|-------------|------------------|---------------------|--------|
+| unit | generated / detected / manual | [e.g. `./mvnw test`] | [e.g. `-Dtest=...`, profile, env vars] | [local, CI, container, Testcontainers] | [pom.xml, package script, compose file, config] | [paste concise output or link report/log] | pass/fail/skipped + reason |
+| acceptance/e2e | generated / detected / manual | [e.g. `./mvnw -PacceptanceTests verify`] | [acceptance profile, ports, fake endpoints] | [isolated artifact boot, Docker Compose, Testcontainers] | [Failsafe, Cucumber, WireMock, env file] | [log/report link or excerpt] | pass/fail/skipped + reason |
+| smoke | generated / detected / manual | [e.g. health check or changed-surface command] | [runtime profile, env vars, URL/port] | [local app + dependencies] | [.planning/SMOKE-TESTS.md, start script] | [startup/check log or excerpt] | pass/fail/skipped + reason |
+
 ---
 
 ## Summary Evidence
@@ -168,7 +178,7 @@ Example:
 - [ ] Reset-token persistence deliverable exists and can be exercised by tests
 - [ ] All verification checks listed above pass
 - [ ] Code changes include intelligent logging per `.planning/LOGGING.md`, with correlation/trace context and levels chosen by criticality
-- [ ] Task test suite was generated/refreshed and every applicable gate has command output or documented evidence
+- [ ] Task test suite was generated/refreshed and every applicable generated, detected, or manual gate has evidence with type, command, parameters/profile/env, environment, config/scripts, output log/report, and result
 - [ ] Acceptance dependency inventory is complete; every dependency needed by acceptance tests has a concrete isolated strategy
 - [ ] For software projects, smoke test plan passes: supporting services, app startup, connectivity or schema checks, and changed-surface smoke checks
 - [ ] If database structure or ORM artifacts changed, static DB/ORM consistency validation passes and local runtime persistence smoke evidence is captured

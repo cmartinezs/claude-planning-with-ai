@@ -34,7 +34,7 @@ Reference workflows:
    5. If this project has an ORM or generated DB client, what static consistency command validates database schema/migrations against ORM models/entities/generated client?
    6. What local runtime command starts the environment needed for persistence smoke checks?
    7. What are the smallest smoke checks that prove the changed surface works?
-   8. What evidence should be shown to the human reviewer?
+   8. What evidence should be shown to the human reviewer, including exact commands, parameters, environment, configuration/scripts, output logs or reports, and result?
 6. Prefill the template from repository inference when the answers are incomplete. Prefer concrete commands and file paths over generic notes.
 7. Write the populated smoke-test plan to `.planning/${software.smoke_tests_file}`.
 8. If `.planning/config.yml` exists and the file path changed, update `software.smoke_tests_file` to match the generated file.
@@ -64,7 +64,7 @@ Reference workflows:
 2. Build or compile the project locally.
 3. Start the app, worker, or API with the project-local configuration.
 4. Run the minimal smoke checks that prove the changed surface boots and responds.
-5. Capture the evidence needed for human review.
+5. Capture the evidence needed for human review: exact command, parameters/profile/env, environment, configuration/scripts, output log or report, and result.
 
 ---
 
@@ -77,6 +77,18 @@ Reference workflows:
 | 3 | Connectivity or schema validation passes | [fill in] |
 | 4 | Changed surface responds correctly | [fill in] |
 | 5 | No startup or migration regressions are visible | [fill in] |
+
+---
+
+## Smoke Evidence
+
+For every smoke check that runs, record the execution evidence in the task file or a linked Markdown artifact.
+
+| Check | Command | Parameters / profile / env | Environment | Config / scripts | Output log / report | Result |
+|-------|---------|----------------------------|-------------|------------------|---------------------|--------|
+| Supporting services | [exact command] | [env vars, profile, ports] | [local, Docker Compose, Testcontainers, CI] | [compose file, env file, helper script] | [log excerpt, report path, CI URL] | pass/fail/skipped + reason |
+| App startup | [exact command] | [runtime profile, env vars] | [local app/service/worker] | [start script, config file] | [startup log excerpt or report] | pass/fail/skipped + reason |
+| Changed surface | [exact command/check] | [URL, port, input fixture] | [local app + dependencies] | [.planning/SMOKE-TESTS.md, script, config] | [response/log excerpt or report] | pass/fail/skipped + reason |
 
 ---
 
@@ -95,6 +107,7 @@ Required for tasks that modify database structure, migrations, schema files, see
 ## Notes For Automation
 
 - Prefer non-destructive commands.
+- Capture exact commands, parameters, environment, configuration/scripts, output logs or report links, and result for every smoke check that runs.
 - If this project has migrations, seed data, ORM models/entities, or generated DB clients, include both static consistency checks and local runtime persistence smoke checks here.
 - If the project has no backend or no external services, replace the rows with the closest reproducible local evidence.
 

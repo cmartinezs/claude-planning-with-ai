@@ -18,6 +18,14 @@ Planning commands always operate on the current working directory's `./.planning
 - Running `/plan-new`, `/plan-from-epic`, `/plan-agent-plan`, or `/plan-expand` inside a child artifact must create or modify only that child artifact's `.planning/`.
 - When a parent planning creates or coordinates child plannings under git, each child planning must run from its own sibling worktree. Create the worktree with the branch that belongs to that child planning: `git worktree add ../<worktree-prefix> <branch>` for an existing branch, or `git worktree add -b <branch> ../<worktree-prefix> <base_branch>` for a new branch.
 
+### Claude session boundaries
+
+Use explicit Claude session resets at planning execution boundaries:
+
+- Before starting a different story, run `/clear`, then rerun `/plan-story <planning-id> <story-NN>` from the project root.
+- Before starting each new task implementation, run `/compact`, then continue with `/plan-task <planning-id> <story-NN> <task-NN>`.
+- Do not require another `/clear` when rerunning `/plan-story` to continue the same story after a task PR merge or review checkpoint.
+
 ### Layered git branch cleanup
 
 When git execution is enabled, the planning system uses a layered branch model:

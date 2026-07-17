@@ -163,6 +163,10 @@ In monorepos, parent and child artifact workspaces can each have their own `.pla
 
 When git is enabled, child plannings coordinated from a parent run in dedicated sibling worktrees, for example `git worktree add ../<worktree-prefix> <branch>`. Branch names preserve the worktree prefix before the story/task portion, such as story branch `<worktree-prefix>/story-NN-<slug>` and task branch `<worktree-prefix>/story-NN-<slug>--task-NN-<slug>`. Task branches use a sibling `--task-...` suffix because Git cannot keep both `<story-branch>` and `<story-branch>/task-...` refs.
 
+Claude session boundaries: run `/clear` before starting a different story, then rerun `/plan-story <planning-id> <story-NN>`; run `/compact` before starting each new task implementation, then continue with `/plan-task <planning-id> <story-NN> <task-NN>`. Continuing the same story after a task PR merge or review checkpoint does not require another `/clear`.
+
+Test evidence contract: every generated, detected, CI, or manually run test gate must record type, exact command, parameters/profile/env, environment, configuration/scripts, output log or report link, and result. This applies to unit, integration, acceptance, e2e, smoke, static-analysis, style, architecture, security, mutation, and manual verification gates whenever they apply.
+
 ### Area code mapping
 
 | Directory name contains | Proposed code |

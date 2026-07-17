@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.10.10] — 2026-07-17
+
+### Added
+
+- Added Claude session boundary guidance: run `/clear` before starting a different story and `/compact` before each new task implementation.
+- Added reproducible test evidence requirements for generated, detected, CI, and manual gates: type, command, parameters, environment, configuration/scripts, output log/report, and result.
+
+### Fixed
+
+- Fixed `/plan-task git-setup` so it checks existing local and `origin/*` story/task branches and no longer resets an existing story branch back to `git.base_branch` with `git checkout -B`; regression coverage in `scripts/verify-plugin.sh` creates a diverged story branch and asserts the generated plan checks it out instead of resetting it.
+- Fixed `/plan-task` affected-file detection for multiline `- **Affected files / components:**` lists so publish allowlists include every indented backtick-quoted path, while preserving the existing inline `New: \`a\`, \`b\`` format; regression coverage in `scripts/verify-plugin.sh` covers both forms.
+
 ## [3.10.9] — 2026-07-16
 
 ### Fixed
@@ -387,7 +399,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.9...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.10...HEAD
+[3.10.10]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.9...v3.10.10
 [3.10.9]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.8...v3.10.9
 [3.10.8]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.7...v3.10.8
 [3.10.7]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.6...v3.10.7

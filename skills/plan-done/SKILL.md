@@ -31,12 +31,12 @@ Reference workflow: `.planning/WORKFLOWS/01-PLANNING-WORKFLOWS/ADVANCE-PLANNING.
    ```bash
    node .planning/scripts/planning-mutate.mjs done <planning-id> <story-id> --format markdown
    ```
-6. Present the script output to the user. For `project.type: software`, also present the latest available smoke-test evidence from `.planning/<software.smoke_tests_file>` or the task/story test-suite artifacts. If that evidence is missing or stale, rerun the smoke test plan before asking for approval.
+6. Present the script output to the user. For `project.type: software`, also present the latest available smoke-test evidence from `.planning/<software.smoke_tests_file>` or the task/story test-suite artifacts. For every applicable generated, detected, or manually supplied gate, the evidence must include test type, exact command, parameters or profiles, environment, relevant configuration and scripts, output log or CI/report link, and result. If that evidence is missing or stale, rerun the smoke test plan or ask the user for the missing manual-test evidence before asking for approval.
 7. Ask:
    > "Reply with **approved** to finalize the story after confirming all task PRs are merged into the story branch, or list the requested corrections."
 
    Do not advance until the user approves.
-8. If the reviewer requests corrections, execute `[RECORD-EDGE-CASE]` with the requested corrections, implement them in a task branch, rerun the relevant verification, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed, and ask for a new human review. Do not mark the story `DONE` or open the story PR before approval.
+8. If the reviewer requests corrections, execute `[RECORD-EDGE-CASE]` with the requested corrections, implement them in a task branch, rerun the relevant verification, refresh the evidence metadata for each impacted gate, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed, and ask for a new human review. Do not mark the story `DONE` or open the story PR before approval.
 9. After approval, run:
    ```bash
    node .planning/scripts/planning-mutate.mjs done <planning-id> <story-id> --finalize-story --format markdown

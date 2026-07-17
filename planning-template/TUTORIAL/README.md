@@ -81,6 +81,8 @@ Los comandos leen la estructura que encuentran y se adaptan — no requieren una
 | `/plan-retrospective NNN-slug` | Genera la retrospectiva final |
 | `/plan-archive NNN-slug` | Audita y archiva a `finished/` |
 
+Antes de empezar una story distinta, ejecuta `/clear` y vuelve a correr `/plan-story <planning-id> <story-NN>`. Antes de implementar cada tarea nueva, ejecuta `/compact` y continúa con `/plan-task <planning-id> <story-NN> <task-NN>`.
+
 **Enriquecimiento del planning (plannings ACTIVE):**
 
 | Comando | Qué hace |

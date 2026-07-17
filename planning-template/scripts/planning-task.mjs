@@ -147,9 +147,34 @@ function extractStatus(text) {
 }
 
 function extractField(text, name) {
-  const pattern = new RegExp(`^>\\s*\\*\\*${escapeRegex(name)}:\\*\\*\\s*(.+)$|^-\\s+\\*\\*${escapeRegex(name)}:\\*\\*\\s*(.+)$`, 'im');
-  const match = pattern.exec(text);
-  return match ? (match[1] || match[2] || '').trim() : '';
+  const pattern = new RegExp(`^(?:>\\s*|(\\s*)-\\s+)\\*\\*${escapeRegex(name)}:\\*\\*([^\\r\\n]*)$`, 'i');
+  const lines = text.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i += 1) {
+    const match = pattern.exec(lines[i]);
+    if (!match) continue;
+    const baseIndent = match[1] ? match[1].length : 0;
+    const values = [];
+    const inline = (match[2] || '').trim();
+    if (inline) values.push(inline);
+    for (let j = i + 1; j < lines.length; j += 1) {
+      const line = lines[j];
+      const trimmed = line.trim();
+      const next = lines[j + 1] || '';
+      if (!trimmed) {
+        if (/^(#{1,6}\s+|\S)/.test(next)) break;
+        if (values.length) values.push('');
+        continue;
+      }
+      if (/^(#{1,6}\s+|---\s*$)/.test(trimmed)) break;
+      if (/^>\s*\*\*[^*]+:\*\*/.test(line)) break;
+      const fieldBullet = /^(\s*)-\s+\*\*[^*]+:\*\*/.exec(line);
+      if (fieldBullet && fieldBullet[1].length <= baseIndent) break;
+      if (!/^\s/.test(line) && values.length) break;
+      values.push(trimmed);
+    }
+    return values.join('\n').trim();
+  }
+  return '';
 }
 
 function markdownSection(text, heading) {
@@ -228,11 +253,15 @@ function currentBranch() {
 }
 
 function branchExists(name) {
-  if (!name) return false;
+  const refs = branchRefs(name);
+  return refs.local || refs.remote;
+}
+
+function branchRefs(name) {
+  if (!name) return { local: false, remote: false };
   const local = git(['show-ref', '--verify', '--quiet', `refs/heads/${name}`], { allowFail: true });
-  if (local.status === 0) return true;
   const remote = git(['show-ref', '--verify', '--quiet', `refs/remotes/origin/${name}`], { allowFail: true });
-  return remote.status === 0;
+  return { local: local.status === 0, remote: remote.status === 0 };
 }
 
 function deriveBranches(storyFile, taskFile, config) {
@@ -363,18 +392,39 @@ function readiness(ctx) {
   return { blockers, warnings };
 }
 
-function gitSetupCommands(ctx) {
+function gitSetupCommands(ctx, options = {}) {
   const b = ctx.branches;
-  return [
-    ['git', 'status', '--porcelain'],
-    ['git', 'fetch', 'origin'],
-    ['git', 'checkout', b.baseBranch],
-    ['git', 'pull', '--ff-only', 'origin', b.baseBranch],
-    ['git', 'checkout', '-B', b.storyBranch],
-    ['git', 'push', '-u', 'origin', b.storyBranch],
-    ['git', 'checkout', '-B', b.taskBranch],
-    ['git', 'push', '-u', 'origin', b.taskBranch],
-  ];
+  const commands = [];
+  const story = branchRefs(b.storyBranch);
+  const task = branchRefs(b.taskBranch);
+  if (options.includePreflight !== false) {
+    commands.push(['git', 'status', '--porcelain']);
+    commands.push(['git', 'fetch', 'origin']);
+  }
+  if (story.local) {
+    commands.push(['git', 'checkout', b.storyBranch]);
+    if (story.remote) commands.push(['git', 'pull', '--ff-only', 'origin', b.storyBranch]);
+    else commands.push(['git', 'push', '-u', 'origin', b.storyBranch]);
+  } else if (story.remote) {
+    commands.push(['git', 'checkout', '-b', b.storyBranch, `origin/${b.storyBranch}`]);
+  } else {
+    commands.push(['git', 'checkout', b.baseBranch]);
+    commands.push(['git', 'pull', '--ff-only', 'origin', b.baseBranch]);
+    commands.push(['git', 'checkout', '-b', b.storyBranch]);
+    commands.push(['git', 'push', '-u', 'origin', b.storyBranch]);
+  }
+  if (task.local) {
+    commands.push(['git', 'checkout', b.taskBranch]);
+    if (task.remote) commands.push(['git', 'pull', '--ff-only', 'origin', b.taskBranch]);
+    else commands.push(['git', 'push', '-u', 'origin', b.taskBranch]);
+  } else if (task.remote) {
+    commands.push(['git', 'checkout', '-b', b.taskBranch, `origin/${b.taskBranch}`]);
+  } else {
+    commands.push(['git', 'checkout', b.storyBranch]);
+    commands.push(['git', 'checkout', '-b', b.taskBranch]);
+    commands.push(['git', 'push', '-u', 'origin', b.taskBranch]);
+  }
+  return commands;
 }
 
 function publishCommands(ctx, correction = false) {
@@ -407,7 +457,10 @@ function executeGitSetup(ctx) {
   const dirty = git(['status', '--porcelain'], { allowFail: true });
   if (dirty.status !== 0) fail('Current directory is not a git repository or git status failed.', { stderr: dirty.stderr.trim() });
   if (dirty.stdout.trim()) fail('Worktree is dirty. Commit, stash, or discard changes before git-setup.', { dirty: dirty.stdout.trim().split('\n') });
-  return gitSetupCommands(ctx).map((command) => runCommand(command));
+  const results = [{ command: 'git status --porcelain', status: 0, stdout: dirty.stdout.trim(), stderr: dirty.stderr.trim() }];
+  results.push(runCommand(['git', 'fetch', 'origin']));
+  for (const command of gitSetupCommands(ctx, { includePreflight: false })) results.push(runCommand(command));
+  return results;
 }
 
 function executePublish(ctx, correction = false) {

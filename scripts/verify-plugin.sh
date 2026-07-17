@@ -120,6 +120,7 @@ for template_check in \
   "## Backend/API Design Plan|planning-template/_template/02-deepening/task-NN-name.md" \
   "### Logging / Observability|planning-template/_template/02-deepening/task-NN-name.md" \
   "### Generated Test Suite|planning-template/_template/02-deepening/task-NN-name.md" \
+  "### Test Execution Evidence|planning-template/_template/02-deepening/task-NN-name.md" \
   "## Test Suite|planning-template/_template/02-deepening/story-NN-name.md"; do
   needle="${template_check%%|*}"
   path="${template_check#*|}"
@@ -297,6 +298,50 @@ if command -v node >/dev/null 2>&1; then
     fail "planning-task.mjs derives nested task branch names that conflict with story refs"
     printf '%s\n' "$task_output"
   fi
+  printf '# Task 01 - Build UI\n\n> **Status:** TODO\n\n## Objective\nBuild UI.\n\n## Technical Design\n- **Affected files / components:**\n  - `web/src/pages/AssessmentPage.tsx`\n  - `web/src/services/assessmentClient.ts`\n  - `web/src/components/AssessmentForm.tsx`\n- **Workflow:** GENERATE-DOCUMENT\n\n## Implementation Steps\n- Build UI.\n\n## Verification\n- Run tests.\n\n## Done Criteria\n- [ ] Done.\n' > "$ui_task"
+  affected_output="$(cd "$tmpdir" && node .planning/scripts/planning-task.mjs inspect 001-demo story-01 task-01 --format markdown 2>&1)"
+  if grep -Fq 'web/src/pages/AssessmentPage.tsx' <<< "$affected_output" \
+    && grep -Fq 'web/src/services/assessmentClient.ts' <<< "$affected_output" \
+    && grep -Fq 'web/src/components/AssessmentForm.tsx' <<< "$affected_output"; then
+    pass "planning-task.mjs parses multiline Affected files / components allowlists"
+  else
+    fail "planning-task.mjs dropped multiline Affected files / components entries"
+    printf '%s\n' "$affected_output"
+  fi
+  printf '# Task 01 - Build UI\n\n> **Status:** TODO\n\n## Objective\nBuild UI.\n\n## Technical Design\n- **Affected files / components:** New: `web/src/pages/InlineOne.tsx`, `web/src/pages/InlineTwo.tsx`. Modified: `web/src/pages/InlineThree.tsx`.\n- **Workflow:** GENERATE-DOCUMENT\n\n## Implementation Steps\n- Build UI.\n\n## Verification\n- Run tests.\n\n## Done Criteria\n- [ ] Done.\n' > "$ui_task"
+  inline_output="$(cd "$tmpdir" && node .planning/scripts/planning-task.mjs inspect 001-demo story-01 task-01 --format markdown 2>&1)"
+  if grep -Fq 'web/src/pages/InlineOne.tsx' <<< "$inline_output" \
+    && grep -Fq 'web/src/pages/InlineTwo.tsx' <<< "$inline_output" \
+    && grep -Fq 'web/src/pages/InlineThree.tsx' <<< "$inline_output"; then
+    pass "planning-task.mjs preserves inline Affected files / components allowlists"
+  else
+    fail "planning-task.mjs broke inline Affected files / components parsing"
+    printf '%s\n' "$inline_output"
+  fi
+  git_tmp="$(mktemp -d)"
+  mkdir -p "$git_tmp/.planning/active/001-demo/02-deepening/story-01-demo"
+  (
+    cd "$git_tmp" || exit 1
+    git init -q
+    git -c user.email=test@example.com -c user.name=Test commit --allow-empty -q -m init
+    git branch -m develop
+    git switch -q -c story-01-demo
+    git -c user.email=test@example.com -c user.name=Test commit --allow-empty -q -m 'story work'
+    git switch -q develop
+  )
+  printf 'base_branch: develop\n' > "$git_tmp/.planning/config.yml"
+  printf '> **Status:** IN PROGRESS\n\n## Tasks\n\n| # | Task | Workflow | Status | Output |\n|---|---|---|---|---|\n| 1 | New task | GENERATE-DOCUMENT | TODO | - |\n' > "$git_tmp/.planning/active/001-demo/02-deepening/story-01-demo.md"
+  printf '> **Status:** TODO\n\n## Objective\nDemo\n\n## Technical Design\n- **Affected files / components:** `src/one.ts`\n- **Workflow:** GENERATE-DOCUMENT\n\n## Implementation Steps\n- Demo\n\n## Verification\n- Demo\n\n## Done Criteria\n- [ ] Demo\n' > "$git_tmp/.planning/active/001-demo/02-deepening/story-01-demo/task-01-new-task.md"
+  git_setup_output="$(cd "$git_tmp" && node "$ROOT/planning-template/scripts/planning-task.mjs" git-setup 001-demo story-01 task-01 --format markdown 2>&1)"
+  if grep -Fq 'git checkout story-01-demo' <<< "$git_setup_output" \
+    && grep -Fq 'git checkout -b story-01-demo--task-01-new-task' <<< "$git_setup_output" \
+    && ! grep -Fq 'git checkout -B story-01-demo' <<< "$git_setup_output"; then
+    pass "planning-task.mjs does not reset existing story branches during git setup"
+  else
+    fail "planning-task.mjs git setup would reset an existing story branch"
+    printf '%s\n' "$git_setup_output"
+  fi
+  rm -rf "$git_tmp"
   rm -rf "$tmpdir"
 else
   warn "node not installed; skipped deterministic script syntax checks"

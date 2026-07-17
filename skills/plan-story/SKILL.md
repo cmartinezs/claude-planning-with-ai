@@ -59,6 +59,10 @@ The skill still owns human judgment:
 
 ## Steps
 
+### 0 — Reset session for a new story
+
+Before starting a new story execution, clear the Claude session with `/clear`, then rerun `/plan-story <planning-id> <story-NN>` from the project root. If this invocation is already the resumed context after `/clear` for this exact story, continue. Do not require another `/clear` when rerunning `/plan-story` to continue the same story after a task PR merge or review checkpoint.
+
 ### 1 — Inspect story
 
 1. Parse `$ARGUMENTS` to extract planning id and story id.
@@ -114,6 +118,7 @@ The skill still owns human judgment:
     ```bash
     /plan-task <planning-id> <story-id> <task-id>
     ```
+    `/plan-task` must compact the session with `/compact` before starting the new task implementation; after compaction, continue with the same task command.
     Then stop. Report that the task PR must be merged into `<story-branch>` and its local task branch deleted before rerunning `/plan-story`.
 13. If the helper reports pending tasks blocked by dependencies, stop and list the blocked tasks.
 14. If no pending tasks exist, continue to story closure.
@@ -127,6 +132,7 @@ The skill still owns human judgment:
     - the full `## Done Criteria` section;
     - all task verification summaries;
     - for software projects, smoke-test evidence from the final task run or a fresh story-level run if the task evidence is stale;
+    - test evidence metadata for every applicable generated, detected, or manual gate: type, command, parameters, environment, configuration/scripts, output log or CI/report link, and result;
     - the commits that will be pushed.
 
     Then ask explicitly:
@@ -137,7 +143,7 @@ The skill still owns human judgment:
 17. If the reviewer requests corrections:
     - execute `[RECORD-EDGE-CASE]` with the requested corrections and the affected story;
     - implement the corrections;
-    - rerun relevant task/story verification;
+    - rerun relevant task/story verification and refresh the evidence metadata for each impacted gate;
     - for software projects, rerun the smoke test plan when code, build, dependencies, migrations, startup, or configuration changed;
     - present the updated review summary again;
     - wait for a new human review.

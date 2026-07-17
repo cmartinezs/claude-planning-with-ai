@@ -508,6 +508,17 @@ function hasPlaceholderBackendDesign(text) {
     || /\bN\/A\b/i.test(styleSource);
 }
 
+function hasPlaceholderTestExecutionEvidence(text) {
+  const generated = section(text, 'Generated Test Suite');
+  const evidence = /^###\s+Test Execution Evidence\s*$/im.test(generated)
+    ? generated.replace(/^[\s\S]*?^###\s+Test Execution Evidence\s*$/im, '').trim()
+    : '';
+  if (!evidence) return true;
+  return /\[(e\.g\.|exact command|env vars|local, CI|paste concise|pass\/fail|profile, ports|startup log|response\/log)/i.test(evidence)
+    || !/\b(unit|integration|acceptance|e2e|smoke|static|style|architecture|security|mutation|manual)\b/i.test(evidence)
+    || !/\b(pass|fail|skipped|passed|failed|error|success|0 failures|build success|tests run)\b/i.test(evidence);
+}
+
 function hasUnlabeledCodeFence(text) {
   let inFence = false;
   for (const line of text.split(/\r?\n/)) {
@@ -769,6 +780,11 @@ function validateTaskFile(planning, storyFile, taskFile, taskRow, catalog, confi
     }
     if (!hasSubheading(text, 'Generated Test Suite') || !/generated|test-suite|quality gate|acceptance dependency/i.test(done)) {
       add(results, 'FAIL', `${taskId} missing generated test-suite gate evidence criteria`, taskFile, lineOf(text, '## Done Criteria'));
+    }
+    if (!hasSubheading(text, 'Test Execution Evidence')) {
+      add(results, 'FAIL', `${taskId} missing Test Execution Evidence section`, taskFile, lineOf(text, /Generated Test Suite|Done Criteria/i), 'Add ### Test Execution Evidence with type, source, command, parameters/profile/env, environment, config/scripts, output log/report, and result for every applicable generated, detected, or manual gate.');
+    } else if (['IN PROGRESS', 'DONE'].includes(status.toUpperCase()) && hasPlaceholderTestExecutionEvidence(text)) {
+      add(results, 'FAIL', `${taskId} has incomplete Test Execution Evidence`, taskFile, lineOf(text, '### Test Execution Evidence'), 'Replace placeholder rows with real executed gates, output logs/reports, results, or explicit skipped-gate rationale.');
     }
     if (isDbOrmTask(text) && (!hasSubheading(text, 'Database / ORM Consistency Check') || !/static.*(db|database|orm)|runtime.*(persistence|smoke)|persistence smoke/i.test(done))) {
       add(results, 'FAIL', `${taskId} missing DB/ORM static consistency and runtime persistence smoke criteria`, taskFile, lineOf(text, '## Done Criteria'));

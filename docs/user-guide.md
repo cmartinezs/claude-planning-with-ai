@@ -55,6 +55,8 @@ Software projects must define a logging mechanism in `.planning/LOGGING.md`. Eve
 
 `/plan-test-suite` generates deterministic quality-gate matrices before execution. It writes a plan-level `TEST-SUITE.md`, story-level `TEST-SUITE.md`, or task-level `test-suites/<task>-test-suite.md` by detecting repository tooling first: package scripts, Maven/Gradle tasks, Python/Go/Rust commands, Docker Compose, SonarQube, linters, typecheckers, coverage tools, and architecture-test conventions. The generated gates cover unit tests, coverage, integration, acceptance/e2e, static analysis, code style, architecture/design guide review (DDD, Hexagonal, DRY, SOLID, GoF, and project-specific guides), smoke, security/dependency scans, and mutation/test-strength checks when applicable.
 
+Every executed test gate must leave reproducible evidence, whether the gate came from `/plan-test-suite`, repository detection, CI, or a user-run manual command. Record the applicable test type (`unit`, `integration`, `acceptance`, `e2e`, `smoke`, `static-analysis`, `style`, `architecture`, `security`, `mutation`, or manual verification), exact command, parameters or profiles, environment, configuration and scripts used, output log or report link, and result. If a generated-suite gate is skipped, record why it is not applicable.
+
 For Maven services that use Cucumber/Gherkin, the preferred acceptance gate is an `acceptanceTests` Maven profile:
 
 ```bash
@@ -70,6 +72,8 @@ Acceptance evidence also requires a complete dependency inventory. The generated
 When `project.type: software`, `/plan-task`, `/plan-story`, and `/plan-done` must run the smoke test plan before final approval: start the supporting services required by the stack, build or start the app, check connectivity or schema behavior, and run the smoke checks. For git-enabled tasks, `/plan-task` then commits, pushes, and opens or reuses the task PR before asking for human developer code review, so external reviewers can comment on the PR. Requested corrections are implemented, verified, committed, and pushed to the same PR before review is requested again.
 
 When a story changes database structure or ORM artifacts, `/plan-atomize` must add a separate validation task. That task statically checks consistency between migrations/schema and ORM models/entities/generated clients, then starts the local environment and runs a persistence smoke check. If the local environment cannot be inferred from repository files, the agent must ask the human for startup steps before finalizing or executing that validation.
+
+Claude session boundaries are part of the execution workflow. Before starting a different story, run `/clear` and then rerun `/plan-story <planning-id> <story-NN>` from the project root. Before starting each new task implementation, run `/compact` and then continue with `/plan-task <planning-id> <story-NN> <task-NN>`. When rerunning `/plan-story` to continue the same story after a task PR merge or review checkpoint, do not require another `/clear`.
 
 When `execution.requires_git` is `true`, the git flow is layered:
 
@@ -414,5 +418,5 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
 - **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
-- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.9` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.10` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

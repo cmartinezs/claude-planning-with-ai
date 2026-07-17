@@ -52,6 +52,7 @@ Examples:
 6. If the script succeeds, report its output verbatim. Then read the generated files it lists and summarize:
    - commands inferred automatically
    - gates that still need manual completion
+   - evidence metadata that must be captured when each gate runs: test type, command, parameters, environment, configuration/scripts, output log or report, and result
    - the next recommended command (`/plan-atomize`, `/plan-task`, `/plan-story`, or `/plan-validate`)
 7. If the script fails, report the error. Do not invent commands blindly; inspect repository files only to explain the failure or identify the missing workspace update.
 
@@ -62,3 +63,4 @@ Examples:
 - Run `/plan-test-suite <planning-id> --all` after `/plan-expand` or `/plan-atomize` when a complete test strategy is needed.
 - Run `/plan-test-suite <planning-id> <story-id> <task-id>` before `/plan-task` when a task lacks a task-level test suite.
 - `/plan-task` should read the task test-suite artifact when present and execute applicable gates before publishing the task PR for review.
+- Generated, detected, and user-supplied manual tests all require durable execution evidence with the same fields: type (`unit`, `integration`, `acceptance`, `e2e`, `smoke`, `static-analysis`, `style`, `architecture`, `security`, `mutation`, or manual), exact command, parameters/profiles/env vars, environment, configuration/scripts used, output log or CI/report link, result, and skipped-gate rationale when applicable.

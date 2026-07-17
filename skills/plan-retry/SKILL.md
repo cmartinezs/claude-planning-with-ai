@@ -37,7 +37,7 @@ Retry all stories with status BLOCKED in a planning. Resets each to TODO and inv
 
 6. If no BLOCKED stories are reported, say "no BLOCKED stories — nothing to retry" and stop.
 
-7. Invoke each reported `retryCommands` entry in order.
+7. Invoke each reported `retryCommands` entry in order. Before starting each retried story, clear the Claude session with `/clear`, then rerun the reported `/plan-story <planning-id> <story-id>` command from the project root. If the current turn is already the resumed context after `/clear` for that exact retried story, continue.
    - If `/plan-story` completes successfully, note it as DONE.
    - If it fails again, leave/report the story as BLOCKED with the new failure reason and execute `[RECORD-EDGE-CASE]` for the retry failure.
 

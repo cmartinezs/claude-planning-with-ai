@@ -48,6 +48,7 @@ Atomize and execute all pending stories in a planning. Independent stories run i
    1. Run /plan-atomize <NNN-slug> <story-NN>
       - Present the task breakdown and immediately confirm it yourself (do not ask the user).
    2. Run /plan-story <NNN-slug> <story-NN>
+      - This subagent is already a fresh story context. If executing the same sequence manually in Claude instead of a subagent, run `/clear` before `/plan-story`.
 
    If /plan-atomize fails, stop and report the error with story ID.
    If /plan-story fails, stop and report the error with story ID.

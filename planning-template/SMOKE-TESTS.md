@@ -44,6 +44,16 @@ Example:
 | 4 | Changed surface responds correctly | [e.g. `curl http://localhost:8080/actuator/health` or a changed endpoint returns expected status] |
 | 5 | No startup or migration regressions are visible | [e.g. logs contain no new stack traces, migration failures, or boot errors] |
 
+## Smoke Evidence
+
+For every smoke check that runs, record the execution evidence in the task file or a linked Markdown artifact.
+
+| Check | Command | Parameters / profile / env | Environment | Config / scripts | Output log / report | Result |
+|-------|---------|----------------------------|-------------|------------------|---------------------|--------|
+| Supporting services | [exact command] | [env vars, profile, ports] | [local, Docker Compose, Testcontainers, CI] | [compose file, env file, helper script] | [log excerpt, report path, CI URL] | pass/fail/skipped + reason |
+| App startup | [exact command] | [runtime profile, env vars] | [local app/service/worker] | [start script, config file] | [startup log excerpt or report] | pass/fail/skipped + reason |
+| Changed surface | [exact command/check] | [URL, port, input fixture] | [local app + dependencies] | [.planning/SMOKE-TESTS.md, script, config] | [response/log excerpt or report] | pass/fail/skipped + reason |
+
 ---
 
 ## Database / ORM Consistency
@@ -62,6 +72,7 @@ Required for tasks that modify database structure, migrations, schema files, see
 
 - If this file is missing, infer the smoke checks from the repository structure and build files before asking for human review.
 - Prefer non-destructive commands and the smallest checks that still prove the real integration path works.
+- Capture exact commands, parameters, environment, configuration/scripts, output logs or report links, and result for every smoke check that runs.
 - If the project has migrations, schema generation, seed data, ORM models/entities, or generated DB clients, include static consistency checks and local runtime persistence smoke checks here.
 - If the project has no backend or no external services, replace those rows with the closest reproducible local evidence.
 
