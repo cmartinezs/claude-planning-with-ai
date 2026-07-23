@@ -10,31 +10,31 @@ No se mantienen aliases. Si un comando v3 no coincide con la superficie v4, se b
 
 ## Superficie v4 permitida
 
-Comandos publicos base:
+Skills publicas base:
 
 ```text
-/arc-init
-/arc-config
-/arc-release
-/arc-item
-/arc-task
-/arc-check
-/arc-report
-/arc-decision
-/arc-update
+init
+config
+release
+item
+task
+check
+report
+decision
+update
 ```
 
 Comandos avanzados solo si se justifican:
 
 ```text
-/arc-run
-/arc-recover
-/arc-backlog
+run
+recover
+backlog
 ```
 
 Todo lo demas debe borrarse o quedar fuera del plugin v4.
 
-`/arc-release` queda como router publico del lifecycle de release. No existe `/arc-release init`; el bootstrap completo es `/arc-init` y la configuracion posterior vive en `/arc-config`.
+`release` queda como router publico del lifecycle de release. No existe `release init`; el bootstrap completo es `init` y la configuracion posterior vive en `config`. La forma visible final es `/<product-name>:<skill-name>` salvo que el spike de namespace obligue a un fallback prefijado.
 
 ## Alcance completo
 
@@ -124,7 +124,7 @@ skills/plan-recover/
 skills/plan-backlog/
 ```
 
-Si esas capacidades sobreviven despues del vertical slice, se recrean como `skills/arc-run/`, `skills/arc-recover/` o `skills/arc-backlog/`; no se conservan con prefijo `plan`.
+Si esas capacidades sobreviven despues del vertical slice, se recrean como `skills/run/`, `skills/recover/` o `skills/backlog/`; no se conservan con prefijo `plan`.
 
 ## Storage a eliminar
 
@@ -143,7 +143,8 @@ El storage v4 es:
   config.yml
   plugin.lock.yml
   events/
-  .operations/
+  operations/
+  .runtime/
   scopes/
   decisions/
   releases/
@@ -152,7 +153,7 @@ El storage v4 es:
 
 Los ejemplos, templates y scripts v4 no deben crear ni leer `active/`, `finished/` o `.releases/`.
 
-`/arc-init` no debe copiar el template pack completo al repo de trabajo. El repo de trabajo guarda `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/.operations/`, scope catalog, releases, artefactos generados y snapshots historicos de template packs; los templates canonicos se leen desde la instalacion del plugin.
+`init` no debe copiar el template pack completo al repo de trabajo. El repo de trabajo guarda `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/operations/`, `.planning/.runtime/`, scope catalog, releases, artefactos generados y snapshots historicos de template packs; los templates canonicos se leen desde la instalacion del plugin.
 
 El estado operativo v4 debe vivir en YAML/JSON canonico:
 
@@ -165,7 +166,7 @@ release-item.yml
 work-package.yml
 task.yml
 events/YYYY/MM/<event-id>.json
-.operations/<operation-id>/operation.yml
+operations/<operation-id>/operation.yml
 ```
 
 Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) es proyeccion humana generada.
@@ -186,11 +187,11 @@ planning-template/scripts/
 Rehacer como v4:
 
 ```text
-bin/arcflow
+bin/<product-cli>
 runtime/src/commands/
 runtime/src/lib/
 runtime/src/schemas/
-runtime/dist/arcflow.mjs
+runtime/dist/<product-cli>.mjs
 runtime/fixtures/
 runtime/package.json
 runtime/package-lock.json
@@ -226,7 +227,7 @@ Reglas del runtime:
 - vive fuera del template pack;
 - contiene comandos de dominio, librerias, schemas, fixtures y bundle self-contained;
 - no se copia al workspace usuario;
-- expone solo el launcher estable de `bin/arcflow` a las skills.
+- expone solo el launcher estable de `bin/<product-cli>` a las skills.
 
 Actualizar referencias en:
 
@@ -299,7 +300,7 @@ No editar como fuente:
 
 Cambios esperados:
 
-- home debe explicar el flujo v4: arc-init -> arc-config -> arc-release -> arc-item -> scope work packages -> arc-task -> ChangeSets -> arc-check/arc-report -> release/deployment -> finalize.
+- home debe explicar el flujo v4: init -> config -> release -> item -> scope work packages -> task -> ChangeSets -> check/report -> release/deployment -> finalize.
 - pagina de comandos debe mostrar solo comandos v4.
 - tutoriales deben usar `.planning/releases/`, `.planning/scopes/`, IDs primarios distribuidos con `display_id` `R0001`/`RI0001`/`WP0001`/`T0001`, task guides y test guides.
 - training/demo no debe ensenar `plan-new`, `plan-expand`, `active/finished`, `.releases/` ni planificaciones adicionales por scope.
@@ -336,7 +337,7 @@ Reglas:
 - `docs/commands.yml` es inventario canonico de comandos v4.
 - `docs/reference.md` debe generarse o revisarse desde `docs/commands.yml`.
 - README no debe tener tabla de "similar commands" para comandos legacy.
-- tutoriales deben iniciar desde `/arc-init`, no desde `/release init`, `/plan-new` o `/plan-expand`.
+- tutoriales deben iniciar desde `init`, no desde `/release init`, `/plan-new` o `/plan-expand`.
 - developer guide debe explicar launcher, runtime/librerias v4, schemas, ChangeSets, event journal y el contrato stage-first interno.
 - glossary debe definir release, release item, item kind, delivery scope, cross-cutting concern, gate profile, scope work package, task guide, test guide, ChangeSet, operation, plugin lock, waiver, blocker, deployment event y finalization.
 
@@ -371,7 +372,7 @@ Cada script debe caer en una de tres categorias:
 Revision inicial:
 
 ```text
-launcher                 -> crear como entrada estable arcflow <domain> <stage>
+launcher                 -> crear como entrada estable <product-cli> <domain> <stage>
 release.mjs              -> reescribir como use cases v4 de release aggregate
 planning-init.mjs        -> reescribir para estructura v4 base y plugin lock
 planning-config.mjs      -> crear para scopes, policies, commands, guides y generators
@@ -379,17 +380,17 @@ planning-story.mjs       -> reescribir para release items y work packages
 planning-task.mjs        -> adaptar a release/release-item/work-package/task
 planning-check.mjs       -> adaptar y ampliar con guide checks
 planning-report.mjs      -> adaptar a release/release-item/work-package/task
-doc-generate.mjs         -> plegar bajo arc-report o borrar wrapper directo
-planning-atomize.mjs     -> integrar a arc-item atomize
+doc-generate.mjs         -> plegar bajo report o borrar wrapper directo
+planning-atomize.mjs     -> integrar a item atomize
 planning-mutate.mjs      -> reemplazar por ChangeSet/stores/librerias v4
 planning-archive.mjs     -> borrar o reimplementar como release finalization
 planning-done.mjs        -> borrar si queda cubierto por release/release-item/task stages
-planning-clone.mjs       -> borrar salvo que arc-recover lo justifique
+planning-clone.mjs       -> borrar salvo que recover lo justifique
 planning-merge.mjs       -> borrar; usar release-item/work-package move/link si aplica
-planning-retry.mjs       -> mover a arc-recover si se conserva
-planning-rollback.mjs    -> mover a arc-recover si se conserva
+planning-retry.mjs       -> mover a recover si se conserva
+planning-rollback.mjs    -> mover a recover si se conserva
 planning-story-skip.mjs  -> mover a release-item/task resolution con waiver si se conserva
-planning-from-release.mjs -> integrar a arc-release plan o arc-item import
+planning-from-release.mjs -> integrar a release plan o item import
 update-version.mjs       -> conservar para futuras migraciones v4+
 ```
 
@@ -398,7 +399,7 @@ update-version.mjs       -> conservar para futuras migraciones v4+
 `scripts/verify-plugin.sh` debe fallar si encuentra:
 
 - `skills/release-*`;
-- ausencia de `skills/arc-config/` cuando `docs/commands.yml` lo declare;
+- ausencia de `skills/config/` cuando `docs/commands.yml` lo declare;
 - `skills/us-*`;
 - `skills/doc-*`;
 - comandos removidos en `docs/commands.yml`;
@@ -419,7 +420,7 @@ update-version.mjs       -> conservar para futuras migraciones v4+
 - ausencia de schemas para entidades canonicas y ChangeSets;
 - ausencia de schemas para Release Item, Operation, Actor, Approval, Gate, Blocker, Risk, Waiver, Decision, Deployment Event, Revision Ref, Command Spec, Provenance y Resolution;
 - ausencia de `plugin.lock.yml` en fixtures v4;
-- ausencia de `bin/arcflow` o `runtime/dist/arcflow.mjs`;
+- ausencia de `bin/<product-cli>` o `runtime/dist/<product-cli>.mjs`;
 - comandos guardados como strings de shell en fixtures/templates v4.
 
 Checks sugeridos:
@@ -451,10 +452,10 @@ Revision manual:
 - abrir README y confirmar que solo describe v4;
 - abrir `docs/reference.md` y confirmar que solo lista comandos v4;
 - abrir landing site local o build output y confirmar que no muestra comandos v3;
-- revisar `template-pack/` como template pack instalado, no como carpeta copiada por `/arc-init`;
+- revisar `template-pack/` como template pack instalado, no como carpeta copiada por `init`;
 - revisar fixtures v4 y confirmar que Markdown se regenera desde YAML/JSON canonico;
 - revisar que ChangeSets fallen ante `baseRevisions` obsoletas;
-- revisar que `/arc-check` no genere ni modifique artefactos;
+- revisar que `check` no genere ni modifique artefactos;
 - revisar `CHANGELOG.md` y version markers juntos.
 
 ## Publicacion
@@ -463,7 +464,7 @@ El release v4 debe comunicar:
 
 - no hay compatibilidad de comandos v3;
 - no hay migracion automatica obligatoria de workspaces v3;
-- el nuevo storage canonico es `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/.operations/`, `.planning/scopes/`, `.planning/releases/` y snapshots historicos en `.planning/vendor/template-packs/`;
+- el nuevo storage canonico es `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/operations/`, `.planning/scopes/`, `.planning/releases/` y snapshots historicos en `.planning/vendor/template-packs/`; `.planning/.runtime/` queda para staging/logs no versionados;
 - los comandos v3 fueron removidos, no deprecados;
 - los Release Items tipados reemplazan story groups y los work packages reemplazan historias hermanas por scope;
 - si se entrega una herramienta de export/migracion v3, es auxiliar y no condiciona el contrato v4.

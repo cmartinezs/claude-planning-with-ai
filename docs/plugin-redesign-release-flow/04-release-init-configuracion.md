@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-`/arc-init` debe preparar el contexto que permite planificar sin asumir una estructura de proyecto especifica. Es el unico bootstrap de v4. No debe existir un segundo `/arc-release init`.
+La skill `init` debe preparar el contexto que permite planificar sin asumir una estructura de proyecto especifica. Es el unico bootstrap de v4. No debe existir un segundo init dentro de `release`.
 
-Para cambios posteriores, `/arc-config` administra scopes, fuentes, politicas, Git, comandos, autonomia, guias y generadores custom.
+Para cambios posteriores, la skill `config` administra scopes, fuentes, politicas, Git, comandos, autonomia, guias y generadores custom.
 
 ## Resultado esperado
 
@@ -15,8 +15,13 @@ Archivos base:
   config.yml
   plugin.lock.yml
   events/
-  .operations/
+  operations/
+  .runtime/
   scopes/
+  concerns/
+  gates/
+  gate-profiles/
+  environments/
   decisions/
   releases/
   vendor/
@@ -33,7 +38,7 @@ project:
 
 plugin:
   schema_version: 4
-  launcher: arcflow
+  launcher: <product-cli>
 
 policies:
   release:
@@ -70,8 +75,13 @@ scope_catalog:
 
 runtime:
   event_store: .planning/events
-  operation_store: .planning/.operations
+  operation_store: .planning/operations
+  runtime_store: .planning/.runtime
   template_vendor: .planning/vendor/template-packs
+  operation_retention_days: 7
+  retain_failed_operations: true
+  retain_before_snapshots: false
+  event_retention: permanent
 ```
 
 `config.yml` no duplica la definicion completa de scopes. Cada scope vive en `.planning/scopes/<scope-id>/scope.yml`.
@@ -138,7 +148,7 @@ plugin:
 
 Los ids anteriores son ejemplos. El plugin no debe tener una lista fija de scopes.
 
-## Preguntas de `/arc-init`
+## Preguntas de `init`
 
 El script debe inferir primero y preguntar despues. Preguntas esperadas:
 
@@ -154,22 +164,22 @@ El script debe inferir primero y preguntar despues. Preguntas esperadas:
 10. Autonomia: que puede ejecutar el agente sin aprobacion y que debe quedar como propuesta o ChangeSet pendiente.
 11. Runtime: donde guardar operaciones, eventos por archivo y snapshots historicos de template packs.
 
-## Preguntas de `/arc-config`
+## Preguntas de `config`
 
-`/arc-config` modifica configuracion existente. Debe operar con ChangeSets y aprobacion cuando cambie una politica que afecte ejecucion o alcance.
+`config` modifica configuracion existente. Debe operar con ChangeSets y aprobacion cuando cambie una politica que afecte ejecucion o alcance.
 
 Stages esperados:
 
 ```text
-/arc-config scopes
-/arc-config sources
-/arc-config policies
-/arc-config git
-/arc-config commands
-/arc-config autonomy
-/arc-config guide refresh --scope <scope-id>
-/arc-config guide approve --scope <scope-id>
-/arc-config generator add --scope <scope-id>
+/<product-name>:config scopes
+/<product-name>:config sources
+/<product-name>:config policies
+/<product-name>:config git
+/<product-name>:config commands
+/<product-name>:config autonomy
+/<product-name>:config guide refresh --scope <scope-id>
+/<product-name>:config guide approve --scope <scope-id>
+/<product-name>:config generator add --scope <scope-id>
 ```
 
 ## Deteccion determinista
@@ -194,10 +204,10 @@ La deteccion no decide sola el contrato final. Propone un ChangeSet y escribe so
 - Si una capacidad cruza scopes, se crea un Release Item unico con varios work packages.
 - Cada work package vive bajo el Release Item y tiene sus propias tasks atomizadas.
 - Si no hay guia tecnica para un scope de codigo, el release plan debe crear un Release Item/work package/task previa para definirla antes de tareas de implementacion.
-- Si hay documentacion suficiente, `/arc-config guide refresh` debe generar o refrescar `task-guide.yml`, `test-guide.yml` y sus proyecciones Markdown antes de atomizar work packages.
+- Si hay documentacion suficiente, `config guide refresh` debe generar o refrescar `task-guide.yml`, `test-guide.yml` y sus proyecciones Markdown antes de atomizar work packages.
 - Si no hay documentacion suficiente, la guia debe marcar gaps explicitos y bloquear la automatizacion deterministica de tasks/tests hasta que se creen fuentes faltantes o una decision humana acepte el riesgo.
 - Si existe un generador custom del proyecto, el plugin debe invocarlo por contrato estable y validar su salida, no duplicar su logica en la skill.
-- Si no hay fuente de release items, `/arc-release plan` o `/arc-item add` puede crearlos desde una descripcion humana, pero debe registrar que no hubo backlog fuente.
+- Si no hay fuente de release items, `release plan` o `item add` puede crearlos desde una descripcion humana, pero debe registrar que no hubo backlog fuente.
 - Si git esta deshabilitado, los scripts no deben generar pasos `git`/`gh`; deben generar evidencia local y checklist manual.
 - Los comandos se guardan como `executable + args + working_directory + timeout + approval`; nunca como string de shell libre.
 - Todas las mutaciones se registran como eventos JSON inmutables bajo `.planning/events/` con operation ID, actor/agente, timestamps, hashes de entrada/salida, archivos modificados y resultado. `events.ndjson` queda solo como export.

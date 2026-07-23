@@ -8,7 +8,7 @@
 4. Scopes globales: los scopes pertenecen al proyecto y las releases referencian revisiones concretas de sus guias.
 5. Estado estructurado: YAML o JSON es fuente de verdad; Markdown es proyeccion humana generada.
 6. Identidad estable y distribuida: IDs primarios ULID/UUIDv7, `display_id` humano como `R0001` o `T0042`, y slugs decorativos.
-7. Marca reconocible: v4 adopta `ARC Flow`; las skills publicas usan prefijo `/arc-*` y el launcher es `arcflow`, no `claude-*` ni `plan-*`.
+7. Marca reconocible pendiente: v4 deja atras `claude-*` y `plan-*`, pero `ARC Flow` queda como codename hasta cerrar naming gate y namespace real de plugin.
 8. Menos comandos publicos: un comando por intencion principal; las variaciones son subcomandos o stages internos.
 9. Skills delgadas: la skill coordina intencion, aprobacion y juicio del agente; no implementa mecanica repetible.
 10. Runtime determinista: parseo, validacion, escritura atomica, indices, estados, secuencia, locks, journal y comandos planificados viven en scripts/librerias.
@@ -134,7 +134,7 @@ kind: application | service | library | infrastructure | documentation | process
 Reglas:
 
 - `config.yml` solo referencia el catalogo de scopes; la definicion completa vive en `.planning/scopes/<scope-id>/scope.yml`.
-- Los scopes se configuran en `/arc-init` y se modifican con `/arc-config`.
+- Los scopes se configuran en `/<product-name>:init` y se modifican con `/<product-name>:config`.
 - Todo scope tiene `id`, `label`, `kind` y al menos un `path` o una justificacion `non_code: true`.
 - Cada kind activa reglas y gates distintos; un scope `compliance` no hereda automaticamente gates de software.
 - Las guias ejecutables `task-guide.yml` y `test-guide.yml` viven a nivel de proyecto bajo `.planning/scopes/<scope-id>/`; los `.md` equivalentes son proyecciones humanas.
@@ -163,7 +163,8 @@ Estructura objetivo:
   config.yml
   plugin.lock.yml
   events/
-  .operations/
+  operations/
+  .runtime/
 
   scopes/
     web/
@@ -179,33 +180,48 @@ Estructura objetivo:
       test-guide.yml
       test-guide.md
 
+  concerns/
+    security.yml
+    accessibility.yml
+  gates/
+    unit-tests.yml
+    threat-model.yml
+  gate-profiles/
+    frontend-default.yml
+    security-default.yml
+  environments/
+    local.yml
+    beta.yml
+    demo.yml
+    production.yml
+
   decisions/
     DEC-0001-slug/
       decision.yml
       README.md
 
   releases/
-    R0001-capability/
+    <release-id>/
       release.yml
       README.md
 
       items/
-        RI0001-publish-assessment/
+        <release-item-id>/
           release-item.yml
           README.md
 
           work-packages/
-            WP0001-api/
+            <work-package-id>/
               work-package.yml
               tasks/
-                T0001-command-contract/
+                <task-id>/
                   task.yml
                   README.md
 
-            WP0002-web/
+            <work-package-id>/
               work-package.yml
               tasks/
-                T0002-form-flow/
+                <task-id>/
                   task.yml
                   README.md
 
@@ -221,12 +237,13 @@ Estado canonico:
 - `config.yml`;
 - `plugin.lock.yml`;
 - `scope.yml`;
+- concern, gate, gate profile y environment YAML;
 - `release.yml`;
 - `release-item.yml`;
 - `work-package.yml`;
 - `task.yml`;
 - `.planning/events/**/*.json`;
-- `.planning/.operations/<operation-id>/operation.yml`.
+- `.planning/operations/<operation-id>/operation.yml`.
 
 Proyecciones humanas generadas:
 
@@ -242,7 +259,7 @@ Proyecciones humanas generadas:
 
 ## Plugin lock y template pack
 
-`/arc-init` crea `.planning/plugin.lock.yml` para fijar la reproducibilidad:
+`/<product-name>:init` crea `.planning/plugin.lock.yml` para fijar la reproducibilidad:
 
 ```yaml
 plugin:
@@ -394,10 +411,13 @@ release_policy:
     - hotfix
 ```
 
-Modos permitidos inicialmente:
+Modos permitidos para el primer runtime:
 
 - `strict_sequence`: no liberar una release si hay una anterior abierta en la misma lane.
 - `dependency_graph`: libera cuando sus dependencias declaradas estan satisfechas.
+
+Modos futuros, no incluidos en el primer vertical slice:
+
 - `release_train`: agrupa releases por ventanas de entrega.
 - `parallel`: permite releases independientes con gates explicitos.
 
@@ -452,7 +472,9 @@ Propiedades obligatorias:
 - aplicable sin volver a consultar al LLM;
 - invalido cuando cambia una revision de agregado relevante.
 
-Cada aplicacion debe usar staging, optimistic locking por agregado, operation journal, validacion post-write y rollback tecnico cuando aplique. Las operaciones multiarchivo viven bajo `.planning/.operations/<operation-id>/`.
+Cada aplicacion debe usar staging, optimistic locking por agregado, operation journal, validacion post-write y rollback tecnico cuando aplique. El manifest resumido de la operacion vive bajo `.planning/operations/<operation-id>/`; staging, snapshots `before/` y logs viven bajo `.planning/.runtime/operations/<operation-id>/` y no son versionados por defecto.
+
+El ChangeSet controla obligatoriamente el control plane (`.planning/**`, policies, operaciones, eventos, aprobaciones, transiciones y metadata canonica). El work product (`src/**`, `tests/**`, `infra/**`, docs de producto y configuracion externa) se registra como evidencia o se modifica solo mediante operaciones explicitas y limitadas. El runtime no es un editor universal ni un rollback engine global.
 
 Los comandos externos se modelan como saga:
 
@@ -481,10 +503,10 @@ El runtime debe protegerse contra command injection, path traversal, symlink esc
 
 ## Launcher estable
 
-La interfaz interna recomendada no expone rutas como `.planning/scripts/release.mjs` ni rutas de instalacion del plugin. Las skills llaman un launcher estable:
+La interfaz interna recomendada no expone rutas como `.planning/scripts/release.mjs` ni rutas de instalacion del plugin. Las skills llaman un launcher estable. Mientras no cierre el naming gate, se documenta como placeholder:
 
 ```text
-arcflow <domain> <stage> [args] [--format json|markdown]
+<product-cli> <domain> <stage> [args] [--format json|markdown]
 ```
 
 El launcher resuelve:
@@ -537,22 +559,22 @@ Cuando el agente produzca Release Items, work packages o tasks, debe entregar un
 ## Flujo feliz propuesto
 
 ```text
-/arc-init
-/arc-config scopes
-/arc-config policies
-/arc-release new --title "Capability name" --target 2026-Q3-M1-W2 --date 2026-08-07
-/arc-item add R0001 --kind user_story --title "Publish assessment"
-/arc-item package add R0001 RI0001 --scope api --title "Command contract and persistence"
-/arc-item package add R0001 RI0001 --scope web --title "Teacher publishing UI"
-/arc-item atomize R0001 RI0001 WP0001
-/arc-item atomize R0001 RI0001 WP0002
-/arc-task inspect R0001 RI0001 WP0001 T0001
-/arc-task start R0001 RI0001 WP0001 T0001
-/arc-check readiness R0001
-/arc-report status R0001
-/arc-release mark R0001 VERIFYING
-/arc-release mark R0001 RELEASED
-/arc-release finalize R0001
+/<product-name>:init
+/<product-name>:config scopes
+/<product-name>:config policies
+/<product-name>:release new --title "Capability name" --target 2026-Q3-M1-W2 --date 2026-08-07
+/<product-name>:item add R0001 --kind user_story --title "Publish assessment"
+/<product-name>:item package add R0001 RI0001 --scope api --title "Command contract and persistence"
+/<product-name>:item package add R0001 RI0001 --scope web --title "Teacher publishing UI"
+/<product-name>:item atomize R0001 RI0001 WP0001
+/<product-name>:item atomize R0001 RI0001 WP0002
+/<product-name>:task inspect R0001 RI0001 WP0001 T0001
+/<product-name>:task start R0001 RI0001 WP0001 T0001
+/<product-name>:check readiness R0001
+/<product-name>:report status R0001
+/<product-name>:release mark R0001 VERIFYING
+/<product-name>:release mark R0001 RELEASED
+/<product-name>:release finalize R0001
 ```
 
 La forma exacta puede cambiar, pero el usuario debe sentir que navega release -> release item -> scope work package -> task, no una coleccion de utilidades ni una jerarquia de planificaciones paralelas.

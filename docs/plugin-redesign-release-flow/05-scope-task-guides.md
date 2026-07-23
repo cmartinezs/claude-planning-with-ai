@@ -10,6 +10,22 @@ Regla principal:
 YAML es regla ejecutable. Markdown es explicacion humana.
 ```
 
+YAML ejecutable significa DSL cerrada, no frases en lenguaje natural dentro de campos `when` o `rule`. El runtime debe poder evaluar reglas sin interpretar narrativa, invocar un LLM ni leer Markdown.
+
+Operadores iniciales permitidos:
+
+```text
+equals
+not_equals
+contains
+exists
+all
+any
+not
+in
+matches
+```
+
 Nombres:
 
 ```text
@@ -133,7 +149,16 @@ scope_id: web
 revision: sha256:...
 work_package_types:
   - id: ui-feature
-    when: User-visible UI behavior.
+    applies_when:
+      any:
+        - field: item.kind
+          op: in
+          value:
+            - user_story
+            - capability
+        - field: item.tags
+          op: contains
+          value: ui
     required_sections:
       - visible_behavior
       - component_plan
@@ -144,7 +169,13 @@ work_package_types:
       - accessibility-review
 task_types:
   - id: data-provider
-    when: Connect UI to real data source.
+    applies_when:
+      all:
+        - field: work_package.type
+          op: equals
+          value: ui-feature
+        - field: work_package.contracts.api
+          op: exists
     required_sections:
       - contract
       - loading_states
@@ -152,7 +183,9 @@ task_types:
     template_ref: task-data-provider
 decomposition_rules:
   - id: contract-before-ui
-    rule: contract-check must precede real-api-connection
+    ordering:
+      predecessor_type: contract-check
+      successor_type: real-api-connection
 automation:
   generator: scripts/planning/web-task-guide.mjs
   input_schema: scope-guide-input-v1
@@ -350,38 +383,38 @@ Los generadores custom deben tratarse como codigo ejecutable sujeto a politica:
 
 ## Puntos de integracion
 
-`/arc-init`:
+`init`:
 
 - descubre fuentes y generadores candidatos;
 - escribe config inicial y plugin lock;
 - crea entradas del catalogo de scopes cuando es posible.
 
-`/arc-config guide refresh`:
+`config guide refresh`:
 
 - genera o refresca `task-guide.yml`, `test-guide.yml` y sus proyecciones `task-guide.md`/`test-guide.md`;
 - actualiza metadata y revisiones de guia;
 - reporta fuentes stale y gaps.
 
-`/arc-config guide approve`:
+`config guide approve`:
 
 - marca guias revisadas como aprobadas;
 - registra aprobador, timestamp y revision en `scope.yml`;
 - emite un evento JSON inmutable bajo `.planning/events/`.
 
-`/arc-item package add`:
+`item package add`:
 
 - lee guias de scope aprobadas antes de crear un work package;
 - registra la revision de guia usada por el work package y la agrega al indice de la release.
 
-`/arc-item atomize`:
+`item atomize`:
 
 - lee el work package y las guias de scope antes de crear tasks;
 - falla cuando faltan guias requeridas o estan stale, salvo que el usuario apruebe una waiver explicita.
 
-`/arc-check guides`:
+`check guides`:
 
 - valida frescura de guias, secciones requeridas, provenance y salida del generador.
 
-`/arc-check tests`:
+`check tests`:
 
-- no genera test suites. Devuelve findings y operaciones recomendadas; la generacion vive en `/arc-task prepare`, `/arc-item atomize` o `/arc-config guide refresh`.
+- no genera test suites. Devuelve findings y operaciones recomendadas; la generacion vive en `task prepare`, `item atomize` o `config guide refresh`.

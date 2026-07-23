@@ -4,7 +4,7 @@
 
 Esto es v4 y parte en limpio. No hay compatibilidad hacia atras, aliases legacy ni storage paralelo por defecto. La ruta sigue siendo incremental para controlar riesgo de implementacion, pero cada corte debe construir el modelo v4 final, no una transicion desde v3.
 
-La recomendacion del review cambia el orden: no comenzar por `skills/arc-release/SKILL.md`. Primero debe cerrarse el contrato del dominio, del naming y del runtime. La segunda revision agrega un Corte -1.1 obligatorio para resolver contradicciones residuales antes del runtime productivo.
+La recomendacion del review cambia el orden: no comenzar por una skill publica. Primero debe cerrarse el contrato del dominio, del naming y del runtime. La segunda revision agrega un Corte -1.1 obligatorio para resolver contradicciones residuales. La tercera revision agrega un Corte -1.2 de spikes tecnicos antes del runtime productivo.
 
 ## Corte -1: contrato del dominio y del runtime
 
@@ -20,7 +20,7 @@ Entregables:
 - Modelo de concurrencia: `baseRevisions` por agregado, optimistic locking, operation locks, idempotency keys y comportamiento en worktrees.
 - Politicas configurables: release sequence, lanes, autonomy, approvals, gates, skip, cancelacion, deployment y finalizacion.
 - Contrato seguro de comandos y custom generators: estructura de comando, cwd, timeouts, allowlist, path boundaries y permisos.
-- Naming publico `ARC Flow`, skills con prefijo `/arc-*` y launcher estable `arcflow <domain> <stage>` para ocultar rutas internas del plugin.
+- Naming publico pendiente: `ARC Flow` y `arcflow` son codename hasta cerrar naming gate; la API debe considerar namespace real de plugin y skills canonicas cortas.
 - Fixtures de arquitectura:
   - monorepo software;
   - repositorio simple;
@@ -34,7 +34,7 @@ Entregables:
 Validacion:
 
 ```text
-arcflow check architecture --fixtures all --format json
+<product-cli> check architecture --fixtures all --format json
 bash scripts/verify-plugin.sh
 ```
 
@@ -51,31 +51,67 @@ Cambios:
 - Cambiar IDs primarios a ULID/UUIDv7 u otro formato distribuido; conservar `display_id` como etiqueta humana.
 - Cambiar `baseRevision` global por `baseRevisions` por agregado.
 - Reemplazar `events.ndjson` como storage primario por eventos individuales inmutables bajo `.planning/events/YYYY/MM/<event-id>.json`.
-- Definir `.planning/.operations/<operation-id>/` con `operation.yml`, `change-set.json`, `before/`, `staged/` y `result.json`.
+- Definir `.planning/operations/<operation-id>/` con `operation.yml`, `change-set.json` y `result.json`; `before/`, `staged/` y logs viven bajo `.planning/.runtime/`.
 - Modelar comandos externos como sagas: `prepare -> execute -> verify -> compensate`.
 - Vincular aprobaciones al hash del ChangeSet.
-- Hacer `/arc-check` query-only; debe recomendar operaciones, no generar artefactos.
+- Hacer `/<product-name>:check` query-only; debe recomendar operaciones, no generar artefactos.
 - Reemplazar `--dry-run`/`--write` como contrato mental por `propose/validate/approve/apply/verify`.
-- Mover el launcher publico a `bin/arcflow`.
-- Crear bundle self-contained en `runtime/dist/arcflow.mjs`.
+- Mover el launcher publico a `bin/<product-cli>`.
+- Crear bundle self-contained en `runtime/dist/<product-cli>.mjs`.
 - Definir estrategia historica de template packs con `.planning/vendor/template-packs/<fingerprint>/`.
 - Agregar schemas faltantes: actor, approval, gate, blocker, risk, waiver, decision, deployment event, finalization, revision ref, command spec, provenance, resolution, release item y operation.
 
 Validacion:
 
 ```text
-arcflow check architecture --contract corte-1.1 --format json
-arcflow changeset validate <fixture-operation-id> --format json
+<product-cli> check architecture --contract corte-1.1 --format json
+<product-cli> changeset validate <fixture-operation-id> --format json
 bash scripts/verify-plugin.sh
 ```
 
-## Corte 0: bootstrap y configuracion del proyecto
+## Corte -1.2: spikes de producto y runtime
 
-Objetivo: hacer que `/arc-init` configure lo necesario para que el plugin pueda trabajar agnosticamente en cualquier estructura.
+Objetivo: cerrar con evidencia los bloqueadores que no se pueden resolver solo con documentacion.
 
 Cambios:
 
-- Crear `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/.operations/`, `.planning/scopes/`, `.planning/decisions/`, `.planning/releases/` y `.planning/vendor/template-packs/` cuando el lock lo requiera.
+- Ejecutar naming gate antes de aprobar marca, paquete, binario o comandos definitivos.
+- Probar namespace real de plugins Claude Code y confirmar si las skills deben vivir como `skills/init/` o requieren fallback prefijado.
+- Decidir runtime: Node.js 20+ obligatorio, binarios nativos o instalacion administrada.
+- Cambiar paths canonicos para que no dependan solo de `display_id` o slug.
+- Definir merge protocol append-by-file: hijos referencian al padre e indices se regeneran como proyeccion.
+- Acotar ChangeSet al control plane `.planning/**`; work product se registra como evidencia o se muta solo mediante operaciones explicitas limitadas.
+- Convertir guias YAML en DSL cerrada con operadores validables.
+- Crear catalogos canonicos para concerns, gates, gate profiles y environments.
+- Definir hashing canonico para `content_revision`, fingerprints, operation hash, ChangeSet hash y render hash.
+- Declarar eventos como auditoria inmutable, no event sourcing completo en la primera version.
+- Separar `.planning/events/`, `.planning/operations/`, `.planning/.runtime/` y `.planning/vendor/` con politica Git/retencion.
+- Exigir `propose` para reportes/renders que escriban proyecciones.
+- Declarar trust model: guardrails cooperativos y trazabilidad, no sandbox contra agente malicioso con permisos del usuario.
+- Decidir continuidad v4 del plugin actual versus producto nuevo 1.0.0.
+
+Validacion:
+
+```text
+<product-cli> check architecture --contract corte-1.2 --format json
+bash scripts/verify-plugin.sh
+```
+
+Spikes obligatorios:
+
+1. Plugin real: manifest, skill namespaced, launcher, runtime, plugin root, PATH, Node ausente, binario colisionado y actualizacion.
+2. Dos worktrees: crear items/work packages/eventos en paralelo, merge real, display IDs reconciliados e indices regenerables.
+3. Crash recovery: fallas despues de staging, write parcial, canonical state, antes del evento y despues de comando externo.
+4. Canonical hashes: YAML equivalente produce el mismo hash pese a orden, indentacion, line endings, comentarios y estilos de string.
+5. Guia ejecutable: atomizar Work Package sin lenguaje natural, LLM ni Markdown.
+
+## Corte 0: bootstrap y configuracion del proyecto
+
+Objetivo: hacer que `/<product-name>:init` configure lo necesario para que el plugin pueda trabajar agnosticamente en cualquier estructura.
+
+Cambios:
+
+- Crear `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/operations/`, `.planning/.runtime/`, `.planning/scopes/`, `.planning/decisions/`, `.planning/releases/` y `.planning/vendor/template-packs/` cuando el lock lo requiera.
 - Detectar y confirmar si el proyecto usa git.
 - Si usa git, configurar branch base, estrategia de ramas, lanes y si se permitira automatizacion `git`/`gh`.
 - Detectar carpetas, paquetes, workspaces o repositorios candidatos a scope.
@@ -90,10 +126,10 @@ Cambios:
 Validacion:
 
 ```text
-arcflow workspace init propose --format json
-arcflow changeset validate OP-... --format json
-arcflow changeset apply OP-... --format json
-arcflow check schema --format json
+<product-cli> workspace init propose --format json
+<product-cli> changeset validate OP-... --format json
+<product-cli> changeset apply OP-... --format json
+<product-cli> check schema --format json
 bash scripts/verify-plugin.sh
 ```
 
@@ -114,10 +150,10 @@ Cambios:
 Validacion:
 
 ```text
-arcflow config guide refresh propose --scope <scope-id> --format json
-arcflow changeset approve OP-... --format json
-arcflow changeset apply OP-... --format json
-arcflow check guides --format json
+<product-cli> config guide refresh propose --scope <scope-id> --format json
+<product-cli> changeset approve OP-... --format json
+<product-cli> changeset apply OP-... --format json
+<product-cli> check guides --format json
 ```
 
 ## Corte 2: release aggregate
@@ -135,19 +171,18 @@ Cambios:
 - Agregar policies configurables:
   - `strict_sequence`;
   - `dependency_graph`;
-  - `release_train`;
-  - `parallel`;
   - lanes como `main`, `hotfix` o `mobile`.
+- Dejar `release_train` y `parallel` fuera del primer vertical slice.
 - Registrar `scope_refs` con indice de `guide_revision` para reproducibilidad, sin reemplazar los `guide_refs` obligatorios de cada Work Package.
 - Regenerar `TRACEABILITY.md`, `RELEASE-NOTES.md` y reportes desde YAML canonico.
-- Impedir saltos de ID de release y validar dependencias/lane segun policy.
+- Validar unicidad, formato y resolucion no ambigua de display IDs; no exigir continuidad sin saltos.
 
 Validacion:
 
 ```text
-arcflow release new propose --title <title> --format json
-arcflow release status R0001 --format json
-arcflow check release R0001 --format json
+<product-cli> release new propose --title <title> --format json
+<product-cli> release status R0001 --format json
+<product-cli> check release R0001 --format json
 ```
 
 ## Corte 3: release items y work packages
@@ -167,14 +202,14 @@ Cambios:
 Validacion:
 
 ```text
-arcflow item create propose R0001 --kind user_story --format json
-arcflow item package add propose R0001 RI0001 --scope <scope-id> --format json
-arcflow check item R0001 RI0001 --format json
+<product-cli> item create propose R0001 --kind user_story --format json
+<product-cli> item package add propose R0001 RI0001 --scope <scope-id> --format json
+<product-cli> check item R0001 RI0001 --format json
 ```
 
 ## Corte 4: tasks y ejecucion atomica
 
-Objetivo: adaptar `/arc-task` al nuevo contexto `release -> release item -> work package -> task`.
+Objetivo: adaptar `/<product-name>:task` al nuevo contexto `release -> release item -> work package -> task`.
 
 Cambios:
 
@@ -189,9 +224,9 @@ Cambios:
 Validacion:
 
 ```text
-arcflow task inspect R0001 RI0001 WP0001 T0001 --format json
-arcflow task start propose R0001 RI0001 WP0001 T0001 --format json
-arcflow task closeout R0001 RI0001 WP0001 T0001 --format json
+<product-cli> task inspect R0001 RI0001 WP0001 T0001 --format json
+<product-cli> task start propose R0001 RI0001 WP0001 T0001 --format json
+<product-cli> task closeout R0001 RI0001 WP0001 T0001 --format json
 ```
 
 ## Corte 5: check/report/docs
@@ -200,26 +235,26 @@ Objetivo: reducir comandos duplicados sin perder capacidades.
 
 Cambios:
 
-- Crear `/arc-check` como wrapper query-only de invariantes, schemas, guide freshness, gates, readiness, links, dependencies y evidence.
-- Crear `/arc-report` para status, standup, history, export, release notes, traceability, docs generadas y exports.
+- Crear `/<product-name>:check` como wrapper query-only de invariantes, schemas, guide freshness, gates, readiness, links, dependencies y evidence.
+- Crear `/<product-name>:report` para status, standup, history, export, release notes, traceability, docs generadas y exports.
 - Reportar drift de Markdown y recomendar operaciones de regeneracion; no mutar desde checks.
 - Centralizar salida markdown/json.
 
 Reemplazos v4:
 
 ```text
-/plan-health         -> /arc-check health
-/plan-validate       -> /arc-check schema
-/plan-task-validate  -> /arc-check task
-/plan-audit-docs     -> /arc-check docs
-/plan-doctor         -> /arc-check doctor
-/plan-status         -> /arc-report status
-/plan-standup        -> /arc-report standup
-/plan-history        -> /arc-report history
-/plan-export         -> /arc-report export
-/doc-task            -> /arc-report docs --level task
-/doc-story           -> /arc-report docs --level release-item
-/doc-generate        -> /arc-report docs
+/plan-health         -> /<product-name>:check health
+/plan-validate       -> /<product-name>:check schema
+/plan-task-validate  -> /<product-name>:check task
+/plan-audit-docs     -> /<product-name>:check docs
+/plan-doctor         -> /<product-name>:check doctor
+/plan-status         -> /<product-name>:report status
+/plan-standup        -> /<product-name>:report standup
+/plan-history        -> /<product-name>:report history
+/plan-export         -> /<product-name>:report export
+/doc-task            -> /<product-name>:report docs --level task
+/doc-story           -> /<product-name>:report docs --level release-item
+/doc-generate        -> /<product-name>:report docs
 ```
 
 ## Corte 6: skills publicas
@@ -228,15 +263,15 @@ Objetivo: exponer la superficie v4 cuando el runtime ya tenga contrato, storage 
 
 Cambios:
 
-- Crear `skills/arc-init/SKILL.md`.
-- Crear `skills/arc-config/SKILL.md`.
-- Crear `skills/arc-release/SKILL.md` como router del lifecycle de release.
-- Crear `skills/arc-item/SKILL.md`.
-- Crear `skills/arc-task/SKILL.md`.
-- Crear `skills/arc-check/SKILL.md`.
-- Crear `skills/arc-report/SKILL.md`.
-- Crear `skills/arc-decision/SKILL.md`.
-- Crear `skills/arc-update/SKILL.md` para mantenimiento del plugin/template pack.
+- Crear `skills/init/SKILL.md`.
+- Crear `skills/config/SKILL.md`.
+- Crear `skills/release/SKILL.md` como router del lifecycle de release.
+- Crear `skills/item/SKILL.md`.
+- Crear `skills/task/SKILL.md`.
+- Crear `skills/check/SKILL.md`.
+- Crear `skills/report/SKILL.md`.
+- Crear `skills/decision/SKILL.md`.
+- Crear `skills/update/SKILL.md` para mantenimiento del plugin/template pack.
 - No crear comandos avanzados hasta tener una necesidad real.
 
 Cada skill debe ser un wrapper pequeno: argumentos, precondiciones, llamada al launcher, punto de juicio del agente y criterios de aprobacion.
@@ -247,10 +282,10 @@ Objetivo: mover comandos secundarios fuera del flujo principal.
 
 Cambios:
 
-- Crear `/arc-backlog` solo si se decide mantener backlog externo como capacidad explicita.
-- Crear `/arc-recover` solo si el event journal y ChangeSets ya soportan retry, rollback y compensacion.
-- Reubicar `plan-from-release` como etapa de `/arc-release plan` o `/arc-item import` si todavia aporta.
-- Mantener `arc-decision` separado porque registra decisiones transversales reales.
+- Crear `/<product-name>:backlog` solo si se decide mantener backlog externo como capacidad explicita.
+- Crear `/<product-name>:recover` solo si el event journal y ChangeSets ya soportan retry, rollback y compensacion.
+- Reubicar `plan-from-release` como etapa de `/<product-name>:release plan` o `/<product-name>:item import` si todavia aporta.
+- Mantener `decision` separado porque registra decisiones transversales reales.
 
 ## Corte 8: cierre de ruptura v4
 
@@ -263,7 +298,7 @@ Cambios:
 - Actualizar manifests y metadata: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, README badge y `.page/package*.json`.
 - Rehacer documentacion publica: README, `docs/commands.yml`, reference, user guide, developer guide, tutoriales, workflows y glossary.
 - Rehacer site/landing desde `.page` para mostrar solo el flujo v4 y validar con `npm run build`.
-- Rehacer `runtime/`, `runtime/src/schemas/` y `template-pack/`. `/arc-init` no copia templates completos al repo de trabajo.
+- Rehacer `runtime/`, `runtime/src/schemas/` y `template-pack/`. `/<product-name>:init` no copia templates completos al repo de trabajo.
 - Actualizar `scripts/verify-plugin.sh` para validar ausencia legacy en skills, docs, template, site, manifests y version markers.
 - Actualizar `CHANGELOG.md`.
 - Actualizar `template-pack/update-version/<N>-<N+1>.md`.
@@ -298,7 +333,7 @@ Sin ejecucion autonoma, Git/gh mutante, recovery, backlog externo ni deployment 
 
 ## Preguntas abiertas
 
-1. Launcher: binario local `arcflow`, script npm empaquetado o wrapper instalado por plugin.
+1. Launcher: binario local `<product-cli>`, script npm empaquetado o wrapper instalado por plugin.
 2. Persistencia de counters: archivo dedicado por agregado o derivacion segura desde YAML/journal con lock.
 3. Version semantica: una release puede o no coincidir con version del plugin/producto; `release_id` y `version` deben mantenerse separados.
 4. Politica inicial por defecto: `strict_sequence` para simplicidad, con soporte posterior para lanes/hotfix.

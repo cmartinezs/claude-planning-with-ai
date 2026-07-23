@@ -1,10 +1,10 @@
-# Propuesta de rediseno v4: ARC Flow
+# Propuesta de rediseno v4: codename ARC Flow
 
 Fecha: 2026-07-22
 
 ## Objetivo
 
-Reordenar el plugin bajo una identidad nueva y reconocible: `ARC Flow` (`ARC`: Agentic Release Coordination). La unidad publica de entrega es la release, sin convertirla en una coleccion de comandos sueltos ni en una base de datos Markdown. El modelo v4 debe ser:
+Reordenar el plugin bajo una identidad nueva y reconocible. `ARC Flow` (`ARC`: Agentic Release Coordination) queda como codename de trabajo, no como nombre definitivo. La unidad publica de entrega es la release, sin convertirla en una coleccion de comandos sueltos ni en una base de datos Markdown. El modelo v4 debe ser:
 
 ```text
 project context -> release -> release item -> scope work package -> task
@@ -14,7 +14,7 @@ El Release Item representa una unidad entregable tipada: user story, capability,
 
 El flujo publico debe ser mas claro, con menos comandos visibles, una identidad estable, estado canonico estructurado, Markdown como proyeccion humana y trabajo mecanico delegado a un runtime determinista.
 
-La superficie publica deja de usar prefijos genericos `claude-*` o `plan-*`. Las skills visibles usan el prefijo `arc-` y el launcher ejecutable es `arcflow`, por ejemplo `/arc-init` llama a `arcflow workspace init`.
+La superficie publica deja de usar prefijos genericos `claude-*` o `plan-*`. La tercera revision corrige el enfoque: la API debe disenarse como `plugin name + skill name`, por ejemplo `/<product-name>:init`; un prefijo por acronimo como `/arc-init` queda solo como fallback si el spike demuestra que el namespace del plugin no es usable.
 
 Esta propuesta asume un corte limpio para v4.0.0. Antes de publicar la version, confirmar el numero exacto contra `CHANGELOG.md` y los manifests, pero el diseno no mantiene compatibilidad hacia atras con los comandos ni carpetas anteriores.
 
@@ -29,6 +29,7 @@ Esta propuesta asume un corte limpio para v4.0.0. Antes de publicar la version, 
 7. [Eliminacion legacy](06-eliminacion-legacy.md)
 8. [Estructura completa del plugin v4](07-estructura-plugin-v4.md)
 9. [Corte -1.1: contratos residuales del runtime](08-corte-1-1-contratos-runtime.md)
+10. [Corte -1.2: spikes de producto y runtime](09-corte-1-2-spikes-producto-runtime.md)
 
 ## Tesis corregida
 
@@ -42,6 +43,8 @@ El plugin no necesita mas comandos de primer nivel. Necesita un runtime con:
 - skills finas que orquestan, piden aprobacion y acotan el trabajo no determinista;
 - decisiones humanas cuando hay ambiguedad real de producto, alcance, arquitectura o release.
 
-La propuesta reduce el flujo publico diario a `arc-init`, `arc-config`, `arc-release`, `arc-item`, `arc-task`, `arc-check`, `arc-report` y `arc-decision`, con `arc-update` como comando de mantenimiento del plugin/template pack. Los comandos actuales son material de referencia para rescatar capacidades, no API que deba conservarse.
+La propuesta reduce el flujo publico diario a skills canonicas `init`, `config`, `release`, `item`, `task`, `check`, `report` y `decision`, con `update` como comando de mantenimiento del plugin/template pack. La forma visible final depende del namespace real del plugin y debe cerrarse con el [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md). Los comandos actuales son material de referencia para rescatar capacidades, no API que deba conservarse.
 
 La segunda revision experta aprueba avanzar al Corte -1, pero exige cerrar antes el [Corte -1.1](08-corte-1-1-contratos-runtime.md): fuente unica de scopes, guias YAML ejecutables, Release Items tipados, IDs distribuidos, eventos por archivo, revisiones por agregado, atomicidad multiarchivo, launcher raiz y bundle self-contained.
+
+La tercera revision aprueba el dominio y los spikes, pero no aprueba todavia el naming definitivo ni el runtime productivo. El [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md) debe resolver naming gate, namespace real de plugins, runtime Node/no Node, paths canonicos, merge protocol, limite del ChangeSet, DSL, catalogos, hashing, retencion y trust model.

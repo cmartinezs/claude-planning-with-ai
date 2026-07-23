@@ -2,52 +2,57 @@
 
 ## Superficie publica objetivo
 
-Nombre publico propuesto:
+Nombre publico provisional:
 
 ```text
 ARC Flow
 ```
 
-`ARC` funciona como acronimo de Agentic Release Coordination. La regla de naming v4 es:
+`ARC` funciona como codename de trabajo para Agentic Release Coordination. No es nombre aprobado para publicacion hasta cerrar el naming gate definido en [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md).
 
-- skills publicas con prefijo corto `/arc-*`;
-- launcher de runtime `arcflow`;
+La regla de naming v4 es:
+
+- el nombre del plugin/producto aporta el namespace publico;
+- las skills canonicas usan nombres cortos sin prefijo: `init`, `config`, `release`, `item`, `task`, `check`, `report`, `decision`, `update`;
+- la forma visible esperada se disena como `/<product-name>:<skill-name>`, por ejemplo `/<product-name>:init`;
+- si el spike demuestra que el host no expone namespace usable, se permite un fallback prefijado por acronimo, por ejemplo `/arc-init`, pero no se aprueba antes de verificarlo;
+- launcher de runtime provisional `arcflow`, sujeto al mismo naming gate;
 - dominios internos sin prefijo conversacional (`workspace`, `config`, `release`, `item`, `task`, `check`, `report`, `decision`, `changeset`);
 - no usar `claude-*` ni `plan-*` como marca publica nueva;
 - conservar menciones `plan-*` solo en tablas de reemplazo legacy.
 
 Comandos publicos base:
 
-| Comando | Responsabilidad publica | Use cases internos | Script/launcher |
-|---------|--------------------------|--------------------|-----------------|
-| `/arc-init` | Bootstrap completo del workspace actual: estructura, deteccion inicial, config base y plugin lock. | `workspace.bootstrap`, `config.detect`, `lock.create` | `arcflow workspace init` |
-| `/arc-config` | Administrar scopes, fuentes, politicas, Git, comandos permitidos, autonomia, guias y generadores custom. | `scope.configure`, `policy.configure`, `guide.refresh`, `command.configure` | `arcflow config <stage>` |
-| `/arc-release` | Router publico del lifecycle de release: crear, planificar, consultar readiness, liberar, registrar deployment y finalizar. | `release.create`, `release.plan`, `release.query`, `release.transition`, `deployment.record`, `release.finalize` | `arcflow release <stage>` |
-| `/arc-item` | Crear/enriquecer Release Items tipados, validar criterios funcionales, crear work packages y atomizarlos por scope. | `release-item.create`, `release-item.enrich`, `work-package.create`, `work-package.atomize` | `arcflow item <stage>` |
-| `/arc-task` | Inspeccionar, preparar, ejecutar, validar, corregir y cerrar tasks atomicas. | `task.inspect`, `task.start`, `task.verify`, `task.correction`, `task.closeout` | `arcflow task <stage>` |
-| `/arc-check` | Validar invariantes, schemas, links, dependencias, guias, gates, readiness y evidencia sin mutar. | `check.health`, `check.schema`, `check.guides`, `check.gates`, `check.readiness` | `arcflow check <stage>` |
-| `/arc-report` | Generar summary, status, standup, history, release notes, traceability, docs y exports. | `report.status`, `report.standup`, `report.history`, `report.release-notes`, `report.export` | `arcflow report <stage>` |
-| `/arc-decision` | Registrar, actualizar, aceptar o rechazar decisiones y vincularlas con releases, release items, scopes o gates. | `decision.propose`, `decision.accept`, `decision.reject`, `decision.link` | `arcflow decision <stage>` |
+| Skill canonica | Forma visible esperada | Responsabilidad publica | Use cases internos | Script/launcher |
+|----------------|------------------------|--------------------------|--------------------|-----------------|
+| `init` | `/<product-name>:init` | Bootstrap completo del workspace actual: estructura, deteccion inicial, config base y plugin lock. | `workspace.bootstrap`, `config.detect`, `lock.create` | `<product-cli> workspace init` |
+| `config` | `/<product-name>:config` | Administrar scopes, fuentes, politicas, Git, comandos permitidos, autonomia, guias y generadores custom. | `scope.configure`, `policy.configure`, `guide.refresh`, `command.configure` | `<product-cli> config <stage>` |
+| `release` | `/<product-name>:release` | Router publico del lifecycle de release: crear, planificar, consultar readiness, liberar, registrar deployment y finalizar. | `release.create`, `release.plan`, `release.query`, `release.transition`, `deployment.record`, `release.finalize` | `<product-cli> release <stage>` |
+| `item` | `/<product-name>:item` | Crear/enriquecer Release Items tipados, validar criterios funcionales, crear work packages y atomizarlos por scope. | `release-item.create`, `release-item.enrich`, `work-package.create`, `work-package.atomize` | `<product-cli> item <stage>` |
+| `task` | `/<product-name>:task` | Inspeccionar, preparar, ejecutar, validar, corregir y cerrar tasks atomicas. | `task.inspect`, `task.start`, `task.verify`, `task.correction`, `task.closeout` | `<product-cli> task <stage>` |
+| `check` | `/<product-name>:check` | Validar invariantes, schemas, links, dependencias, guias, gates, readiness y evidencia sin mutar. | `check.health`, `check.schema`, `check.guides`, `check.gates`, `check.readiness` | `<product-cli> check <stage>` |
+| `report` | `/<product-name>:report` | Generar summary, status, standup, history, release notes, traceability, docs y exports. | `report.status`, `report.standup`, `report.history`, `report.release-notes`, `report.export` | `<product-cli> report <stage>` |
+| `decision` | `/<product-name>:decision` | Registrar, actualizar, aceptar o rechazar decisiones y vincularlas con releases, release items, scopes o gates. | `decision.propose`, `decision.accept`, `decision.reject`, `decision.link` | `<product-cli> decision <stage>` |
 
-Ocho comandos bien definidos son preferibles a un comando unico sobrecargado. `/arc-release` puede ser fachada publica, pero su `SKILL.md` no debe contener todo el lifecycle.
+Ocho comandos bien definidos son preferibles a un comando unico sobrecargado. `release` puede ser fachada publica, pero su `SKILL.md` no debe contener todo el lifecycle.
 
 ## Comando de mantenimiento
 
-`/arc-update` se conserva como comando de mantenimiento del plugin/template pack. No forma parte del flujo diario release/release-item/task, pero sigue siendo publico porque permite actualizar workspaces v4 a revisiones compatibles futuras.
+`update` se conserva como comando de mantenimiento del plugin/template pack. No forma parte del flujo diario release/release-item/task, pero sigue siendo publico porque permite actualizar workspaces v4 a revisiones compatibles futuras.
 
-| Comando | Responsabilidad | Script/launcher |
-|---------|-----------------|-----------------|
-| `/arc-update` | Aplicar migraciones v4+ compatibles, actualizar lock/template pack y reportar cambios requeridos. | `arcflow update <stage>` |
+| Skill canonica | Forma visible esperada | Responsabilidad | Script/launcher |
+|----------------|------------------------|-----------------|-----------------|
+| `update` | `/<product-name>:update` | Aplicar migraciones v4+ compatibles, actualizar lock/template pack y reportar cambios requeridos. | `<product-cli> update <stage>` |
 
 ## Comandos avanzados
 
 Solo implementar cuando exista una necesidad real y evidencia de uso:
 
-| Comando | Uso |
-|---------|-----|
-| `/arc-run` | Orquestador end-to-end encima de release/release-item/task/check. No pertenece al primer vertical slice. |
-| `/arc-recover` | Retry, rollback, clone, merge, compensaciones y fallas de operacion con stages explicitos. |
-| `/arc-backlog` | Importar o mantener backlog externo cuando no hay release directa. |
+| Skill canonica | Forma visible esperada | Uso |
+|----------------|------------------------|-----|
+| `run` | `/<product-name>:run` | Orquestador end-to-end encima de release/release-item/task/check. No pertenece al primer vertical slice. |
+| `recover` | `/<product-name>:recover` | Retry, rollback, clone, merge, compensaciones y fallas de operacion con stages explicitos. |
+| `backlog` | `/<product-name>:backlog` | Importar o mantener backlog externo cuando no hay release directa. |
 
 No se implementan por anticipacion para evitar reconstruir la explosion de comandos v3.
 
@@ -57,19 +62,19 @@ Estos comandos no se preservan como aliases en v4. La tabla sirve para decidir q
 
 | Comandos v3 | Destino v4 | Accion v4 | Razon |
 |-------------|------------|-----------|-------|
-| `release-init`, `release-new`, `release-add`, `release-remove`, `release-status` | `/arc-init`, `/arc-config`, `/arc-release <new|status|mark|deployment|finalize>` | Borrar skills v3. | Init/config son de workspace; release queda como router de lifecycle, no CRUD aislado. |
-| `plan-status`, `plan-standup`, `plan-history`, `plan-export` | `/arc-report <status|standup|history|export>` | Borrar wrappers separados. | Son vistas/proyecciones, no checks. |
-| `plan-health`, `plan-validate`, `plan-task-validate`, `plan-audit-docs`, `plan-doctor` | `/arc-check <health|schema|task|docs|doctor|readiness>` | Borrar skills v3 o reimplementar solo `/arc-check`. | Todos validan invariantes, schemas, gates o evidencia. |
-| `doc-generate`, `doc-story`, `doc-task` | `/arc-report docs --level <release|release-item|work-package|task>` | Borrar wrappers separados. | Markdown es proyeccion generada desde estado canonico. |
-| `us-new`, `us-enrich`, `us-split`, `us-status`, `epic-enrich` | `/arc-backlog <new|enrich|split|status|import>` si se justifica | Borrar por defecto. | Backlog externo no debe competir con release activa. |
-| `plan-enrich-epic`, `plan-enrich-story`, `plan-split-story` | `/arc-item <enrich|split|package add|atomize>` | Borrar skills v3. | El Release Item es unidad de alcance; los slices tecnicos son work packages. |
-| `plan-merge`, `plan-story-skip` | `/arc-item <move|resolve>` o `/arc-recover` | Borrar skills v3. | Skip requiere resolucion/waiver, no estado principal. |
-| `plan-from-epic`, `plan-from-release`, `plan-template`, `plan-new`, `plan-expand` | `/arc-release plan` o `/arc-item import` | Borrar flujo INITIAL/EXPANSION como API publica. | El flujo INITIAL/EXPANSION desaparece del contrato v4. |
-| `plan-agent-plan`, `plan-agent-execute`, `plan-agent-validate`, `plan-run` | `/arc-run` solo si se justifica | Borrar agentes por fase. | Un orquestador avanzado no debe formar parte del primer corte. |
-| `plan-retry`, `plan-rollback`, `plan-clone` | `/arc-recover <retry|rollback|clone>` si se justifica | Borrar skills sueltas. | Recuperacion debe operar sobre eventos y ChangeSets. |
-| `plan-smoke-config`, `plan-git-config` | `/arc-config <commands|git|policies>` | Borrar config commands sueltos. | Configuracion pertenece al Project Context. |
-| `plan-test-suite` | `/arc-task prepare`, `/arc-item atomize` o `/arc-config guide refresh` | Borrar como comando principal. | `arc-check` no muta; la generacion pertenece a prepare/atomize/config. |
-| `plan-edge-case`, `plan-retrospective` | `/arc-release note unexpected`, `/arc-release finalize` o `/arc-report retro` | Borrar como comandos de planning. | Retrospectiva cierra release y se sintetiza desde eventos/hechos. |
+| `release-init`, `release-new`, `release-add`, `release-remove`, `release-status` | `/<product-name>:init`, `/<product-name>:config`, `/<product-name>:release` con stages `new`, `status`, `mark`, `deployment`, `finalize` | Borrar skills v3. | Init/config son de workspace; release queda como router de lifecycle, no CRUD aislado. |
+| `plan-status`, `plan-standup`, `plan-history`, `plan-export` | `/<product-name>:report` con stages `status`, `standup`, `history`, `export` | Borrar wrappers separados. | Son vistas/proyecciones, no checks. |
+| `plan-health`, `plan-validate`, `plan-task-validate`, `plan-audit-docs`, `plan-doctor` | `/<product-name>:check` con stages `health`, `schema`, `task`, `docs`, `doctor`, `readiness` | Borrar skills v3 o reimplementar solo `check`. | Todos validan invariantes, schemas, gates o evidencia. |
+| `doc-generate`, `doc-story`, `doc-task` | `/<product-name>:report docs --level` con niveles `release`, `release-item`, `work-package`, `task` | Borrar wrappers separados. | Markdown es proyeccion generada desde estado canonico. |
+| `us-new`, `us-enrich`, `us-split`, `us-status`, `epic-enrich` | `/<product-name>:backlog` con stages `new`, `enrich`, `split`, `status`, `import`, si se justifica | Borrar por defecto. | Backlog externo no debe competir con release activa. |
+| `plan-enrich-epic`, `plan-enrich-story`, `plan-split-story` | `/<product-name>:item` con stages `enrich`, `split`, `package add`, `atomize` | Borrar skills v3. | El Release Item es unidad de alcance; los slices tecnicos son work packages. |
+| `plan-merge`, `plan-story-skip` | `/<product-name>:item` con stages `move`, `resolve` o `/<product-name>:recover` | Borrar skills v3. | Skip requiere resolucion/waiver, no estado principal. |
+| `plan-from-epic`, `plan-from-release`, `plan-template`, `plan-new`, `plan-expand` | `/<product-name>:release plan` o `/<product-name>:item import` | Borrar flujo INITIAL/EXPANSION como API publica. | El flujo INITIAL/EXPANSION desaparece del contrato v4. |
+| `plan-agent-plan`, `plan-agent-execute`, `plan-agent-validate`, `plan-run` | `/<product-name>:run` solo si se justifica | Borrar agentes por fase. | Un orquestador avanzado no debe formar parte del primer corte. |
+| `plan-retry`, `plan-rollback`, `plan-clone` | `/<product-name>:recover` con stages `retry`, `rollback`, `clone`, si se justifica | Borrar skills sueltas. | Recuperacion debe operar sobre eventos y ChangeSets. |
+| `plan-smoke-config`, `plan-git-config` | `/<product-name>:config` con stages `commands`, `git`, `policies` | Borrar config commands sueltos. | Configuracion pertenece al Project Context. |
+| `plan-test-suite` | `/<product-name>:task prepare`, `/<product-name>:item atomize` o `/<product-name>:config guide refresh` | Borrar como comando principal. | `check` no muta; la generacion pertenece a prepare/atomize/config. |
+| `plan-edge-case`, `plan-retrospective` | `/<product-name>:release note unexpected`, `/<product-name>:release finalize` o `/<product-name>:report retro` | Borrar como comandos de planning. | Retrospectiva cierra release y se sintetiza desde eventos/hechos. |
 
 ## Corte limpio v4
 
@@ -110,15 +115,15 @@ La skill no debe contener:
 El contrato interno usa stage-first, pero mediante launcher estable:
 
 ```text
-arcflow workspace init [args] [--format json|markdown]
-arcflow config <stage> [args] [--format json|markdown]
-arcflow release <stage> [args] [--format json|markdown]
-arcflow item <stage> [args] [--format json|markdown]
-arcflow task <stage> [args] [--format json|markdown]
-arcflow check <stage> [args] [--format json|markdown]
-arcflow report <stage> [args] [--format json|markdown]
-arcflow decision <stage> [args] [--format json|markdown]
-arcflow changeset <propose|validate|approve|apply|verify> [args] [--format json|markdown]
+<product-cli> workspace init [args] [--format json|markdown]
+<product-cli> config <stage> [args] [--format json|markdown]
+<product-cli> release <stage> [args] [--format json|markdown]
+<product-cli> item <stage> [args] [--format json|markdown]
+<product-cli> task <stage> [args] [--format json|markdown]
+<product-cli> check <stage> [args] [--format json|markdown]
+<product-cli> report <stage> [args] [--format json|markdown]
+<product-cli> decision <stage> [args] [--format json|markdown]
+<product-cli> changeset <propose|validate|approve|apply|verify> [args] [--format json|markdown]
 ```
 
 Mutaciones no aplican directamente. Primero producen un `ChangeSet`:

@@ -45,9 +45,9 @@ Hay demasiados comandos que representan variaciones mecanicas de una misma respo
 
 Esto viola el criterio de responsabilidad unica a nivel de skill: muchas skills no son capacidades distintas, sino wrappers publicos para una etapa particular de un mismo script.
 
-Tambien existe una contradiccion de UX: tener `/plan-init` y `/release init` obliga al usuario a decidir que inicializacion necesita. En v4 debe existir un unico bootstrap con marca nueva: `/arc-init`. La configuracion posterior de scopes, fuentes, politicas, comandos y autonomia debe vivir en `/arc-config`.
+Tambien existe una contradiccion de UX: tener `/plan-init` y `/release init` obliga al usuario a decidir que inicializacion necesita. En v4 debe existir un unico bootstrap con marca nueva y namespace real de plugin: `/<product-name>:init`. La configuracion posterior de scopes, fuentes, politicas, comandos y autonomia debe vivir en `/<product-name>:config`.
 
-`/arc-release` puede existir como router publico, pero no como comando dios. Debe delegar en use cases internos pequenos: crear release, planificar alcance, consultar readiness, registrar deployment, transicionar lifecycle o cerrar finalizacion.
+`release` puede existir como router publico, pero no como comando dios. Debe delegar en use cases internos pequenos: crear release, planificar alcance, consultar readiness, registrar deployment, transicionar lifecycle o cerrar finalizacion.
 
 ## Problema de estado y mutaciones
 
@@ -59,7 +59,7 @@ La regla v4 debe ser:
 YAML o JSON es la fuente de verdad. Markdown es una proyeccion humana generada.
 ```
 
-El almacenamiento canonico debe incluir `config.yml`, `plugin.lock.yml`, `scope.yml`, `release.yml`, `release-item.yml`, `work-package.yml`, `task.yml`, operaciones bajo `.planning/.operations/` y eventos JSON inmutables bajo `.planning/events/`. Los Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) se regeneran desde ese estado.
+El almacenamiento canonico debe incluir `config.yml`, `plugin.lock.yml`, `scope.yml`, `release.yml`, `release-item.yml`, `work-package.yml`, `task.yml`, manifests de operacion bajo `.planning/operations/` y eventos JSON inmutables bajo `.planning/events/`. Staging, snapshots y logs viven bajo `.planning/.runtime/`. Los Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) se regeneran desde ese estado.
 
 `dry-run` y `--write` tampoco bastan como protocolo seguro. Toda mutacion debe pasar por `inspect -> propose -> validate -> approve -> stage -> apply -> verify -> record`, con `ChangeSet` validable, `baseRevisions` por agregado, idempotencia, optimistic locking, staging multiarchivo y journal de eventos por archivo.
 

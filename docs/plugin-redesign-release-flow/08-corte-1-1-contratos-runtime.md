@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-La segunda revision experta aprueba la arquitectura para avanzar al Corte -1, pero identifica contradicciones que deben cerrarse antes de escribir runtime productivo. Este documento convierte esas observaciones en contrato de diseno.
+La segunda revision experta aprueba la arquitectura para avanzar al Corte -1, pero identifica contradicciones que deben cerrarse antes de escribir runtime productivo. Este documento convierte esas observaciones en contrato de diseno. La tercera revision no invalida este corte, pero lo extiende con spikes obligatorios en [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md).
 
 Regla:
 
@@ -172,15 +172,22 @@ Cada evento declara `event_id`, `type`, aggregate, timestamp UTC, actor, operati
 
 ## 8. Operaciones multiarchivo
 
-Cada operacion usa directorio propio:
+Cada operacion usa directorios propios. El manifest resumido puede versionarse:
 
 ```text
-.planning/.operations/<operation-id>/
+.planning/operations/<operation-id>/
   operation.yml
   change-set.json
+  result.json
+```
+
+Los archivos de staging, snapshots `before/` y logs viven en runtime storage no versionado por defecto:
+
+```text
+.planning/.runtime/operations/<operation-id>/
   before/
   staged/
-  result.json
+  logs/
 ```
 
 Estados:
@@ -236,9 +243,9 @@ approval:
 
 Modificar el ChangeSet invalida la aprobacion.
 
-## 11. CQS para checks
+## 11. CQS para checks y reportes
 
-`/arc-check` no muta. Solo valida, reporta y recomienda operaciones:
+`check` no muta. Solo valida, reporta y recomienda operaciones:
 
 ```json
 {
@@ -248,7 +255,9 @@ Modificar el ChangeSet invalida la aprobacion.
 }
 ```
 
-La generacion vive en `/arc-item atomize`, `/arc-task prepare` o `/arc-config guide refresh`.
+La generacion vive en `item atomize`, `task prepare` o `config guide refresh`.
+
+`report` puede emitir stdout sin mutar. Si escribe proyecciones Markdown, debe hacerlo via `report render propose` y ChangeSet.
 
 ## 12. Vocabulario unico de mutacion
 
@@ -257,22 +266,22 @@ No mezclar `dry-run/write` con ChangeSets como modelo mental.
 CLI conceptual:
 
 ```text
-arcflow workspace init propose
-arcflow changeset validate OP-...
-arcflow changeset approve OP-...
-arcflow changeset apply OP-...
-arcflow changeset verify OP-...
+<product-cli> workspace init propose
+<product-cli> changeset validate OP-...
+<product-cli> changeset approve OP-...
+<product-cli> changeset apply OP-...
+<product-cli> changeset verify OP-...
 ```
 
 Los comandos publicos pueden ocultar parte de esta mecanica, pero el runtime conserva el contrato `propose/validate/approve/apply/verify`.
 
 ## 13. Launcher y bundle
 
-El ejecutable publico vive en la raiz:
+El ejecutable publico vive en la raiz. El nombre exacto queda pendiente del naming gate:
 
 ```text
 bin/
-  arcflow
+  <product-cli>
 ```
 
 El runtime compilado vive en:
@@ -281,7 +290,7 @@ El runtime compilado vive en:
 runtime/
   src/
   dist/
-    arcflow.mjs
+    <product-cli>.mjs
   package.json
   package-lock.json
   build.mjs
@@ -290,6 +299,8 @@ runtime/
 El bundle debe ser self-contained. No se asume `npm install` en el workspace usuario.
 
 Debe incluir parser YAML, JSON Schema validator, parser de argumentos, hashing, globbing, locks y renderers.
+
+Esto no elimina la dependencia del runtime de ejecucion. Corte -1.2 debe decidir entre Node.js 20+ obligatorio, binarios nativos o instalacion administrada.
 
 ## 14. Template pack historico
 
@@ -350,5 +361,5 @@ El runtime puede comenzar cuando:
 - las dependencias esten empaquetadas;
 - el journal no cause conflictos sistematicos;
 - el template pack pueda resolverse de forma reproducible;
-- `/arc-check` sea query-only;
+- `check` sea query-only;
 - el vocabulario `propose/apply/verify` sea el unico contrato de mutacion.

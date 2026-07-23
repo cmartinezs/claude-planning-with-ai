@@ -26,7 +26,7 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |       +-- deploy-pages.yml
 |
 +-- bin/
-|   +-- arcflow
+|   +-- <product-cli>
 |
 +-- .page/
 |   +-- components/
@@ -54,6 +54,8 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |   +-- plugin-redesign-release-flow/
 |   +-- plugin-review/
 |   +-- claude-planning-v4-expert-review/
+|   +-- claude-planning-v4-second-expert-review/
+|   +-- claude-planning-v4-third-expert-review/
 |   +-- design-history/
 |
 +-- runtime/
@@ -72,7 +74,7 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |   |   +-- lib/
 |   |   +-- schemas/
 |   +-- dist/
-|   |   +-- arcflow.mjs
+|   |   +-- <product-cli>.mjs
 |   +-- fixtures/
 |       +-- monorepo-software/
 |       +-- simple-repo/
@@ -118,15 +120,15 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |   +-- verify-plugin.sh
 |
 +-- skills/
-|   +-- arc-init/
-|   +-- arc-config/
-|   +-- arc-release/
-|   +-- arc-item/
-|   +-- arc-task/
-|   +-- arc-check/
-|   +-- arc-report/
-|   +-- arc-decision/
-|   +-- arc-update/
+|   +-- init/
+|   +-- config/
+|   +-- release/
+|   +-- item/
+|   +-- task/
+|   +-- check/
+|   +-- report/
+|   +-- decision/
+|   +-- update/
 |
 +-- README.md
 +-- CHANGELOG.md
@@ -157,13 +159,14 @@ Por tanto, `scripts/` dentro de `planning-template/` era una herencia v3, no una
 
 | Archivo | Responsabilidad v4 |
 |---------|--------------------|
-| `plugin.json` | Nombre, version, descripcion corta, autor y metadata requerida por Claude Code. Debe describir `ARC Flow`, el prefijo `/arc-*` y el runtime release/release-item/work-package/task, no el flujo v3 Markdown-first. |
+| `plugin.json` | Nombre, version, descripcion corta, autor y metadata requerida por Claude Code. Debe describir el producto final, el namespace de skills y el runtime release/release-item/work-package/task, no el flujo v3 Markdown-first. |
 | `marketplace.json` | Texto publico, comandos expuestos, enlaces, tags y metadata de marketplace. No debe listar comandos legacy. |
 
 Reglas:
 
 - La version debe coincidir con `CHANGELOG.md`, README badge, site package y update-version.
-- La descripcion debe mencionar `ARC Flow`, `/arc-init`, `/arc-config`, `/arc-release`, `/arc-item`, `/arc-task`, `/arc-check`, release items tipados, work packages, ChangeSets y estado canonico.
+- La descripcion debe mencionar el nombre aprobado por naming gate, las skills canonicas `init`, `config`, `release`, `item`, `task`, `check`, release items tipados, work packages, ChangeSets y estado canonico.
+- `ARC Flow` puede aparecer solo como codename interno hasta cerrar naming gate.
 - No debe prometer compatibilidad con comandos v3.
 
 ## Skills
@@ -173,28 +176,28 @@ Reglas:
 Skills base:
 
 ```text
-skills/arc-init/
-skills/arc-config/
-skills/arc-release/
-skills/arc-item/
-skills/arc-task/
-skills/arc-check/
-skills/arc-report/
-skills/arc-decision/
+skills/init/
+skills/config/
+skills/release/
+skills/item/
+skills/task/
+skills/check/
+skills/report/
+skills/decision/
 ```
 
 Skill de mantenimiento:
 
 ```text
-skills/arc-update/
+skills/update/
 ```
 
 Skills avanzadas solo si se justifican despues del vertical slice:
 
 ```text
-skills/arc-run/
-skills/arc-recover/
-skills/arc-backlog/
+skills/run/
+skills/recover/
+skills/backlog/
 ```
 
 Contrato de cada `SKILL.md`:
@@ -202,7 +205,7 @@ Contrato de cada `SKILL.md`:
 - proposito;
 - argumentos publicos;
 - precondiciones;
-- llamada al launcher `arcflow <domain> <stage>`;
+- llamada al launcher `<product-cli> <domain> <stage>`;
 - donde entra juicio del agente;
 - cuando pedir aprobacion humana;
 - criterios de stop.
@@ -216,22 +219,22 @@ No debe contener parseo Markdown, asignacion de IDs, logica de transiciones, pas
 La entrada visible es un launcher raiz minimo:
 
 ```text
-bin/arcflow
+bin/<product-cli>
 ```
 
 Ese launcher delega al bundle:
 
 ```text
-runtime/dist/arcflow.mjs
+runtime/dist/<product-cli>.mjs
 ```
 
 Las skills deben invocar el launcher conceptual:
 
 ```text
-arcflow <domain> <stage> [args] [--format json|markdown]
+<product-cli> <domain> <stage> [args] [--format json|markdown]
 ```
 
-El launcher resuelve internamente rutas de instalacion, template pack, schemas y workspace actual. El usuario no debe necesitar conocer rutas internas como `runtime/src/commands/release.mjs` ni `runtime/dist/arcflow.mjs`.
+El launcher resuelve internamente rutas de instalacion, template pack, schemas y workspace actual. El usuario no debe necesitar conocer rutas internas como `runtime/src/commands/release.mjs` ni `runtime/dist/<product-cli>.mjs`.
 
 Scripts de dominio:
 
@@ -291,7 +294,7 @@ Reglas:
 | `work-package.schema.json` | Trabajo tecnico por scope y gates propios. |
 | `task.schema.json` | Cambio atomico, evidencia y closeout. |
 | `change-set.schema.json` | Operacion propuesta/aplicable con `baseRevisions` e idempotencia. |
-| `operation.schema.json` | Estado de operacion multiarchivo bajo `.planning/.operations/`. |
+| `operation.schema.json` | Estado de operacion multiarchivo bajo `.planning/operations/` y referencias a runtime storage. |
 | `event.schema.json` | Evento append-only por archivo bajo `.planning/events/`. |
 
 Schemas compartidos requeridos:
@@ -349,9 +352,9 @@ test-guide.md
 Reglas:
 
 - El workspace usuario no recibe una copia completa de `template-pack/`.
-- `/arc-init` crea estado inicial y lock; las plantillas se leen desde la instalacion del plugin.
+- `/<product-name>:init` crea estado inicial y lock; las plantillas se leen desde la instalacion del plugin.
 - Markdown generado debe poder regenerarse desde YAML/JSON canonico.
-- Si un usuario edita Markdown generado, `/arc-check docs` debe detectar drift o regenerarlo segun politica.
+- Si un usuario edita Markdown generado, `/<product-name>:check docs` debe detectar drift o regenerarlo segun politica.
 
 ## Fixtures y pruebas de arquitectura
 
@@ -394,13 +397,15 @@ Reglas:
 | `docs/plugin-redesign-release-flow/` | Decision de arquitectura del redisenio v4. |
 | `docs/plugin-review/` | Revisiones historicas y hallazgos que alimentan el redisenio. |
 | `docs/claude-planning-v4-expert-review/` | Review externo de la propuesta v4. |
+| `docs/claude-planning-v4-second-expert-review/` | Segunda revision experta, fuente del Corte -1.1. |
+| `docs/claude-planning-v4-third-expert-review/` | Tercera revision experta, fuente del Corte -1.2 y spikes. |
 | `docs/design-history/` | Material archivado; no debe ser fuente publica principal. |
 
 Reglas:
 
 - `docs/commands.yml` debe listar solo comandos activos v4 y comandos avanzados cuando existan.
 - `docs/reference.md`, README y site no deben contener tabla de comandos similares legacy.
-- La documentacion publica debe explicar primero `arc-init -> arc-config -> arc-release -> arc-item -> work package -> arc-task -> arc-check/arc-report`.
+- La documentacion publica debe explicar primero `init -> config -> release -> item -> work package -> task -> check/report`, renderizado con el namespace real del plugin.
 - Los docs de redesign pueden mencionar v3 como diagnostico, pero los docs publicos no deben ensenarlo como flujo vigente.
 
 ## Sitio web
@@ -433,8 +438,8 @@ Outputs generados, no editar:
 
 Responsabilidades v4 del sitio:
 
-- Home: explicar el flujo `arc-init -> arc-config -> arc-release -> arc-item -> work package -> arc-task -> ChangeSet -> arc-check/arc-report -> release/deployment -> finalize`.
-- Commands: mostrar solo comandos v4 y separar `arc-update` como mantenimiento.
+- Home: explicar el flujo `init -> config -> release -> item -> work package -> task -> ChangeSet -> check/report -> release/deployment -> finalize`.
+- Commands: mostrar solo comandos v4 y separar `update` como mantenimiento.
 - Tutorials: usar IDs display `R0001`, `RI0001`, `WP0001`, `T0001`, IDs primarios distribuidos y storage `.planning/scopes/` + `.planning/releases/`.
 - Training: no ensenar `plan-new`, `plan-expand`, `active/finished`, `.releases/` ni historias hermanas por scope.
 - Locales: actualizar `en` y `es` juntos.
@@ -459,13 +464,17 @@ El plugin v4 crea esta estructura en el proyecto del usuario:
     2026/
       07/
         <event-id>.json
-  .operations/
+  operations/
     <operation-id>/
       operation.yml
       change-set.json
-      before/
-      staged/
       result.json
+  .runtime/
+    operations/
+      <operation-id>/
+        before/
+        staged/
+        logs/
 
   scopes/
     <scope-id>/
@@ -475,24 +484,33 @@ El plugin v4 crea esta estructura en el proyecto del usuario:
       test-guide.yml
       test-guide.md
 
+  concerns/
+    <concern-id>.yml
+  gates/
+    <gate-id>.yml
+  gate-profiles/
+    <gate-profile-id>.yml
+  environments/
+    <environment-id>.yml
+
   decisions/
     DEC-0001-slug/
       decision.yml
       README.md
 
   releases/
-    R0001-slug/
+    <release-id>/
       release.yml
       README.md
       items/
-        RI0001-slug/
+        <release-item-id>/
           release-item.yml
           README.md
           work-packages/
-            WP0001-scope-slug/
+            <work-package-id>/
               work-package.yml
               tasks/
-                T0001-slug/
+                <task-id>/
                   task.yml
                   README.md
       TRACEABILITY.md
@@ -520,7 +538,7 @@ Antes de publicar v4:
 
 - `.claude-plugin/plugin.json` y `marketplace.json` describen solo v4.
 - `README.md`, `docs/commands.yml`, `docs/reference.md`, `docs/user-guide.md` y site estan alineados.
-- `bin/`, `runtime/`, `runtime/src/schemas/`, `runtime/dist/arcflow.mjs`, `template-pack/template-pack.yml` y `template-pack/templates/` tienen versiones compatibles.
+- `bin/`, `runtime/`, `runtime/src/schemas/`, `runtime/dist/<product-cli>.mjs`, `template-pack/template-pack.yml` y `template-pack/templates/` tienen versiones compatibles.
 - `CHANGELOG.md` declara ruptura, comandos removidos, storage nuevo y ausencia de aliases.
 - `template-pack/update-version/<N>-<N+1>.md` explica el corte limpio y futuras migraciones v4+.
 - `scripts/verify-plugin.sh`, `.page/scripts/verify.js` y `npm run build` pasan.
