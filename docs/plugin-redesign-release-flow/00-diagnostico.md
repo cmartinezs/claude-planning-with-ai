@@ -26,10 +26,10 @@ release -> plannings
 El modelo requerido ahora es:
 
 ```text
-project context -> release -> user story/capability -> scope work package -> technical task
+project context -> release -> release item -> scope work package -> technical task
 ```
 
-Esto cambia el centro de gravedad. El usuario no deberia tener que crear una "planning" como entidad mental principal para despues agregarla a una release. La planning puede seguir existiendo como concepto historico, pero la API publica debe hablar primero de releases, capacidades funcionales, work packages por scope y tasks.
+Esto cambia el centro de gravedad. El usuario no deberia tener que crear una "planning" como entidad mental principal para despues agregarla a una release. La planning puede seguir existiendo como concepto historico, pero la API publica debe hablar primero de releases, release items tipados, work packages por scope y tasks.
 
 La correccion principal del review v4 es que los antiguos `story-01-a` y `story-01-b` no son User Stories independientes. Son slices tecnicos de una misma capacidad. La entidad que antes se estaba llamando `Story Group` debe ascender a `User Story` o `Capability`; las partes por scope deben modelarse como `Scope Work Package`.
 
@@ -45,9 +45,9 @@ Hay demasiados comandos que representan variaciones mecanicas de una misma respo
 
 Esto viola el criterio de responsabilidad unica a nivel de skill: muchas skills no son capacidades distintas, sino wrappers publicos para una etapa particular de un mismo script.
 
-Tambien existe una contradiccion de UX: tener `/plan-init` y `/release init` obliga al usuario a decidir que inicializacion necesita. En v4 debe existir un unico bootstrap: `/plan-init`. La configuracion posterior de scopes, fuentes, politicas, comandos y autonomia debe vivir en `/plan-config`.
+Tambien existe una contradiccion de UX: tener `/plan-init` y `/release init` obliga al usuario a decidir que inicializacion necesita. En v4 debe existir un unico bootstrap con marca nueva: `/arc-init`. La configuracion posterior de scopes, fuentes, politicas, comandos y autonomia debe vivir en `/arc-config`.
 
-`/release` puede seguir existiendo, pero no como comando dios. Debe ser una fachada publica o router de subcomandos que delega en use cases internos pequenos: crear release, planificar alcance, consultar readiness, registrar deployment, transicionar lifecycle o cerrar finalizacion.
+`/arc-release` puede existir como router publico, pero no como comando dios. Debe delegar en use cases internos pequenos: crear release, planificar alcance, consultar readiness, registrar deployment, transicionar lifecycle o cerrar finalizacion.
 
 ## Problema de estado y mutaciones
 
@@ -59,9 +59,9 @@ La regla v4 debe ser:
 YAML o JSON es la fuente de verdad. Markdown es una proyeccion humana generada.
 ```
 
-El almacenamiento canonico debe incluir `config.yml`, `plugin.lock.yml`, `scope.yml`, `release.yml`, `story.yml`, `work-package.yml`, `task.yml` y `events.ndjson`. Los Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) se regeneran desde ese estado.
+El almacenamiento canonico debe incluir `config.yml`, `plugin.lock.yml`, `scope.yml`, `release.yml`, `release-item.yml`, `work-package.yml`, `task.yml`, operaciones bajo `.planning/.operations/` y eventos JSON inmutables bajo `.planning/events/`. Los Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) se regeneran desde ese estado.
 
-`dry-run` y `--write` tampoco bastan como protocolo seguro. Toda mutacion debe pasar por `inspect -> propose -> validate -> approve -> apply -> verify -> record`, con `ChangeSet` validable, `baseRevision`, idempotencia, optimistic locking, escrituras atomicas y journal de eventos.
+`dry-run` y `--write` tampoco bastan como protocolo seguro. Toda mutacion debe pasar por `inspect -> propose -> validate -> approve -> stage -> apply -> verify -> record`, con `ChangeSet` validable, `baseRevisions` por agregado, idempotencia, optimistic locking, staging multiarchivo y journal de eventos por archivo.
 
 ## Lo que ya esta bien encaminado
 
@@ -73,7 +73,7 @@ Ya existe una direccion correcta:
 - `planning-template/scripts/release.mjs` ya centraliza release CRUD, aunque con el modelo viejo de release -> plannings.
 - `planning-template/scripts/planning-from-release.mjs` ya apunta al bridge desde documentos de release.
 
-Esas rutas son evidencia del repo v3 actual, no ubicacion objetivo. En v4, la logica rescatable debe moverse a `runtime/commands/` o `runtime/lib/`, y `planning-template/` debe dejar de ser contenedor de scripts.
+Esas rutas son evidencia del repo v3 actual, no ubicacion objetivo. En v4, la logica rescatable debe moverse a `runtime/src/commands/` o `runtime/src/lib/`, y `planning-template/` debe dejar de ser contenedor de scripts.
 
 El siguiente paso no deberia ser crear mas skills. Antes de implementar el primer comando publico v4, hace falta un Corte -1 de dominio y runtime: schemas, storage canonico, ChangeSet, IDs estables, politicas, launcher, fixtures y pruebas de arquitectura.
 

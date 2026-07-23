@@ -3,17 +3,18 @@
 ## Principios
 
 1. Release primero: la release es la unidad publica de planificacion, seguimiento, liberacion y cierre.
-2. Story como valor: la User Story o Capability representa comportamiento observable, actor, necesidad, valor y criterios funcionales.
+2. Release Item como valor: user story, capability, defect, enabler, spike, compliance, migration u operational work representan unidades de alcance entregable.
 3. Work package por scope: el trabajo tecnico se divide por unidades estables de ownership y validacion, no por "historias hermanas".
 4. Scopes globales: los scopes pertenecen al proyecto y las releases referencian revisiones concretas de sus guias.
 5. Estado estructurado: YAML o JSON es fuente de verdad; Markdown es proyeccion humana generada.
-6. Identidad estable: IDs inmutables como `R0001`, `S0001`, `WP0001` y `T0001`; los slugs son decorativos.
-7. Menos comandos publicos: un comando por intencion principal; las variaciones son subcomandos o stages internos.
-8. Skills delgadas: la skill coordina intencion, aprobacion y juicio del agente; no implementa mecanica repetible.
-9. Runtime determinista: parseo, validacion, escritura atomica, indices, estados, secuencia, locks, journal y comandos planificados viven en scripts/librerias.
-10. IA acotada: el agente interpreta producto, descompone trabajo, toma decisiones tecnicas justificadas, implementa codigo y revisa evidencia.
-11. Configuracion explicita: policies, lanes, gates, autonomia, comandos permitidos y generadores custom viven en configuracion versionada.
-12. Reproducibilidad: cada workspace registra plugin lock, schema, template pack, guide revisions y eventos.
+6. Identidad estable y distribuida: IDs primarios ULID/UUIDv7, `display_id` humano como `R0001` o `T0042`, y slugs decorativos.
+7. Marca reconocible: v4 adopta `ARC Flow`; las skills publicas usan prefijo `/arc-*` y el launcher es `arcflow`, no `claude-*` ni `plan-*`.
+8. Menos comandos publicos: un comando por intencion principal; las variaciones son subcomandos o stages internos.
+9. Skills delgadas: la skill coordina intencion, aprobacion y juicio del agente; no implementa mecanica repetible.
+10. Runtime determinista: parseo, validacion, escritura atomica, indices, estados, secuencia, locks, journal y comandos planificados viven en scripts/librerias.
+11. IA acotada: el agente interpreta producto, descompone trabajo, toma decisiones tecnicas justificadas, implementa codigo y revisa evidencia.
+12. Configuracion explicita: policies, lanes, gates, autonomia, comandos permitidos y generadores custom viven en configuracion versionada.
+13. Reproducibilidad: cada workspace registra plugin lock, schema, template pack, guide revisions y eventos.
 
 ## Modelo de dominio
 
@@ -27,7 +28,7 @@ Project Context
 +-- Decisions
 +-- Releases
     +-- Release
-        +-- User Story / Capability
+        +-- Release Item
             +-- Scope Work Package
             |   +-- Tasks
             +-- Scope Work Package
@@ -37,7 +38,7 @@ Project Context
 Version corta:
 
 ```text
-release -> story/capability -> scope work package -> task
+release -> release item -> scope work package -> task
 ```
 
 ### Release
@@ -47,7 +48,7 @@ La release controla:
 - objetivo del incremento;
 - alcance comprometido;
 - target, lane y politica de entrega;
-- stories/capabilities incluidas;
+- release items incluidos;
 - gates de release;
 - riesgos y blockers agregados;
 - eventos de release y deployment;
@@ -55,9 +56,28 @@ La release controla:
 
 La release no reemplaza deployment ni retrospectiva. Los eventos de deployment y la finalizacion son entidades/eventos diferenciados dentro del agregado de release.
 
-### User Story o Capability
+### Release Item
 
-La story contiene el valor funcional:
+El Release Item es la entidad canonica de alcance dentro de una release. Puede representar trabajo funcional, tecnico, investigativo, operacional o regulatorio.
+
+```yaml
+kind: user_story | capability | defect | enabler | spike | compliance | migration | operational
+```
+
+Campos condicionales:
+
+| Kind | Campos requeridos |
+|------|-------------------|
+| `user_story` | actor, need, value, acceptance_criteria |
+| `capability` | outcome, behavior, acceptance_criteria |
+| `defect` | observed_behavior, expected_behavior, reproduction, severity |
+| `enabler` | technical_outcome, unlocked_capabilities |
+| `spike` | question, timebox, expected_decision |
+| `compliance` | obligation, authority, deadline, evidence |
+| `migration` | source_state, target_state, rollback |
+| `operational` | procedure, owner, evidence |
+
+Un Release Item funcional puede contener:
 
 - actor;
 - necesidad;
@@ -69,11 +89,11 @@ La story contiene el valor funcional:
 - Definition of Done funcional;
 - work packages requeridos u opcionales.
 
-La story no se divide artificialmente por componentes tecnicos. Si una capacidad afecta web, API, datos y documentacion, sigue siendo una story y contiene cuatro work packages.
+Un Release Item no se divide artificialmente por componentes tecnicos. Si una capacidad afecta web, API, datos y documentacion, sigue siendo un solo item y contiene cuatro work packages.
 
 ### Scope Work Package
 
-Un work package contiene la porcion tecnica o disciplinaria de una story para un scope propietario:
+Un work package contiene la porcion tecnica o disciplinaria de un Release Item para un scope propietario:
 
 - scope propietario;
 - diseno tecnico;
@@ -103,7 +123,7 @@ Una task pertenece a exactamente un work package y hereda el scope de ese work p
 
 ## Scope
 
-`scope` queda definido como una unidad estable de ownership y validacion que puede recibir work packages y posee paths, fuentes, reglas y gates propios.
+`scope` queda definido como una unidad estable de delivery, ownership y validacion que puede recibir work packages y posee paths, fuentes, reglas y gates propios.
 
 Un scope no es solo una carpeta. Puede mapear a artefactos, repositorios, paquetes, servicios, modulos, equipos, disciplinas o procesos. Por eso debe declarar `kind`:
 
@@ -113,12 +133,26 @@ kind: application | service | library | infrastructure | documentation | process
 
 Reglas:
 
-- Los scopes se configuran en `/plan-init` y se modifican con `/plan-config`.
+- `config.yml` solo referencia el catalogo de scopes; la definicion completa vive en `.planning/scopes/<scope-id>/scope.yml`.
+- Los scopes se configuran en `/arc-init` y se modifican con `/arc-config`.
 - Todo scope tiene `id`, `label`, `kind` y al menos un `path` o una justificacion `non_code: true`.
 - Cada kind activa reglas y gates distintos; un scope `compliance` no hereda automaticamente gates de software.
-- Las guias `task-guide.md` y `test-guide.md` viven a nivel de proyecto bajo `.planning/scopes/<scope-id>/`.
-- Cada release referencia la revision de guia usada para mantener reproducibilidad historica.
+- Las guias ejecutables `task-guide.yml` y `test-guide.yml` viven a nivel de proyecto bajo `.planning/scopes/<scope-id>/`; los `.md` equivalentes son proyecciones humanas.
+- Cada Work Package registra `guide_refs` con las revisiones exactas de `task-guide.yml` y `test-guide.yml` usadas al crearlo o atomizarlo; la release puede mantener un indice agregado para trazabilidad, pero no ser la unica referencia.
 - Los scripts no asumen nombres como `web`, `api` o `docs`; solo leen el catalogo configurado.
+
+Conceptos transversales no se modelan como scopes por defecto. Separar:
+
+- Delivery Scope;
+- Cross-cutting Concern;
+- Gate Profile.
+
+Los solapamientos de paths requieren politica explicita:
+
+```yaml
+paths:
+  overlap_policy: reject | allow | explicit
+```
 
 ## Storage canonico
 
@@ -128,29 +162,36 @@ Estructura objetivo:
 .planning/
   config.yml
   plugin.lock.yml
-  events.ndjson
+  events/
+  .operations/
 
   scopes/
     web/
       scope.yml
+      task-guide.yml
       task-guide.md
+      test-guide.yml
       test-guide.md
     api/
       scope.yml
+      task-guide.yml
       task-guide.md
+      test-guide.yml
       test-guide.md
 
   decisions/
-    DEC-0001-slug.md
+    DEC-0001-slug/
+      decision.yml
+      README.md
 
   releases/
     R0001-capability/
       release.yml
       README.md
 
-      stories/
-        S0001-publish-assessment/
-          story.yml
+      items/
+        RI0001-publish-assessment/
+          release-item.yml
           README.md
 
           work-packages/
@@ -181,10 +222,11 @@ Estado canonico:
 - `plugin.lock.yml`;
 - `scope.yml`;
 - `release.yml`;
-- `story.yml`;
+- `release-item.yml`;
 - `work-package.yml`;
 - `task.yml`;
-- `events.ndjson`.
+- `.planning/events/**/*.json`;
+- `.planning/.operations/<operation-id>/operation.yml`.
 
 Proyecciones humanas generadas:
 
@@ -196,9 +238,11 @@ Proyecciones humanas generadas:
 - dashboards Markdown;
 - exports.
 
+`events.ndjson` puede existir como export o proyeccion, no como journal primario.
+
 ## Plugin lock y template pack
 
-`/plan-init` crea `.planning/plugin.lock.yml` para fijar la reproducibilidad:
+`/arc-init` crea `.planning/plugin.lock.yml` para fijar la reproducibilidad:
 
 ```yaml
 plugin:
@@ -212,29 +256,36 @@ plugin:
 
 Los templates canonicos viven en la instalacion del plugin. El workspace no recibe una copia completa del template pack; solo guarda estado, lock y artefactos generados. El runtime debe poder leer artefactos creados con revisiones anteriores compatibles del schema y bloquear o advertir cuando cambian schema, template pack o guide revisions.
 
+Para reproducibilidad historica, el workspace puede guardar snapshots minimos de templates realmente utilizados:
+
+```text
+.planning/vendor/template-packs/<fingerprint>/
+```
+
+El fingerprint identifica el pack; el snapshot garantiza disponibilidad cuando el plugin instalado ya no contiene esa revision exacta.
+
 ## Identidad
 
-Los IDs son inmutables y no mezclan identidad, orden visible, scope, slug ni titulo.
+Los IDs son inmutables y no mezclan identidad, orden visible, scope, slug ni titulo. La clave primaria debe ser distribuida para evitar colisiones en worktrees.
 
 Recomendado:
 
-```text
-R0001
-S0001
-WP0001
-T0001
+```yaml
+id: 01J4F0Z9M...
+display_id: T0042
+slug: validate-schema
 ```
 
-Los slugs mejoran lectura, pero no son la referencia primaria:
+`display_id` mejora lectura, pero no es la referencia primaria:
 
 ```text
 R0001-release-flow-redesign
-S0004-configure-project-scopes
+RI0004-configure-project-scopes
 WP0012-api-contract
 T0041-validate-schema
 ```
 
-Cambiar un titulo o mover un work package dentro de una story no debe romper dependencias ni trazabilidad.
+Cambiar un titulo o mover un work package dentro de un Release Item no debe romper dependencias ni trazabilidad.
 
 ## Estados y dimensiones separadas
 
@@ -262,7 +313,19 @@ finalization:
   retrospective_status: APPROVED
 ```
 
-### Story, Work Package y Task
+Completion y readiness son derivados, no lifecycle:
+
+```yaml
+completion:
+  required_work_packages: 8
+  completed_work_packages: 7
+readiness:
+  releasable: false
+  blocking_gates:
+    - smoke-web
+```
+
+### Release Item, Work Package y Task
 
 Estados:
 
@@ -284,7 +347,7 @@ approved_by: ...
 accepted_risk: ...
 replacement:
   release_id: R0002
-  work_item_id: S0015
+  work_item_id: 01J...
 ```
 
 Cada elemento declara:
@@ -345,10 +408,10 @@ La cancelacion exige razon, impacto y aprobacion humana. Una release cancelada c
 Toda mutacion debe seguir:
 
 ```text
-inspect -> propose -> validate -> approve -> apply -> verify -> record
+inspect -> propose -> validate -> approve -> stage -> apply -> verify -> record
 ```
 
-`dry-run` es solo una forma de presentar un `ChangeSet`; no es una transaccion. `apply` debe fallar si cambia la revision base.
+`dry-run` y `--write` no son el contrato conceptual de v4. El contrato es ChangeSet con `propose/validate/approve/apply/verify`. `apply` debe fallar si cambia una revision de agregado leida o mutada.
 
 Contrato minimo:
 
@@ -358,11 +421,16 @@ Contrato minimo:
   "operationId": "OP-01J...",
   "operation": "story.atomize",
   "target": {
-    "releaseId": "R0001",
-    "storyId": "S0001",
-    "workPackageId": "WP0001"
+    "releaseId": "01J...",
+    "releaseItemId": "01J...",
+    "workPackageId": "01J..."
   },
-  "baseRevision": "sha256:...",
+  "baseRevisions": {
+    "release:01J...": "sha256:...",
+    "releaseItem:01J...": "sha256:...",
+    "workPackage:01J...": "sha256:...",
+    "guide:web:task": "sha256:..."
+  },
   "idempotencyKey": "...",
   "assumptions": [],
   "preconditions": [],
@@ -382,9 +450,17 @@ Propiedades obligatorias:
 - reintentable;
 - rechazable;
 - aplicable sin volver a consultar al LLM;
-- invalido cuando cambia `baseRevision`.
+- invalido cuando cambia una revision de agregado relevante.
 
-Cada aplicacion debe usar escrituras atomicas, optimistic locking, operation journal, validacion post-write y rollback tecnico cuando aplique.
+Cada aplicacion debe usar staging, optimistic locking por agregado, operation journal, validacion post-write y rollback tecnico cuando aplique. Las operaciones multiarchivo viven bajo `.planning/.operations/<operation-id>/`.
+
+Los comandos externos se modelan como saga:
+
+```text
+prepare -> execute -> verify -> compensate
+```
+
+La aprobacion se vincula al hash del ChangeSet. Modificar el ChangeSet invalida la aprobacion.
 
 ## Seguridad de comandos
 
@@ -408,7 +484,7 @@ El runtime debe protegerse contra command injection, path traversal, symlink esc
 La interfaz interna recomendada no expone rutas como `.planning/scripts/release.mjs` ni rutas de instalacion del plugin. Las skills llaman un launcher estable:
 
 ```text
-claude-planning <domain> <stage> [args] [--format json|markdown]
+arcflow <domain> <stage> [args] [--format json|markdown]
 ```
 
 El launcher resuelve:
@@ -426,27 +502,27 @@ El launcher resuelve:
 
 El runtime debe hacerse cargo de:
 
-- asignar IDs estables sin colisiones;
-- calcular revision del workspace;
+- asignar IDs primarios distribuidos sin colisiones y display IDs humanos;
+- calcular revisiones por agregado;
 - validar schemas;
 - validar transiciones de estados;
 - aplicar politicas de release/lane/dependencias;
 - crear carpetas y archivos desde templates;
 - actualizar YAML canonico;
 - regenerar proyecciones Markdown;
-- sincronizar estado agregado desde stories, work packages y tasks;
+- calcular completion/readiness derivados desde Release Items, work packages y tasks sin cambiar automaticamente el lifecycle;
 - validar links, dependencias, gates, evidencia y guide revisions;
 - generar y refrescar indices por scope desde fuentes configuradas;
-- generar esqueletos de work package, task y test suite desde guias aprobadas;
+- generar esqueletos de work package, task y test suite desde guias YAML aprobadas;
 - producir comandos git/gh permitidos como estructuras, no shell libre;
-- registrar eventos append-only en `events.ndjson`;
+- registrar eventos append-only como archivos JSON inmutables bajo `.planning/events/`;
 - bloquear cambios concurrentes con optimistic locking.
 
 ## Responsabilidades del agente AI
 
 El agente queda limitado a:
 
-- transformar intencion de negocio en stories/capabilities candidatas;
+- transformar intencion de negocio en Release Items candidatos;
 - proponer work packages por scope;
 - dividir work packages en tasks tecnicas atomicas;
 - sintetizar guias cuando las fuentes no permiten extraccion deterministica completa;
@@ -456,27 +532,27 @@ El agente queda limitado a:
 - revisar evidencia y proponer correcciones;
 - sintetizar decisiones y retrospectivas desde hechos capturados.
 
-Cuando el agente produzca stories, work packages o tasks, debe entregar un bloque estructurado que el runtime valida y aplica como `ChangeSet`. El agente no debe editar manualmente estados, indices, rutas, dependencias o proyecciones derivables.
+Cuando el agente produzca Release Items, work packages o tasks, debe entregar un bloque estructurado que el runtime valida y aplica como `ChangeSet`. El agente no debe editar manualmente estados, indices, rutas, dependencias o proyecciones derivables.
 
 ## Flujo feliz propuesto
 
 ```text
-/plan-init
-/plan-config scopes
-/plan-config policies
-/release new --title "Capability name" --target 2026-Q3-M1-W2 --date 2026-08-07
-/plan-story add R0001 --title "Publish assessment"
-/plan-story package add R0001 S0001 --scope api --title "Command contract and persistence"
-/plan-story package add R0001 S0001 --scope web --title "Teacher publishing UI"
-/plan-story atomize R0001 S0001 WP0001
-/plan-story atomize R0001 S0001 WP0002
-/plan-task inspect R0001 S0001 WP0001 T0001
-/plan-task start R0001 S0001 WP0001 T0001
-/plan-check readiness R0001
-/plan-report status R0001
-/release mark R0001 VERIFYING
-/release mark R0001 RELEASED
-/release finalize R0001
+/arc-init
+/arc-config scopes
+/arc-config policies
+/arc-release new --title "Capability name" --target 2026-Q3-M1-W2 --date 2026-08-07
+/arc-item add R0001 --kind user_story --title "Publish assessment"
+/arc-item package add R0001 RI0001 --scope api --title "Command contract and persistence"
+/arc-item package add R0001 RI0001 --scope web --title "Teacher publishing UI"
+/arc-item atomize R0001 RI0001 WP0001
+/arc-item atomize R0001 RI0001 WP0002
+/arc-task inspect R0001 RI0001 WP0001 T0001
+/arc-task start R0001 RI0001 WP0001 T0001
+/arc-check readiness R0001
+/arc-report status R0001
+/arc-release mark R0001 VERIFYING
+/arc-release mark R0001 RELEASED
+/arc-release finalize R0001
 ```
 
-La forma exacta puede cambiar, pero el usuario debe sentir que navega release -> story/capability -> scope work package -> task, no una coleccion de utilidades ni una jerarquia de planificaciones paralelas.
+La forma exacta puede cambiar, pero el usuario debe sentir que navega release -> release item -> scope work package -> task, no una coleccion de utilidades ni una jerarquia de planificaciones paralelas.

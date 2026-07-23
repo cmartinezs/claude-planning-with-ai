@@ -2,7 +2,13 @@
 
 ## Objetivo
 
-Cada scope necesita guias operativas cortas que traduzcan la documentacion del proyecto a reglas concretas para crear work packages, tasks tecnicas y test suites. La guia no debe vivir hardcodeada en el plugin. Debe generarse desde las fuentes configuradas del proyecto, revisarse, aprobarse y refrescarse cuando esas fuentes cambien.
+Cada scope necesita guias operativas que traduzcan la documentacion del proyecto a reglas concretas para crear work packages, tasks tecnicas y test suites. La guia no debe vivir hardcodeada en el plugin. Debe generarse desde las fuentes configuradas del proyecto, revisarse, aprobarse y refrescarse cuando esas fuentes cambien.
+
+Regla principal:
+
+```text
+YAML es regla ejecutable. Markdown es explicacion humana.
+```
 
 Nombres:
 
@@ -20,11 +26,15 @@ Las guias viven a nivel de proyecto:
   scopes/
     web/
       scope.yml
+      task-guide.yml
       task-guide.md
+      test-guide.yml
       test-guide.md
     api/
       scope.yml
+      task-guide.yml
       task-guide.md
+      test-guide.yml
       test-guide.md
 ```
 
@@ -49,25 +59,40 @@ Esto evita duplicar guias por release y permite reproducir el contexto de una re
 ```yaml
 scope_id: web
 kind: application
-guide_status:
-  task_guide: approved
-  test_guide: approved
-guide_revisions:
-  task_guide: sha256:...
-  test_guide: sha256:...
-provenance:
-  sources:
-    - docs/product/
-    - docs/frontend-guidelines.md
-  source_fingerprints:
-    - path: docs/frontend-guidelines.md
-      fingerprint: sha256:...
-  generator_version: 4.0.0
-  model: gpt-5
-  prompt_version: scope-guide-v1
-  generated_at: 2026-07-22T00:00:00Z
-  reviewed_by: carlos
-  approved_at: 2026-07-22T00:00:00Z
+guides:
+  task:
+    status: approved
+    revision: sha256:...
+    path: .planning/scopes/web/task-guide.yml
+    projection: .planning/scopes/web/task-guide.md
+    provenance:
+      sources:
+        - docs/product/
+        - docs/frontend-guidelines.md
+      source_fingerprints:
+        - path: docs/frontend-guidelines.md
+          fingerprint: sha256:...
+      generator_version: 4.0.0
+      model: gpt-5
+      prompt_version: scope-task-guide-v1
+      generated_at: 2026-07-22T00:00:00Z
+      reviewed_by: carlos
+      approved_at: 2026-07-22T00:00:00Z
+  test:
+    status: approved
+    revision: sha256:...
+    path: .planning/scopes/web/test-guide.yml
+    projection: .planning/scopes/web/test-guide.md
+    provenance:
+      sources:
+        - docs/testing.md
+      source_fingerprints: []
+      generator_version: 4.0.0
+      model: null
+      prompt_version: null
+      generated_at: 2026-07-22T00:00:00Z
+      reviewed_by: carlos
+      approved_at: 2026-07-22T00:00:00Z
 ```
 
 Estados permitidos:
@@ -98,9 +123,46 @@ Las guias se generan desde:
 
 El runtime guarda `Source Index` con paths y fingerprints para detectar staleness.
 
+## Contenido de `task-guide.yml`
+
+Estructura ejecutable recomendada:
+
+```yaml
+schema_version: 1
+scope_id: web
+revision: sha256:...
+work_package_types:
+  - id: ui-feature
+    when: User-visible UI behavior.
+    required_sections:
+      - visible_behavior
+      - component_plan
+      - data_contracts
+    required_gates:
+      - build
+      - unit-tests
+      - accessibility-review
+task_types:
+  - id: data-provider
+    when: Connect UI to real data source.
+    required_sections:
+      - contract
+      - loading_states
+      - error_mapping
+    template_ref: task-data-provider
+decomposition_rules:
+  - id: contract-before-ui
+    rule: contract-check must precede real-api-connection
+automation:
+  generator: scripts/planning/web-task-guide.mjs
+  input_schema: scope-guide-input-v1
+  fallback: mark-gaps
+open_gaps: []
+```
+
 ## Contenido de `task-guide.md`
 
-Estructura recomendada:
+Estructura narrativa recomendada:
 
 ```md
 # Task Guide: <scope-id>
@@ -179,9 +241,41 @@ Un scope no-code puede derivar work packages y tasks manuales:
 
 Sus gates no deben exigir build/test de software salvo que el scope configure comandos propios.
 
+## Contenido de `test-guide.yml`
+
+Estructura ejecutable recomendada:
+
+```yaml
+schema_version: 1
+scope_id: web
+revision: sha256:...
+gates_by_work_package_type:
+  - work_package_type: ui-feature
+    required_gates:
+      - build
+      - accessibility-review
+    command_refs:
+      - web-build
+    evidence:
+      - command_output
+      - screenshot_when_ui
+gates_by_task_type:
+  - task_type: data-provider
+    required_gates:
+      - unit-tests
+      - integration-tests
+test_data:
+  - need: authenticated-user
+    strategy: fixture
+environments:
+  - local
+  - ci
+open_gaps: []
+```
+
 ## Contenido de `test-guide.md`
 
-Estructura recomendada:
+Estructura narrativa recomendada:
 
 ```md
 # Test Guide: <scope-id>
@@ -235,11 +329,11 @@ scopes:
 Contrato:
 
 - El plugin invoca el generador con input JSON.
-- El generador retorna JSON o Markdown mas metadata.
+- El generador retorna YAML/JSON ejecutable, Markdown narrativo y metadata.
 - El plugin valida secciones requeridas, fingerprints y rutas de salida.
 - Si falta el generador, el plugin cae a extraccion generica y marca las partes inciertas como gaps.
 - El agente AI puede sintetizar narrativa faltante solo en secciones explicitamente marcadas como no deterministicas.
-- La guia generada sigue siendo entrada no deterministica hasta que sea revisada, aprobada y versionada.
+- La guia generada sigue siendo entrada no deterministica hasta que sea revisada, aprobada y versionada. Solo el YAML/JSON aprobado puede alimentar atomizacion automatica.
 
 ## Seguridad de generadores
 
@@ -256,38 +350,38 @@ Los generadores custom deben tratarse como codigo ejecutable sujeto a politica:
 
 ## Puntos de integracion
 
-`/plan-init`:
+`/arc-init`:
 
 - descubre fuentes y generadores candidatos;
 - escribe config inicial y plugin lock;
 - crea entradas del catalogo de scopes cuando es posible.
 
-`/plan-config guide refresh`:
+`/arc-config guide refresh`:
 
-- genera o refresca `task-guide.md` y `test-guide.md`;
+- genera o refresca `task-guide.yml`, `test-guide.yml` y sus proyecciones `task-guide.md`/`test-guide.md`;
 - actualiza metadata y revisiones de guia;
 - reporta fuentes stale y gaps.
 
-`/plan-config guide approve`:
+`/arc-config guide approve`:
 
 - marca guias revisadas como aprobadas;
 - registra aprobador, timestamp y revision en `scope.yml`;
-- emite un evento en `events.ndjson`.
+- emite un evento JSON inmutable bajo `.planning/events/`.
 
-`/plan-story package add`:
+`/arc-item package add`:
 
 - lee guias de scope aprobadas antes de crear un work package;
-- registra la revision de guia usada por la release.
+- registra la revision de guia usada por el work package y la agrega al indice de la release.
 
-`/plan-story atomize`:
+`/arc-item atomize`:
 
 - lee el work package y las guias de scope antes de crear tasks;
 - falla cuando faltan guias requeridas o estan stale, salvo que el usuario apruebe una waiver explicita.
 
-`/plan-check guides`:
+`/arc-check guides`:
 
 - valida frescura de guias, secciones requeridas, provenance y salida del generador.
 
-`/plan-check tests --generate`:
+`/arc-check tests`:
 
-- usa `test-guide.md` para generar test suites de task/story.
+- no genera test suites. Devuelve findings y operaciones recomendadas; la generacion vive en `/arc-task prepare`, `/arc-item atomize` o `/arc-config guide refresh`.
