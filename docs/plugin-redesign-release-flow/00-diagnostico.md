@@ -26,10 +26,12 @@ release -> plannings
 El modelo requerido ahora es:
 
 ```text
-release -> scopes -> user stories -> technical tasks
+project context -> release -> user story/capability -> scope work package -> technical task
 ```
 
-Esto cambia el centro de gravedad. El usuario no deberia tener que crear una "planning" como entidad mental principal para despues agregarla a una release. La planning puede seguir existiendo como estructura interna de trabajo, pero la API publica debe hablar primero de releases y de los frentes configurados para cada proyecto.
+Esto cambia el centro de gravedad. El usuario no deberia tener que crear una "planning" como entidad mental principal para despues agregarla a una release. La planning puede seguir existiendo como concepto historico, pero la API publica debe hablar primero de releases, capacidades funcionales, work packages por scope y tasks.
+
+La correccion principal del review v4 es que los antiguos `story-01-a` y `story-01-b` no son User Stories independientes. Son slices tecnicos de una misma capacidad. La entidad que antes se estaba llamando `Story Group` debe ascender a `User Story` o `Capability`; las partes por scope deben modelarse como `Scope Work Package`.
 
 ## Problema de superficie publica
 
@@ -43,6 +45,24 @@ Hay demasiados comandos que representan variaciones mecanicas de una misma respo
 
 Esto viola el criterio de responsabilidad unica a nivel de skill: muchas skills no son capacidades distintas, sino wrappers publicos para una etapa particular de un mismo script.
 
+Tambien existe una contradiccion de UX: tener `/plan-init` y `/release init` obliga al usuario a decidir que inicializacion necesita. En v4 debe existir un unico bootstrap: `/plan-init`. La configuracion posterior de scopes, fuentes, politicas, comandos y autonomia debe vivir en `/plan-config`.
+
+`/release` puede seguir existiendo, pero no como comando dios. Debe ser una fachada publica o router de subcomandos que delega en use cases internos pequenos: crear release, planificar alcance, consultar readiness, registrar deployment, transicionar lifecycle o cerrar finalizacion.
+
+## Problema de estado y mutaciones
+
+El diseno inicial todavia trataba Markdown como almacenamiento operativo para estados, dependencias, indices y orquestacion. Eso es fragil porque el Markdown puede ser reformateado por usuarios, agentes o merges, y porque existen muchas representaciones textuales equivalentes para la misma tabla.
+
+La regla v4 debe ser:
+
+```text
+YAML o JSON es la fuente de verdad. Markdown es una proyeccion humana generada.
+```
+
+El almacenamiento canonico debe incluir `config.yml`, `plugin.lock.yml`, `scope.yml`, `release.yml`, `story.yml`, `work-package.yml`, `task.yml` y `events.ndjson`. Los Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) se regeneran desde ese estado.
+
+`dry-run` y `--write` tampoco bastan como protocolo seguro. Toda mutacion debe pasar por `inspect -> propose -> validate -> approve -> apply -> verify -> record`, con `ChangeSet` validable, `baseRevision`, idempotencia, optimistic locking, escrituras atomicas y journal de eventos.
+
 ## Lo que ya esta bien encaminado
 
 Ya existe una direccion correcta:
@@ -53,7 +73,9 @@ Ya existe una direccion correcta:
 - `planning-template/scripts/release.mjs` ya centraliza release CRUD, aunque con el modelo viejo de release -> plannings.
 - `planning-template/scripts/planning-from-release.mjs` ya apunta al bridge desde documentos de release.
 
-El siguiente paso no deberia ser crear mas skills. Deberia ser estabilizar una interfaz publica menor y mover la variabilidad a etapas deterministas.
+Esas rutas son evidencia del repo v3 actual, no ubicacion objetivo. En v4, la logica rescatable debe moverse a `runtime/commands/` o `runtime/lib/`, y `planning-template/` debe dejar de ser contenedor de scripts.
+
+El siguiente paso no deberia ser crear mas skills. Antes de implementar el primer comando publico v4, hace falta un Corte -1 de dominio y runtime: schemas, storage canonico, ChangeSet, IDs estables, politicas, launcher, fixtures y pruebas de arquitectura.
 
 ## Riesgos si se sigue igual
 
@@ -62,4 +84,7 @@ El siguiente paso no deberia ser crear mas skills. Deberia ser estabilizar una i
 - Las skills crecen como procedimientos largos con juicio y mecanica mezclados.
 - La documentacion se vuelve una lista de excepciones.
 - La release queda como reporte agregado, no como contrato de entrega.
-- El cierre secuencial de releases sera dificil de validar si no queda en un script unico.
+- El cierre secuencial de releases sera dificil de validar si no queda como politica explicita.
+- Dos agentes o worktrees pueden pisarse si no existe control de revision y journal.
+- Los IDs basados en orden, scope o slug romperan referencias cuando cambie el titulo o se reordene el trabajo.
+- Los scopes no-code o de compliance heredaran gates de software si `scope` no queda definido como unidad estable de ownership y validacion con `kind` propio.

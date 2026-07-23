@@ -1,10 +1,18 @@
-# Propuesta de rediseno: flujo centrado en releases
+# Propuesta de rediseno v4: runtime centrado en releases
 
 Fecha: 2026-07-22
 
 ## Objetivo
 
-Reordenar el plugin para que la unidad principal de planificacion sea la release. Cada release se organiza por scopes configurables del proyecto; cada scope contiene sus propias historias de usuario, y cada historia contiene una o mas tareas tecnicas. Cuando una capacidad afecta mas de un scope, se modela como un grupo de historias relacionadas, por ejemplo `story-01-a` en un scope y `story-01-b` en otro. Las historias y tareas deben mantener su formato actual en lo esencial, pero el flujo publico debe ser mas claro, con menos comandos visibles y con mas trabajo mecanico delegado a scripts deterministas.
+Reordenar el plugin para que la unidad publica de entrega sea la release, sin convertirla en una coleccion de comandos sueltos ni en una base de datos Markdown. El modelo v4 debe ser:
+
+```text
+project context -> release -> story/capability -> scope work package -> task
+```
+
+La story/capability representa valor funcional observable. Cuando una capacidad afecta varios frentes, no se divide en "historias hermanas"; se conserva como una sola story y se descompone en work packages por scope. Cada work package contiene el diseno, contratos, riesgos, gates y tasks tecnicas del scope propietario.
+
+El flujo publico debe ser mas claro, con menos comandos visibles, una identidad estable, estado canonico estructurado, Markdown como proyeccion humana y trabajo mecanico delegado a un runtime determinista.
 
 Esta propuesta asume un corte limpio para v4.0.0. Antes de publicar la version, confirmar el numero exacto contra `CHANGELOG.md` y los manifests, pero el diseno no mantiene compatibilidad hacia atras con los comandos ni carpetas anteriores.
 
@@ -12,18 +20,23 @@ Esta propuesta asume un corte limpio para v4.0.0. Antes de publicar la version, 
 
 1. [Diagnostico](00-diagnostico.md)
 2. [Arquitectura objetivo](01-arquitectura-objetivo.md)
-3. [Configuracion inicial de release](04-release-init-configuracion.md)
-4. [Guias por scope para tasks y tests](05-scope-task-guides.md)
-5. [Eliminacion legacy](06-eliminacion-legacy.md)
-6. [Mapa de comandos y skills](02-mapa-comandos-skills.md)
-7. [Plan incremental](03-plan-incremental.md)
+3. [Mapa de comandos y skills](02-mapa-comandos-skills.md)
+4. [Plan incremental](03-plan-incremental.md)
+5. [Configuracion inicial del proyecto](04-release-init-configuracion.md)
+6. [Guias por scope para tasks y tests](05-scope-task-guides.md)
+7. [Eliminacion legacy](06-eliminacion-legacy.md)
+8. [Estructura completa del plugin v4](07-estructura-plugin-v4.md)
 
-## Tesis inicial
+## Tesis corregida
 
-El plugin no necesita mas comandos de primer nivel. Necesita menos comandos, mas etapas explicitas y una separacion mas fuerte entre:
+El plugin no necesita mas comandos de primer nivel. Necesita un runtime con:
 
-- scripts deterministas que leen, validan y mutan Markdown;
+- modelo de dominio explicito;
+- schemas para config, lock, scopes, releases, stories, work packages, tasks, ChangeSets, eventos y guias;
+- protocolo `inspect -> propose -> validate -> approve -> apply -> verify -> record`;
+- launcher estable que resuelve instalacion, template pack, schemas y workspace;
+- scripts deterministas que leen y mutan estado estructurado;
 - skills finas que orquestan, piden aprobacion y acotan el trabajo no determinista;
 - decisiones humanas cuando hay ambiguedad real de producto, alcance, arquitectura o release.
 
-La propuesta inicial reduce el flujo publico a una familia central de release/scope/story/task/check/report y trata los comandos actuales como material de referencia, no como API que deba conservarse.
+La propuesta reduce el flujo publico diario a `plan-init`, `plan-config`, `release`, `plan-story`, `plan-task`, `plan-check`, `plan-report` y `plan-decision`, con `plan-update-version` como comando de mantenimiento del plugin/template pack. Los comandos actuales son material de referencia para rescatar capacidades, no API que deba conservarse.

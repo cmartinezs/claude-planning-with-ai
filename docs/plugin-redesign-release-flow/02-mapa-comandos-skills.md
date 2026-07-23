@@ -2,26 +2,40 @@
 
 ## Superficie publica objetivo
 
-Propuesta inicial de comandos publicos:
+Comandos publicos base:
 
-| Comando | Responsabilidad unica | Script principal |
-|---------|------------------------|------------------|
-| `/plan-init` | Crear la configuracion minima `.planning/` del workspace actual y registrar la referencia al template pack del plugin. | `planning-init.mjs` |
-| `/release` | Configurar contexto del proyecto; crear, planificar, modificar, consultar, liberar y finalizar releases. | `release.mjs` |
-| `/plan-story` | Orquestar una story dentro de una release. | `planning-story.mjs` |
-| `/plan-task` | Ejecutar una task atomica. | `planning-task.mjs` |
-| `/plan-check` | Validar health, estructura, guias por scope, evidencia, links, docs y readiness. | `planning-check.mjs` |
-| `/plan-report` | Generar reportes, standup, history, export y release notes. | `planning-report.mjs`, `doc-generate.mjs` |
-| `/plan-decision` | Registrar decisiones transversales reales. | Script nuevo o etapa en `planning-mutate.mjs` |
-| `/plan-update-version` | Actualizar plantillas v4 dentro del mismo major o ejecutar migraciones futuras. No carga compatibilidad v3. | `update-version.mjs` |
+| Comando | Responsabilidad publica | Use cases internos | Script/launcher |
+|---------|--------------------------|--------------------|-----------------|
+| `/plan-init` | Bootstrap completo del workspace actual: estructura, deteccion inicial, config base y plugin lock. | `workspace.bootstrap`, `config.detect`, `lock.create` | `claude-planning workspace init` |
+| `/plan-config` | Administrar scopes, fuentes, politicas, Git, comandos permitidos, autonomia, guias y generadores custom. | `scope.configure`, `policy.configure`, `guide.refresh`, `command.configure` | `claude-planning config <stage>` |
+| `/release` | Router publico del lifecycle de release: crear, planificar, consultar readiness, liberar, registrar deployment y finalizar. | `release.create`, `release.plan`, `release.query`, `release.transition`, `deployment.record`, `release.finalize` | `claude-planning release <stage>` |
+| `/plan-story` | Crear/enriquecer stories o capabilities, validar criterios funcionales, crear work packages y atomizarlos por scope. | `story.create`, `story.enrich`, `work-package.create`, `work-package.atomize` | `claude-planning story <stage>` |
+| `/plan-task` | Inspeccionar, preparar, ejecutar, validar, corregir y cerrar tasks atomicas. | `task.inspect`, `task.start`, `task.verify`, `task.correction`, `task.closeout` | `claude-planning task <stage>` |
+| `/plan-check` | Validar invariantes, schemas, links, dependencias, guias, gates, readiness y evidencia. | `check.health`, `check.schema`, `check.guides`, `check.gates`, `check.readiness` | `claude-planning check <stage>` |
+| `/plan-report` | Generar summary, status, standup, history, release notes, traceability, docs y exports. | `report.status`, `report.standup`, `report.history`, `report.release-notes`, `report.export` | `claude-planning report <stage>` |
+| `/plan-decision` | Registrar, actualizar, aceptar o rechazar decisiones y vincularlas con releases, stories, scopes o gates. | `decision.propose`, `decision.accept`, `decision.reject`, `decision.link` | `claude-planning decision <stage>` |
 
-Comandos opcionales o avanzados:
+Ocho comandos bien definidos son preferibles a un comando unico sobrecargado. `/release` puede ser fachada publica, pero su `SKILL.md` no debe contener todo el lifecycle.
+
+## Comando de mantenimiento
+
+`/plan-update-version` se conserva como comando de mantenimiento del plugin/template pack. No forma parte del flujo diario release/story/task, pero sigue siendo publico porque permite actualizar workspaces v4 a revisiones compatibles futuras.
+
+| Comando | Responsabilidad | Script/launcher |
+|---------|-----------------|-----------------|
+| `/plan-update-version` | Aplicar migraciones v4+ compatibles, actualizar lock/template pack y reportar cambios requeridos. | `claude-planning update-version <stage>` |
+
+## Comandos avanzados
+
+Solo implementar cuando exista una necesidad real y evidencia de uso:
 
 | Comando | Uso |
 |---------|-----|
-| `/plan-run` | Orquestador end-to-end encima de release/story/task/check. |
-| `/plan-recover` | Retry, rollback, clone, merge y skip con etapas explicitas. |
+| `/plan-run` | Orquestador end-to-end encima de release/story/task/check. No pertenece al primer vertical slice. |
+| `/plan-recover` | Retry, rollback, clone, merge, compensaciones y fallas de operacion con stages explicitos. |
 | `/plan-backlog` | Importar o mantener backlog externo cuando no hay release directa. |
+
+No se implementan por anticipacion para evitar reconstruir la explosion de comandos v3.
 
 ## Comandos removidos y reemplazos conceptuales
 
@@ -29,80 +43,97 @@ Estos comandos no se preservan como aliases en v4. La tabla sirve para decidir q
 
 | Comandos v3 | Destino v4 | Accion v4 | Razon |
 |-------------|------------|-----------|-------|
-| `release-init`, `release-new`, `release-add`, `release-remove`, `release-status` | `/release <init|new|add|remove|status|mark|finalize>` | Borrar skills v3. | Son etapas de la misma entidad. |
-| `plan-status`, `plan-health`, `plan-validate`, `plan-task-validate`, `plan-audit-docs`, `plan-doctor` | `/plan-check <status|health|validate|task|docs|doctor>` | Borrar skills v3 o reimplementar solo `/plan-check`. | Todos son chequeos o vistas de consistencia. |
-| `plan-report`, `plan-standup`, `plan-history`, `plan-export`, `doc-generate`, `doc-story`, `doc-task` | `/plan-report <summary|standup|history|export|docs>` | Borrar wrappers separados. | Mismo modelo, distinta salida. |
-| `us-new`, `us-enrich`, `us-split`, `us-status`, `epic-enrich` | `/plan-backlog <new|enrich|split|status|import>` | Borrar por defecto; crear `/plan-backlog` solo si se conserva backlog externo. | Backlog externo no debe competir con release activa. |
-| `plan-enrich-epic`, `plan-enrich-story`, `plan-split-story`, `plan-merge`, `plan-story-skip` | `/release story <add|enrich|split|link|move|skip>` o `/plan-recover` | Borrar skills v3. | Son mutaciones de stories dentro de release; `link` registra relaciones multi-scope en el padre. |
-| `plan-from-epic`, `plan-from-release`, `plan-template`, `plan-new`, `plan-expand` | `/release import|plan` | Borrar flujo INITIAL/EXPANSION como API publica. | El flujo INITIAL/EXPANSION pasa a ser una etapa de planificacion de release. |
-| `plan-agent-plan`, `plan-agent-execute`, `plan-agent-validate`, `plan-run` | `/plan-run` | Borrar agentes por fase; mantener solo orquestador si aporta. | Un solo orquestador de alto nivel. |
-| `plan-retry`, `plan-rollback`, `plan-clone` | `/plan-recover <retry|rollback|clone>` | Borrar skills sueltas. | Recuperacion debe ser avanzada, no flujo principal. |
-| `plan-smoke-config`, `plan-git-config` | `/release init` o `/release config <git|smoke|scope|docs|guides>` | Borrar config commands sueltos. | Configuracion pertenece al contexto de release y proyecto. |
-| `plan-test-suite` | `/plan-check tests --generate` y `/release scope guide --tests` | Borrar como comando principal. | Es generacion/validacion de gates desde la guia del scope, no una intencion principal separada. |
-| `plan-edge-case`, `plan-retrospective` | `/release note unexpected` y `/release retrospective` o `/plan-report retro` | Borrar como comandos de planning. | Retrospectiva debe cerrar release, no solo planning. |
+| `release-init`, `release-new`, `release-add`, `release-remove`, `release-status` | `/plan-init`, `/plan-config`, `/release <new|status|mark|deployment|finalize>` | Borrar skills v3. | Init/config son de workspace; release queda como router de lifecycle, no CRUD aislado. |
+| `plan-status`, `plan-standup`, `plan-history`, `plan-export` | `/plan-report <status|standup|history|export>` | Borrar wrappers separados. | Son vistas/proyecciones, no checks. |
+| `plan-health`, `plan-validate`, `plan-task-validate`, `plan-audit-docs`, `plan-doctor` | `/plan-check <health|schema|task|docs|doctor|readiness>` | Borrar skills v3 o reimplementar solo `/plan-check`. | Todos validan invariantes, schemas, gates o evidencia. |
+| `doc-generate`, `doc-story`, `doc-task` | `/plan-report docs --level <release|story|work-package|task>` | Borrar wrappers separados. | Markdown es proyeccion generada desde estado canonico. |
+| `us-new`, `us-enrich`, `us-split`, `us-status`, `epic-enrich` | `/plan-backlog <new|enrich|split|status|import>` si se justifica | Borrar por defecto. | Backlog externo no debe competir con release activa. |
+| `plan-enrich-epic`, `plan-enrich-story`, `plan-split-story` | `/plan-story <enrich|split|package add|atomize>` | Borrar skills v3. | La story/capability es unidad funcional; los slices tecnicos son work packages. |
+| `plan-merge`, `plan-story-skip` | `/plan-story <move|resolve>` o `/plan-recover` | Borrar skills v3. | Skip requiere resolucion/waiver, no estado principal. |
+| `plan-from-epic`, `plan-from-release`, `plan-template`, `plan-new`, `plan-expand` | `/release plan` o `/plan-story import` | Borrar flujo INITIAL/EXPANSION como API publica. | El flujo INITIAL/EXPANSION desaparece del contrato v4. |
+| `plan-agent-plan`, `plan-agent-execute`, `plan-agent-validate`, `plan-run` | `/plan-run` solo si se justifica | Borrar agentes por fase. | Un orquestador avanzado no debe formar parte del primer corte. |
+| `plan-retry`, `plan-rollback`, `plan-clone` | `/plan-recover <retry|rollback|clone>` si se justifica | Borrar skills sueltas. | Recuperacion debe operar sobre eventos y ChangeSets. |
+| `plan-smoke-config`, `plan-git-config` | `/plan-config <commands|git|policies>` | Borrar config commands sueltos. | Configuracion pertenece al Project Context. |
+| `plan-test-suite` | `/plan-check tests --generate` y `/plan-config guide --tests` | Borrar como comando principal. | Es generacion/validacion de gates desde la guia del scope. |
+| `plan-edge-case`, `plan-retrospective` | `/release note unexpected`, `/release finalize` o `/plan-report retro` | Borrar como comandos de planning. | Retrospectiva cierra release y se sintetiza desde eventos/hechos. |
 
 ## Corte limpio v4
 
-La version v4 debe instalar una superficie nueva, sin wrappers de compatibilidad. Los comandos v3 pueden quedar documentados en una tabla de ruptura durante el release, pero no deben existir como skills activas si duplican una responsabilidad v4.
+La version v4 instala una superficie nueva, sin wrappers de compatibilidad.
 
 Reglas:
 
 - no crear aliases legacy;
-- no mantener `.releases/` como storage paralelo;
-- no aceptar `NNN-slug` como identificador raiz si el nuevo contrato exige `release-NNN-slug`;
-- no duplicar skills por etapa cuando una etapa puede ser argumento de un comando gestor;
-- si una capacidad v3 no entra en release/scope/story/task/check/report, se elimina o queda como comando avanzado solo con una razon fuerte.
+- no mantener `.releases/`, `.planning/active/` ni `.planning/finished/` como storage;
+- no aceptar `NNN-slug` como identificador raiz si el contrato exige `R0001`;
+- no duplicar skills por etapa cuando una etapa puede ser stage interno;
+- no usar IDs que mezclen slug, scope, titulo u orden de story;
+- si una capacidad v3 no entra en project context, release, story, work package, task, check, report o decision, se elimina o queda como comando avanzado solo con una razon fuerte.
 
 ## Contrato de skills
 
-Cada `SKILL.md` deberia tener como maximo:
+Cada `SKILL.md` debe tener como maximo:
 
 - proposito del comando;
-- argumentos;
+- argumentos publicos;
 - precondiciones;
-- llamada al script determinista;
+- llamada al launcher determinista;
 - punto exacto donde entra juicio del agente;
-- criterios de stop y aprobacion humana.
+- criterios de stop;
+- reglas de aprobacion humana.
 
-La skill no deberia contener:
+La skill no debe contener:
 
 - parseo manual de Markdown;
-- reglas de asignacion de IDs;
-- tablas largas duplicadas;
-- pasos git detallados repetidos;
-- logica de transicion de estados;
-- instrucciones extensas que ya existan en el template pack o scripts del plugin.
+- asignacion de IDs;
+- logica de estados;
+- pasos Git repetidos;
+- tablas duplicadas;
+- reglas que ya viven en schemas, runtime, templates o docs canonicos.
 
-## Contrato de scripts
+## Contrato del runtime
 
-Los scripts deben tener interfaz stage-first:
+El contrato interno usa stage-first, pero mediante launcher estable:
 
 ```text
-node .planning/scripts/release.mjs <stage> [args] [--write|--execute] [--format markdown|json]
-node .planning/scripts/planning-story.mjs <stage> <release-id> <scope-id> [story-id] [--write|--format markdown|json]
-node .planning/scripts/planning-task.mjs <stage> <release-id> <scope-id> <story-id> <task-id> [--write|--execute|--format markdown|json]
-node .planning/scripts/planning-check.mjs <stage> [args] [--format markdown|json]
-node .planning/scripts/planning-report.mjs <stage> [args] [--output markdown|json]
+claude-planning workspace init [args] [--format json|markdown]
+claude-planning config <stage> [args] [--format json|markdown]
+claude-planning release <stage> [args] [--format json|markdown]
+claude-planning story <stage> [args] [--format json|markdown]
+claude-planning task <stage> [args] [--format json|markdown]
+claude-planning check <stage> [args] [--format json|markdown]
+claude-planning report <stage> [args] [--format json|markdown]
+claude-planning decision <stage> [args] [--format json|markdown]
 ```
 
-Mutaciones deben ser dry-run por defecto excepto cuando el usuario entrega `--write` o `--execute`.
+Mutaciones no aplican directamente. Primero producen un `ChangeSet`:
+
+```text
+inspect -> propose -> validate -> approve -> apply -> verify -> record
+```
+
+`apply` requiere `baseRevision` vigente, `operationId`, `idempotencyKey` y aprobacion cuando cambie alcance, se omita un gate, se acepte un riesgo, se ejecute un comando sensible, se cancele trabajo comprometido, se libere o se despliegue.
 
 ## Librerias internas recomendadas
 
-Para reducir duplicacion entre scripts:
-
 ```text
-planning-template/scripts/lib/
-  markdown.mjs       # secciones, tablas, status lines, links
-  workspace.mjs      # raiz .planning, paths, current cwd boundary, plugin template pack
-  project-config.mjs # git, scopes, docs, story sources, guides
-  release-store.mjs  # CRUD y estado de release
-  story-store.mjs    # scoped story rows/files/tasks
-  story-links.mjs    # story groups, story parts, cross-scope orchestration refs
-  task-store.mjs     # task metadata, dependencias, evidencia
-  scope-guides.mjs   # task/test guide extraction, index, signatures, generators
-  git-flow.mjs       # ramas, comandos planificados, ref checks
-  render.mjs         # markdown/json rendering helpers
+runtime/lib/
+  schema.mjs          # carga y valida schemas
+  identity.mjs        # IDs estables, counters, idempotency keys
+  revision.mjs        # workspace revision, optimistic locking, locks
+  paths.mjs           # cwd boundary, path normalization, symlink checks
+  command-policy.mjs  # comandos estructurados, allowlist, approvals
+  event-journal.mjs   # append-only events.ndjson
+  change-set.mjs      # inspect/propose/validate/apply/verify
+  atomic-write.mjs    # temp files, rename, rollback tecnico
+  project-store.mjs   # config, plugin lock, policies
+  scope-store.mjs     # scope catalog y guide metadata
+  release-store.mjs   # release aggregate y lifecycle
+  story-store.mjs     # story/capability aggregate
+  work-package-store.mjs # ownership tecnico, gates y tasks
+  task-store.mjs      # task metadata, dependencias, evidencia
+  guide-store.mjs     # guide status, fingerprints, provenance
+  render.mjs          # proyecciones Markdown/json
 ```
 
-Esto permite que las skills sean SOLID en serio: una skill coordina una intencion; los scripts comparten librerias con una responsabilidad tecnica unica.
+Esto mantiene SOLID en serio: una skill coordina una intencion; el runtime aplica contratos mecanicos con librerias de responsabilidad tecnica unica.

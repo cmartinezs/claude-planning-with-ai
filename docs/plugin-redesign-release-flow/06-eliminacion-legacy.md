@@ -14,6 +14,7 @@ Comandos publicos base:
 
 ```text
 /plan-init
+/plan-config
 /release
 /plan-story
 /plan-task
@@ -33,6 +34,8 @@ Comandos avanzados solo si se justifican:
 
 Todo lo demas debe borrarse o quedar fuera del plugin v4.
 
+`/release` queda como router publico del lifecycle de release. No existe `/release init`; el bootstrap completo es `/plan-init` y la configuracion posterior vive en `/plan-config`.
+
 ## Alcance completo
 
 La eliminacion legacy cubre todo el plugin:
@@ -42,9 +45,9 @@ La eliminacion legacy cubre todo el plugin:
 .page/                 # landing site, comandos, tutoriales, textos y build
 .github/workflows/     # deploy/publicacion del site si referencia outputs o comandos
 docs/                  # user/developer/reference/commands docs
-planning-template/     # template pack distribuido con el plugin
-planning-template/scripts/
-planning-template/update-version/
+runtime/               # launcher, use cases, librerias, schemas y fixtures v4
+template-pack/         # templates, docs renderizables y update-version v4+
+planning-template/     # estructura legacy v3 que se elimina o reemplaza
 scripts/               # tooling de repo, verify, migraciones internas
 skills/                # comandos expuestos al usuario
 README.md
@@ -136,13 +139,31 @@ El storage v4 es:
 ```text
 .planning/
   config.yml
-  project-context.md
+  plugin.lock.yml
+  events.ndjson
+  scopes/
+  decisions/
   releases/
 ```
 
 Los ejemplos, templates y scripts v4 no deben crear ni leer `active/`, `finished/` o `.releases/`.
 
-`/plan-init` no debe copiar el template pack completo al repo de trabajo. El repo de trabajo guarda `.planning/config.yml`, `.planning/project-context.md` y artefactos generados; los templates canonicos se leen desde la instalacion del plugin.
+`/plan-init` no debe copiar el template pack completo al repo de trabajo. El repo de trabajo guarda `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events.ndjson`, scope catalog, releases y artefactos generados; los templates canonicos se leen desde la instalacion del plugin.
+
+El estado operativo v4 debe vivir en YAML/JSON canonico:
+
+```text
+config.yml
+plugin.lock.yml
+scope.yml
+release.yml
+story.yml
+work-package.yml
+task.yml
+events.ndjson
+```
+
+Markdown (`README.md`, `TRACEABILITY.md`, `RELEASE-NOTES.md`, `RETROSPECTIVE.md`, reportes y exports) es proyeccion humana generada.
 
 ## Template pack y docs a eliminar o rehacer
 
@@ -154,20 +175,30 @@ planning-template/finished/
 planning-template/_template/00-initial.md
 planning-template/_template/01-expansion.md
 planning-template/_template/02-deepening/
+planning-template/scripts/
 ```
 
 Rehacer como v4:
 
 ```text
-planning-template/template-pack.yml
-planning-template/templates/release.md
-planning-template/templates/scope.md
-planning-template/templates/task-guide.md
-planning-template/templates/test-guide.md
-planning-template/templates/story.md
-planning-template/templates/task.md
-planning-template/templates/TRACEABILITY.md
-planning-template/templates/RETROSPECTIVE-RAW.md
+runtime/bin/claude-planning.mjs
+runtime/commands/
+runtime/lib/
+runtime/schemas/
+runtime/fixtures/
+template-pack/template-pack.yml
+template-pack/templates/release.md
+template-pack/templates/scope.md
+template-pack/templates/task-guide.md
+template-pack/templates/test-guide.md
+template-pack/templates/story.md
+template-pack/templates/work-package.md
+template-pack/templates/task.md
+template-pack/templates/TRACEABILITY.md
+template-pack/templates/RELEASE-NOTES.md
+template-pack/templates/RETROSPECTIVE-RAW.md
+template-pack/docs/
+template-pack/update-version/
 ```
 
 Reglas del template pack:
@@ -176,7 +207,15 @@ Reglas del template pack:
 - se versiona junto con el plugin;
 - se usa para renderizar artefactos hacia `.planning/releases/`;
 - no se copia completo al repo de trabajo;
-- puede ser referenciado por version/fingerprint en `.planning/config.yml`.
+- se referencia por version/fingerprint en `.planning/plugin.lock.yml`;
+- declara compatibilidad con las versiones de schema soportadas por `runtime/schemas/`.
+
+Reglas del runtime:
+
+- vive fuera del template pack;
+- contiene el launcher, comandos de dominio, librerias, schemas y fixtures;
+- no se copia al workspace usuario;
+- expone solo el launcher estable a las skills.
 
 Actualizar referencias en:
 
@@ -192,13 +231,13 @@ docs/user-guide.md
 docs/developer-guide.md
 docs/training-mode-plan.md
 docs/plugin-review/
-planning-template/TUTORIAL/
-planning-template/WORKFLOWS/
-planning-template/GLOSSARY.md
-planning-template/GUIDE.md
-planning-template/README.md
-planning-template/config.yml
-planning-template/update-version/
+template-pack/docs/TUTORIAL/
+template-pack/docs/WORKFLOWS/
+template-pack/docs/GLOSSARY.md
+template-pack/docs/GUIDE.md
+template-pack/docs/README.md
+template-pack/templates/config.yml
+template-pack/update-version/
 ```
 
 ## Configuracion y metadata
@@ -220,8 +259,9 @@ Reglas:
 - `marketplace.json` no debe listar comandos removidos ni texto antiguo.
 - todo version marker debe apuntar a v4.0.0 cuando se publique el major.
 - `CHANGELOG.md` debe declarar ruptura, comandos removidos, storage nuevo y ausencia de aliases.
-- `planning-template/update-version/` debe explicar que v4 es corte limpio. Si existe herramienta auxiliar de export desde v3, debe documentarse como opcional.
-- `config.yml` debe modelar `project`, `plugin.template_pack_ref`, `git`, `scopes`, `guide_outputs`, `custom_generators`, validacion y autonomia; no debe conservar `terminology.planning_item` ni estados INITIAL/EXPANSION/DEEPENING.
+- `template-pack/update-version/` debe explicar que v4 es corte limpio. Si existe herramienta auxiliar de export desde v3, debe documentarse como opcional.
+- `config.yml` debe modelar `project`, `policies`, `git`, `commands`, `scopes`, `guide_outputs`, `custom_generators`, validacion y autonomia; no debe conservar `terminology.planning_item` ni estados INITIAL/EXPANSION/DEEPENING.
+- `plugin.lock.yml` debe fijar `plugin.version`, `schema_version`, `template_pack.id`, `template_pack.version` y `template_pack.fingerprint`.
 
 ## Site y landing page
 
@@ -248,9 +288,9 @@ No editar como fuente:
 
 Cambios esperados:
 
-- home debe explicar el flujo v4: init -> release init -> release -> scopes -> story groups -> tasks -> checks -> finalize.
+- home debe explicar el flujo v4: plan-init -> plan-config -> release -> stories/capabilities -> scope work packages -> tasks -> ChangeSets -> checks -> release/deployment -> finalize.
 - pagina de comandos debe mostrar solo comandos v4.
-- tutoriales deben usar `.planning/releases/`, scopes, `story-NN-a`, task guides y test guides.
+- tutoriales deben usar `.planning/releases/`, `.planning/scopes/`, IDs `R0001`/`S0001`/`WP0001`/`T0001`, task guides y test guides.
 - training/demo no debe ensenar `plan-new`, `plan-expand`, `active/finished`, `.releases/` ni planificaciones adicionales por scope.
 - localizaciones `en` y `es` deben actualizarse juntas.
 - `.page/scripts/verify.js` debe fallar si el site renderiza comandos legacy.
@@ -272,12 +312,12 @@ docs/commands.yml
 docs/reference.md
 docs/user-guide.md
 docs/developer-guide.md
-planning-template/TUTORIAL/reference.md
-planning-template/TUTORIAL/*.md
-planning-template/WORKFLOWS/**/*.md
-planning-template/GLOSSARY.md
-planning-template/GUIDE.md
-planning-template/README.md
+template-pack/docs/TUTORIAL/reference.md
+template-pack/docs/TUTORIAL/*.md
+template-pack/docs/WORKFLOWS/**/*.md
+template-pack/docs/GLOSSARY.md
+template-pack/docs/GUIDE.md
+template-pack/docs/README.md
 ```
 
 Reglas:
@@ -285,9 +325,9 @@ Reglas:
 - `docs/commands.yml` es inventario canonico de comandos v4.
 - `docs/reference.md` debe generarse o revisarse desde `docs/commands.yml`.
 - README no debe tener tabla de "similar commands" para comandos legacy.
-- tutoriales deben iniciar desde `/release init`, no desde `/plan-new` o `/plan-expand`.
-- developer guide debe explicar scripts/librerias v4 y el contrato stage-first.
-- glossary debe definir release, scope, story group, story part, task guide, test guide y finalize.
+- tutoriales deben iniciar desde `/plan-init`, no desde `/release init`, `/plan-new` o `/plan-expand`.
+- developer guide debe explicar launcher, runtime/librerias v4, schemas, ChangeSets, event journal y el contrato stage-first interno.
+- glossary debe definir release, story/capability, scope, scope work package, task guide, test guide, ChangeSet, plugin lock, waiver, blocker, deployment event y finalization.
 
 ## Tooling y CI del plugin
 
@@ -314,29 +354,31 @@ Cada script debe caer en una de tres categorias:
 | Categoria | Accion |
 |-----------|--------|
 | Reescribir | El script implementa una capacidad v4 con modelo release/scope/story/task. |
-| Extraer libreria | Se rescata logica pura a `planning-template/scripts/lib/`. |
+| Extraer libreria | Se rescata logica pura a `runtime/lib/`. |
 | Borrar | El script solo existe para modelos v3. |
 
 Revision inicial:
 
 ```text
-release.mjs              -> reescribir como gestor v4
-planning-init.mjs        -> reescribir para estructura v4 base
-planning-story.mjs       -> reescribir para scopes
-planning-task.mjs        -> adaptar a release/scope/story/task
+launcher                 -> crear como entrada estable claude-planning <domain> <stage>
+release.mjs              -> reescribir como use cases v4 de release aggregate
+planning-init.mjs        -> reescribir para estructura v4 base y plugin lock
+planning-config.mjs      -> crear para scopes, policies, commands, guides y generators
+planning-story.mjs       -> reescribir para stories/capabilities y work packages
+planning-task.mjs        -> adaptar a release/story/work-package/task
 planning-check.mjs       -> adaptar y ampliar con guide checks
-planning-report.mjs      -> adaptar a release/scope
+planning-report.mjs      -> adaptar a release/story/work-package/task
 doc-generate.mjs         -> plegar bajo plan-report o borrar wrapper directo
-planning-atomize.mjs     -> integrar a release story atomize
-planning-mutate.mjs      -> reemplazar por stores/librerias v4
-planning-archive.mjs     -> borrar o reimplementar como release finalize
+planning-atomize.mjs     -> integrar a plan-story atomize
+planning-mutate.mjs      -> reemplazar por ChangeSet/stores/librerias v4
+planning-archive.mjs     -> borrar o reimplementar como release finalization
 planning-done.mjs        -> borrar si queda cubierto por release/story/task stages
 planning-clone.mjs       -> borrar salvo que plan-recover lo justifique
-planning-merge.mjs       -> borrar; usar release story move/link si aplica
+planning-merge.mjs       -> borrar; usar story/work-package move/link si aplica
 planning-retry.mjs       -> mover a plan-recover si se conserva
 planning-rollback.mjs    -> mover a plan-recover si se conserva
-planning-story-skip.mjs  -> mover a release story skip
-planning-from-release.mjs -> integrar a release import/plan
+planning-story-skip.mjs  -> mover a story/task resolution con waiver si se conserva
+planning-from-release.mjs -> integrar a release plan o plan-story import
 update-version.mjs       -> conservar para futuras migraciones v4+
 ```
 
@@ -345,6 +387,7 @@ update-version.mjs       -> conservar para futuras migraciones v4+
 `scripts/verify-plugin.sh` debe fallar si encuentra:
 
 - `skills/release-*`;
+- ausencia de `skills/plan-config/` cuando `docs/commands.yml` lo declare;
 - `skills/us-*`;
 - `skills/doc-*`;
 - comandos removidos en `docs/commands.yml`;
@@ -352,21 +395,31 @@ update-version.mjs       -> conservar para futuras migraciones v4+
 - referencias a `INITIAL`, `EXPANSION` o `DEEPENING` como estados publicos;
 - `Linked Child Plannings` o cualquier instruccion de planificaciones adicionales por scope;
 - ejemplos que usen `NNN-slug` como raiz de trabajo;
-- templates que creen `00-initial.md`, `01-expansion.md` o `02-deepening/`.
+- ejemplos que usen `story-01-a`/`story-01-b` o `story_group`/`story_part` como modelo v4;
+- referencias activas a `/release init`;
+- comandos internos que expongan rutas `.planning/scripts/*.mjs` como API publica en vez del launcher;
+- templates que creen `00-initial.md`, `01-expansion.md` o `02-deepening/`;
 - comandos legacy en `.page/locales`, `.page/components`, `.page/pages` o `.page/out`;
 - referencias legacy en `.claude-plugin/marketplace.json` o `.claude-plugin/plugin.json`;
 - version markers desalineados entre `.claude-plugin/plugin.json`, `.page/package*.json`, README badge y `CHANGELOG.md`;
 - `docs/commands.yml` desalineado con carpetas `skills/` v4;
-- `planning-template/config.yml` sin `scopes` o con campos v3 como contrato principal.
+- `template-pack/templates/config.yml` sin `scopes` o con campos v3 como contrato principal;
+- presencia de `planning-template/` como estructura activa de v4;
+- ausencia de schemas para entidades canonicas y ChangeSets;
+- ausencia de `plugin.lock.yml` en fixtures v4;
+- comandos guardados como strings de shell en fixtures/templates v4.
 
 Checks sugeridos:
 
 ```text
-rg -n "release-init|release-new|release-add|release-remove|release-status" skills docs planning-template
-rg -n "us-new|us-enrich|us-split|us-status|epic-enrich" skills docs planning-template
-rg -n "\.planning/active|\.planning/finished|\.releases" docs planning-template skills .page .claude-plugin
-rg -n "INITIAL|EXPANSION|DEEPENING|Linked Child Plannings|02-deepening" docs planning-template skills .page .claude-plugin
-rg -n "plan-new|plan-expand|plan-from-epic|plan-template|doc-task|plan-test-suite" README.md docs planning-template skills .page .claude-plugin
+test ! -e planning-template
+rg -n "release-init|release-new|release-add|release-remove|release-status" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
+rg -n "us-new|us-enrich|us-split|us-status|epic-enrich" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
+rg -n "\.planning/active|\.planning/finished|\.releases" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
+rg -n "INITIAL|EXPANSION|DEEPENING|Linked Child Plannings|02-deepening" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
+rg -n "plan-new|plan-expand|plan-from-epic|plan-template|doc-task|plan-test-suite" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
+rg -n "release init|story-01-a|story-01-b|story_group|story_part" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
+rg -n "\.planning/scripts/.*\.mjs" README.md docs runtime template-pack skills .page .claude-plugin --glob '!docs/plugin-redesign-release-flow/**'
 ```
 
 ## Verificacion de cierre
@@ -385,7 +438,9 @@ Revision manual:
 - abrir README y confirmar que solo describe v4;
 - abrir `docs/reference.md` y confirmar que solo lista comandos v4;
 - abrir landing site local o build output y confirmar que no muestra comandos v3;
-- revisar `planning-template/` como template pack instalado, no como carpeta copiada por `/plan-init`;
+- revisar `template-pack/` como template pack instalado, no como carpeta copiada por `/plan-init`;
+- revisar fixtures v4 y confirmar que Markdown se regenera desde YAML/JSON canonico;
+- revisar que ChangeSets fallen ante `baseRevision` obsoleta;
 - revisar `CHANGELOG.md` y version markers juntos.
 
 ## Publicacion
@@ -394,6 +449,7 @@ El release v4 debe comunicar:
 
 - no hay compatibilidad de comandos v3;
 - no hay migracion automatica obligatoria de workspaces v3;
-- el nuevo storage es `.planning/releases/`;
+- el nuevo storage canonico es `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events.ndjson`, `.planning/scopes/` y `.planning/releases/`;
 - los comandos v3 fueron removidos, no deprecados;
+- las stories/capabilities reemplazan story groups y los work packages reemplazan historias hermanas por scope;
 - si se entrega una herramienta de export/migracion v3, es auxiliar y no condiciona el contrato v4.
