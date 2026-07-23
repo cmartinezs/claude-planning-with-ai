@@ -414,9 +414,10 @@ For non-software projects, use `/plan-init --blank` if automatic repository area
 
 - **One planning per initiative.** Avoid creating plannings for trivial one-off tasks.
 - **Enrich before generating.** `/us-enrich` improves source stories before `/plan-from-epic`.
+- **Bridge releases deterministically.** `/plan-from-release inspect <release-file>` extracts release gates and ownership before creating parent coordination artifacts.
 - **Atomize when tasks hide design decisions.** `/plan-atomize` forces approach, steps, verification, and done criteria to be explicit.
 - **Use `/plan-status` as the dashboard.** Check it at the start of each session.
 - **Run `/plan-validate` before `/plan-archive`.** It is read-only and can be used often.
 - **Run `/plan-retrospective` before `/plan-archive`.** It turns raw edge-case notes into a professional retrospective.
-- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.10.10` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
+- **Use `/plan-update-version <from> <to>` for old workspaces.** For example, `/plan-update-version 2.1.0 3.11.0` updates a `2.x` workspace to the current baseline using `.planning/update-version/2-3.md`.
 - **Finished plannings are read-only.** Continue work by creating a new planning that references the archived one.

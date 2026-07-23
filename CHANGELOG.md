@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [3.11.0] — 2026-07-22
+
+### Added
+
+- Added `/plan-from-release` backed by `.planning/scripts/planning-from-release.mjs` for deterministic release source inspection, parent coordination bridge generation, and `.releases/` seeding.
+- Added release-to-planning bridge migration guidance to the `2.x -> 3.x` update baseline.
+
 ## [3.10.10] — 2026-07-17
 
 ### Added
@@ -399,7 +406,8 @@ All notable changes to this project will be documented in this file.
 - `plan-status` skill for at-a-glance planning state
 - GitHub Pages deploy workflow
 
-[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.10...HEAD
+[Unreleased]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.11.0...HEAD
+[3.11.0]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.10...v3.11.0
 [3.10.10]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.9...v3.10.10
 [3.10.9]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.8...v3.10.9
 [3.10.8]: https://github.com/cmartinezs/claude-planning-with-ai/compare/v3.10.7...v3.10.8

@@ -93,6 +93,10 @@ commands:
     category: bridge
     source: skills/plan-from-epic/SKILL.md
     summary: Generate an active planning from source stories.
+  - name: plan-from-release
+    category: bridge
+    source: skills/plan-from-release/SKILL.md
+    summary: Inspect a release source document and generate deterministic parent coordination artifacts.
   - name: plan-git-config
     category: setup
     source: skills/plan-git-config/SKILL.md

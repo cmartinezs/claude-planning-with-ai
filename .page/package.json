@@ -1,6 +1,6 @@
 {
   "name": "claude-planning-with-ai",
-  "version": "3.10.10",
+  "version": "3.11.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

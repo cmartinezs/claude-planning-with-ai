@@ -49,6 +49,7 @@ require_file "planning-template/scripts/doc-generate.mjs"
 require_file "planning-template/scripts/generate-test-suite.sh"
 require_file "planning-template/scripts/planning-mutate.mjs"
 require_file "planning-template/scripts/planning-init.mjs"
+require_file "planning-template/scripts/planning-from-release.mjs"
 require_file "planning-template/scripts/planning-check.mjs"
 require_file "planning-template/scripts/planning-report.mjs"
 require_file "planning-template/scripts/planning-atomize.mjs"
@@ -186,6 +187,12 @@ if command -v node >/dev/null 2>&1; then
     pass "planning-template/scripts/planning-init.mjs syntax is valid"
   else
     fail "planning-template/scripts/planning-init.mjs has invalid syntax"
+  fi
+
+  if node --check "$ROOT/planning-template/scripts/planning-from-release.mjs" >/dev/null; then
+    pass "planning-template/scripts/planning-from-release.mjs syntax is valid"
+  else
+    fail "planning-template/scripts/planning-from-release.mjs has invalid syntax"
   fi
 
   for mutate_impl in \

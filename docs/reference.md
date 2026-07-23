@@ -31,6 +31,7 @@ Canonical inventory for synchronization: [`docs/commands.yml`](commands.yml).
 | Command | What it does |
 |---------|-------------|
 | `/plan-from-epic <NNN> <path/to/container> [--filter field=value]` | Generates a full active planning from a story container; one source story becomes one planning story |
+| `/plan-from-release <inspect\|bridge\|seed-release> <release-file> [...]` | Inspects a release source document, generates a parent coordination bridge, or seeds `.releases/` from source facts |
 
 ### Planning Lifecycle
 
@@ -129,6 +130,8 @@ Some commands intentionally overlap because they operate at different layers.
 | You want to inspect current planning state | `/plan-status` | Read-only status overview before deciding the next command |
 | A decision affects multiple stories or areas | `/plan-decision` | Creates a PDR and updates traceability instead of leaving the decision in chat |
 | The plugin checkout itself may be inconsistent | `/plan-doctor` | Checks command inventory, skill metadata, template integrity, and legacy drift |
+
+For release-to-planning work, start with `/plan-from-release inspect <release-file>`. Use `bridge` only when the source release is ready to become parent coordination work, and use `seed-release` only after the version, target period, and estimated date are known. Child implementation remains in the child workspace that owns the files.
 
 `/plan-decision` is the only command that writes PDR files. Other workflows can invoke it automatically after resolving conflicts, cascading cross-cutting changes, updating traceability, or closing milestones. If the decision is not accepted or lacks evidence, those workflows should suggest `/plan-decision` instead of writing a PDR.
 

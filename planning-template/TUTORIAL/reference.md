@@ -34,6 +34,15 @@ Todos los comandos disponibles con su sintaxis exacta.
 /plan-from-epic NNN path/to/container/
 /plan-from-epic NNN path/to/container/ --filter priority=P0
 /plan-from-epic NNN path/to/requirements.md --filter status=approved
+
+# Inspeccionar un documento de release antes de planificar
+/plan-from-release inspect docs/releases/release-01.md
+
+# Generar puente padre de coordinacion desde una release
+/plan-from-release bridge docs/releases/release-01.md --planning-id 008-release-01 --write
+
+# Sembrar .releases/ desde una release ya versionada
+/plan-from-release seed-release docs/releases/release-01.md --version v1.0.0 --target 2026-Q3-M1-W2 --date 2026-08-07 --write
 ```
 
 ---
@@ -216,7 +225,8 @@ Nada se ejecuta sin estar dentro de un planning activo.
 | Story nueva de backlog + story nueva de planning coordinadas | `/us-new` → `/plan-enrich-epic` |
 | Algo raro ocurrió fuera de un comando del plugin | `/plan-edge-case NNN-slug -- nota` |
 | Preparar retrospectiva final | `/plan-retrospective NNN-slug` |
-| Workspace `2.x` antiguo | `/plan-update-version 2.1.0 3.10.10 --dry-run` -> `/plan-update-version 2.1.0 3.10.10` |
+| Release documentado debe pasar a planning padre | `/plan-from-release inspect release.md` -> `/plan-from-release bridge release.md --planning-id NNN-slug --write` |
+| Workspace `2.x` antiguo | `/plan-update-version 2.1.0 3.11.0 --dry-run` -> `/plan-update-version 2.1.0 3.11.0` |
 | Cerrar el planning | `/plan-retrospective NNN-slug` → `/plan-archive NNN-slug` |
 | Ejecutar todo el ciclo sin intervención | `/plan-run NNN-slug` |
 | Solo la fase de planificación autónoma | `/plan-agent-plan NNN-slug` |
