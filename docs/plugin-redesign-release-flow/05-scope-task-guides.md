@@ -99,7 +99,7 @@ guides:
       source_fingerprints:
         - path: docs/frontend-guidelines.md
           fingerprint: sha256:...
-      generator_version: <product-version>
+      generator_version: 1.0.0
       model: gpt-5
       prompt_version: scope-task-guide-v1
       generated_at: 2026-07-22T00:00:00Z
@@ -114,7 +114,7 @@ guides:
       sources:
         - docs/testing.md
       source_fingerprints: []
-      generator_version: <product-version>
+      generator_version: 1.0.0
       model: null
       prompt_version: null
       generated_at: 2026-07-22T00:00:00Z

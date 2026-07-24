@@ -2,21 +2,20 @@
 
 ## Superficie publica objetivo
 
-Nombre publico provisional:
+Nombre publico del producto next-generation:
 
 ```text
 ARC Flow
 ```
 
-`ARC` funciona como codename de trabajo para Agentic Release Coordination. No es nombre aprobado para publicacion hasta cerrar el naming gate definido en [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md).
+`ARC Flow` es una etiqueta historica de trabajo; la interfaz publica se resuelve por el namespace del plugin.
 
-La regla de naming v4 es:
+La regla de naming del producto next-generation es:
 
 - el nombre del plugin/producto aporta el namespace publico;
 - las skills canonicas usan nombres cortos sin prefijo: `init`, `config`, `release`, `item`, `task`, `check`, `report`, `decision`, `update`;
-- la forma visible esperada se disena como `/<product-name>:<skill-name>`, por ejemplo `/<product-name>:init`;
-- si el spike demuestra que el host no expone namespace usable, se permite un fallback prefijado por acronimo, por ejemplo `/<acronym>-init`, pero no se aprueba antes de verificarlo;
-- launcher interno estable provisional `<product-cli>`, sujeto al mismo naming gate;
+- la forma visible es `/<plugin-name>:<skill-name>`, por ejemplo `/<plugin-name>:init`;
+- launcher interno estable `<product-cli>`;
 - dominios internos sin prefijo conversacional (`workspace`, `config`, `release`, `item`, `task`, `check`, `report`, `decision`, `changeset`);
 - no usar `claude-*` ni `plan-*` como marca publica nueva;
 - conservar menciones `plan-*` solo en tablas de reemplazo legacy.
@@ -112,9 +111,33 @@ Frontmatter esperado para flujos con efectos secundarios:
 description: ...
 argument-hint: ...
 disable-model-invocation: true
-allowed-tools: Bash(<product-cli> ...)
 ---
 ```
+
+Las skills canonicas usan nombres cortos y se exponen mediante el
+namespace del plugin:
+
+```text
+/<plugin-name>:init
+/<plugin-name>:config
+/<plugin-name>:release
+/<plugin-name>:item
+/<plugin-name>:task
+/<plugin-name>:check
+/<plugin-name>:report
+/<plugin-name>:decision
+/<plugin-name>:update
+```
+
+No se crearan skills duplicadas con prefijos por acronimo.
+El Spike Host Integration valida discovery, autocomplete, ayuda y
+presentacion, pero no altera esta convencion.
+
+`allowed-tools` debe restringirse por comando exacto. `check` puede usar
+`Bash(<product-cli> check *)`; `report` solo puede preaprobar
+`Bash(<product-cli> report status *)`, `Bash(<product-cli> report standup *)`
+y `Bash(<product-cli> report history *)`. Las skills mutantes no declaran
+`allowed-tools` general.
 
 Politica de permisos:
 

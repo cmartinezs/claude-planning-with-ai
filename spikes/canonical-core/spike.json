@@ -1,0 +1,30 @@
+{
+  "id": "canonical-core",
+  "status": "PLANNED",
+  "hypothesis": "UUIDv7, canonicalization, hashing, paths and DSL rules are deterministic across worktrees.",
+  "scope": "Identity, display IDs, RFC 8785, SHA-256, paths, DSL and schemas.",
+  "non_goals": ["User-facing skills"],
+  "timebox": "3 days",
+  "prototype_location": "spikes/canonical-core/",
+  "reusable_or_disposable": "reusable",
+  "inputs": ["RFC 8785 fixtures", "UUIDv7 fixtures", "DSL fixtures"],
+  "fault_model": ["hash drift", "path escape", "ambiguous DSL"],
+  "decision_record": null,
+  "critical": true,
+  "waivable": false,
+  "pass_criteria": [
+    { "id": "uuidv7-identity", "severity": "critical", "waivable": false },
+    { "id": "reproducible-hash", "severity": "critical", "waivable": false },
+    { "id": "path-isolation", "severity": "critical", "waivable": false },
+    { "id": "deterministic-dsl", "severity": "critical", "waivable": false }
+  ],
+  "fail_criteria": [
+    { "id": "hash-drift", "severity": "critical", "waivable": false }
+  ],
+  "evidence": [],
+  "fixtures": [],
+  "tests": [],
+  "adr": null,
+  "decision": null,
+  "result": null
+}

@@ -1,0 +1,29 @@
+{
+  "id": "host-integration",
+  "status": "PLANNED",
+  "hypothesis": "The plugin host exposes the canonical namespaced skills and bundled hooks.",
+  "scope": "Manifest, discovery, namespace, help, PATH, reload, update and hooks.",
+  "non_goals": ["Productive runtime implementation"],
+  "timebox": "2 days",
+  "prototype_location": "spikes/host-integration/",
+  "reusable_or_disposable": "reusable",
+  "inputs": ["plugin manifest", "Claude Code host"],
+  "fault_model": ["namespace hidden", "hooks not loaded"],
+  "decision_record": null,
+  "critical": true,
+  "waivable": false,
+  "pass_criteria": [
+    { "id": "manifest", "severity": "critical", "waivable": false },
+    { "id": "hooks-active", "severity": "critical", "waivable": false },
+    { "id": "namespace-discovery", "severity": "critical", "waivable": false }
+  ],
+  "fail_criteria": [
+    { "id": "namespace-hidden", "severity": "critical", "waivable": false }
+  ],
+  "evidence": [],
+  "fixtures": [],
+  "tests": [],
+  "adr": null,
+  "decision": null,
+  "result": null
+}

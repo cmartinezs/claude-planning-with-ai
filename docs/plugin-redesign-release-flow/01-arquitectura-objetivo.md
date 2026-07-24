@@ -7,8 +7,8 @@
 3. Work package por scope: el trabajo tecnico se divide por unidades estables de ownership y validacion, no por "historias hermanas".
 4. Scopes globales: los scopes pertenecen al proyecto y las releases referencian revisiones concretas de sus guias.
 5. Estado estructurado: YAML o JSON es fuente de verdad; Markdown es proyeccion humana generada.
-6. Identidad estable y distribuida: IDs primarios ULID/UUIDv7, `display_id` humano resoluble como alias de entrada y slugs decorativos.
-7. Marca reconocible pendiente: v4 deja atras `claude-*` y `plan-*`, pero `ARC Flow` queda como codename hasta cerrar naming gate y namespace real de plugin.
+6. Identidad estable y distribuida: UUIDv7 es el ID primario; `display_id` es determinista e inmutable y el slug es decorativo.
+7. Marca reconocible: el producto next-generation usa exclusivamente el namespace del plugin; `v4` es etiqueta historica.
 8. Menos comandos publicos: un comando por intencion principal; las variaciones son subcomandos o stages internos.
 9. Skills delgadas: la skill coordina intencion, aprobacion y juicio del agente; no implementa mecanica repetible.
 10. Runtime determinista: parseo, validacion, escritura atomica, indices, estados, secuencia, locks, journal y comandos planificados viven en scripts/librerias.
@@ -307,11 +307,11 @@ Proyecciones humanas generadas:
 
 ```yaml
 plugin:
-  version: <product-version>
-  schema_version: <schema-version>
+  version: 1.0.0
+  schema_version: 1
   template_pack:
     id: default
-    version: <template-pack-version>
+    version: 1.0.0
     fingerprint: sha256:...
 ```
 
@@ -332,10 +332,9 @@ Los IDs son inmutables y no mezclan identidad, orden visible, scope, slug ni tit
 Recomendado:
 
 ```yaml
-id: 01J4F0Z9M...
-display_id: T-7H3K9
-display_id_status: COMMITTED
-aliases: []
+id: 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
+display_id: T-3Q6NZ8KD
+display_id_status: ACTIVE
 slug: validate-schema
 ```
 
@@ -348,48 +347,36 @@ WP-9M2AB-api-contract
 T-3Q6NZ-validate-schema
 ```
 
-Cambiar un titulo o mover un work package dentro de un Release Item no debe romper dependencias ni trazabilidad.
+Cambiar un titulo no debe romper dependencias ni trazabilidad. Las relaciones padre-hijo son inmutables; trasladar trabajo crea un agregado reemplazante.
 
 Lifecycle de `display_id`:
 
 ```text
-UNASSIGNED
-PROVISIONAL
-COMMITTED
-ALIASED
+ACTIVE
 RETIRED
 ```
 
 ```mermaid
 stateDiagram-v2
-    [*] --> UNASSIGNED : create_entity
-    UNASSIGNED --> PROVISIONAL : assign_provisional_display_id
-    PROVISIONAL --> COMMITTED : commit_display_id
-    PROVISIONAL --> RETIRED : retire_provisional_display_id
-    COMMITTED --> ALIASED : alias_display_id
-    COMMITTED --> RETIRED : retire_display_id
-    ALIASED --> RETIRED : retire_aliased_display_id
+    [*] --> ACTIVE : create_display_id
+    ACTIVE --> RETIRED : retire_display_id
     RETIRED --> [*]
 ```
 
 | Evento | Transicion | Motivo o guard |
 |--------|------------|----------------|
-| `create_entity` | inicial -> `UNASSIGNED` | Se crea el agregado sin etiqueta humana asignada. |
-| `assign_provisional_display_id` | `UNASSIGNED` -> `PROVISIONAL` | Se genera una etiqueta candidata antes de confirmar su unicidad. |
-| `commit_display_id` | `PROVISIONAL` -> `COMMITTED` | La colision se descarta y la etiqueta queda persistida para el agregado. |
-| `retire_provisional_display_id` | `PROVISIONAL` -> `RETIRED` | Se abandona el agregado antes de confirmar su etiqueta. |
-| `alias_display_id` | `COMMITTED` -> `ALIASED` | Cambia la etiqueta visible; la anterior se conserva como alias. |
-| `retire_display_id` | `COMMITTED` -> `RETIRED` | El agregado se retira y su etiqueta no puede reutilizarse. |
-| `retire_aliased_display_id` | `ALIASED` -> `RETIRED` | Se retira un agregado que conserva historial de aliases. |
+| `create_display_id` | inicial -> `ACTIVE` | El display ID se deriva del UUIDv7 y se persiste al crear el agregado. |
+| `retire_display_id` | `ACTIVE` -> `RETIRED` | El agregado se retira y su display ID no puede reutilizarse. |
 
 Reglas:
 
-- no exigir continuidad;
+- asignar el display ID al crear;
 - no reutilizar IDs retirados o cancelados;
-- mantener aliases cuando una etiqueta humana cambie;
+- mantener el display ID inmutable;
 - resolver `display_id` solo como entrada humana;
 - usar siempre `id` en referencias internas;
-- considerar una etiqueta humana derivada del ID primario para el primer runtime, por ejemplo `RI-7H3K9`, hasta demostrar counters secuenciales seguros en merges de worktrees.
+- derivar el display ID con prefijo de agregado y Base32 Crockford de un short-hash del UUIDv7, por ejemplo `RI-4F8Q2B7X`;
+- ampliar la longitud si una colision real aparece antes de persistirlo.
 
 ## Estados y dimensiones separadas
 
@@ -513,6 +500,19 @@ commitment: required | optional
 ```
 
 Los elementos `required` no pueden omitirse sin waiver formal.
+
+Relaciones padre-hijo inmutables:
+
+```text
+ReleaseItem.release_id        immutable
+WorkPackage.release_item_id   immutable
+Task.work_package_id          immutable
+```
+
+Ningun comando publico ni interno modifica `parent_id` despues de crear el
+agregado. Para trasladar trabajo se crea un nuevo agregado, se copia solo el
+contenido permitido, se registra provenance y se marca el anterior como
+`SUPERSEDED` o `CANCELLED` con `replacement_id`.
 
 Blockers:
 

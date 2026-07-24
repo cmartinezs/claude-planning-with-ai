@@ -1,0 +1,30 @@
+{
+  "id": "integrated-prototype",
+  "status": "PLANNED",
+  "hypothesis": "The canonical workflow works end to end without direct planning-state writes.",
+  "scope": "init, release, item, work package, task, ChangeSet and query projections.",
+  "non_goals": ["Autonomous Git", "Deployment"],
+  "timebox": "3 days",
+  "prototype_location": "spikes/integrated-prototype/",
+  "reusable_or_disposable": "reusable",
+  "inputs": ["all previous spike outputs", "integrated fixtures"],
+  "fault_model": ["direct-write bypass", "missing audit event", "stale ChangeSet"],
+  "decision_record": null,
+  "critical": true,
+  "waivable": false,
+  "pass_criteria": [
+    { "id": "canonical-state", "severity": "critical", "waivable": false },
+    { "id": "changeset-required", "severity": "critical", "waivable": false },
+    { "id": "audit-trail", "severity": "critical", "waivable": false },
+    { "id": "hooks-block-direct-writes", "severity": "critical", "waivable": false }
+  ],
+  "fail_criteria": [
+    { "id": "direct-write-bypass", "severity": "critical", "waivable": false }
+  ],
+  "evidence": [],
+  "fixtures": [],
+  "tests": [],
+  "adr": null,
+  "decision": null,
+  "result": null
+}

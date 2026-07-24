@@ -1,0 +1,29 @@
+{
+  "id": "runtime-node20",
+  "status": "PLANNED",
+  "hypothesis": "A self-contained bundle runs reliably with Node.js 20+ on supported platforms.",
+  "scope": "Node preflight, launcher, bundle, platform and path matrix.",
+  "non_goals": ["Native binaries", "Managed runtime installer"],
+  "timebox": "2 days",
+  "prototype_location": "spikes/runtime-node20/",
+  "reusable_or_disposable": "reusable",
+  "inputs": ["runtime bundle", "platform fixtures"],
+  "fault_model": ["Node absent", "Node 18", "PATH collision", "spaces and Unicode"],
+  "decision_record": null,
+  "critical": true,
+  "waivable": false,
+  "pass_criteria": [
+    { "id": "node-20-minimum", "severity": "critical", "waivable": false },
+    { "id": "json-output", "severity": "critical", "waivable": false },
+    { "id": "platform-matrix", "severity": "critical", "waivable": false }
+  ],
+  "fail_criteria": [
+    { "id": "incompatible-node-accepted", "severity": "critical", "waivable": false }
+  ],
+  "evidence": [],
+  "fixtures": [],
+  "tests": [],
+  "adr": null,
+  "decision": null,
+  "result": null
+}

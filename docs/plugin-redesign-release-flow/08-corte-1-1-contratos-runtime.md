@@ -133,7 +133,7 @@ Reglas:
 - `id` es la clave primaria y se usa en referencias internas.
 - `display_id` es etiqueta humana y puede asignarse al crear, integrar o renderizar.
 - `slug` es decorativo.
-- ULID, UUIDv7 u otro formato distribuido evitan colisiones entre worktrees y agentes.
+- UUIDv7 evita colisiones entre worktrees y agentes.
 
 ## 6. Revisiones por agregado
 
@@ -168,7 +168,7 @@ Storage primario:
       01J4F-task-started.json
 ```
 
-Cada evento declara `event_id`, `type`, aggregate, timestamp UTC, actor, operation_id, idempotency_key, payload, input_hash y output_hash. El orden se deriva de ULID/timestamp/causal references, no del orden de lineas.
+Cada evento declara `event_id`, `type`, aggregate, timestamp UTC, actor, operation_id, idempotency_key, payload, input_hash y output_hash. El orden se deriva de UUIDv7/timestamp/causal references, no del orden de lineas.
 
 ## 8. Operaciones multiarchivo
 
@@ -194,15 +194,22 @@ Estados:
 
 ```text
 PROPOSED
+INVALID
 VALIDATED
 APPROVED
+REJECTED
+STALE
 STAGED
 APPLYING
 APPLIED
+VERIFYING
 VERIFIED
+RECORDING
 RECORDED
-FAILED
+COMPENSATING
+COMPENSATED
 ROLLED_BACK
+MANUAL_INTERVENTION_REQUIRED
 ```
 
 State machine inicial:
@@ -214,7 +221,7 @@ stateDiagram-v2
     [*] --> PROPOSED : propose_operation
 
     PROPOSED --> VALIDATED : validate_operation
-    PROPOSED --> FAILED : reject_invalid_proposal
+    PROPOSED --> INVALID : invalidate_operation
 
     VALIDATED --> APPROVED : approve_operation
     VALIDATED --> REJECTED : reject_operation
@@ -224,78 +231,67 @@ stateDiagram-v2
     APPROVED --> STALE : mark_operation_stale
 
     STAGED --> APPLYING : begin_apply
-    STAGED --> FAILED : fail_staging
+    STAGED --> INVALID : invalidate_operation
 
     APPLYING --> APPLIED : apply_succeeded
-    APPLYING --> FAILED : apply_failed
-    APPLYING --> ROLLED_BACK : rollback_apply
-    APPLYING --> PARTIALLY_APPLIED : detect_partial_apply
+    APPLYING --> COMPENSATING : begin_compensation
     APPLYING --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
-    PARTIALLY_APPLIED --> COMPENSATING : begin_compensation
-    PARTIALLY_APPLIED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
 
-    APPLIED --> VERIFIED : verify_operation
-    APPLIED --> FAILED : postcondition_failed
-    APPLIED --> ROLLED_BACK : rollback_applied_change
-    APPLIED --> COMPENSATING : begin_compensation
-    APPLIED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+    APPLIED --> VERIFYING : begin_verification
 
-    VERIFIED --> RECORDED : record_operation
-    VERIFIED --> FAILED : verification_failed
+    VERIFYING --> VERIFIED : verification_succeeded
+    VERIFYING --> COMPENSATING : verification_failed
+    VERIFYING --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
 
-    FAILED --> COMPENSATING : begin_compensation
-    FAILED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+    VERIFIED --> RECORDING : begin_recording
+    RECORDING --> RECORDED : recording_succeeded
+    RECORDING --> MANUAL_INTERVENTION_REQUIRED : recording_failed
 
     COMPENSATING --> COMPENSATED : compensation_succeeded
+    COMPENSATING --> ROLLED_BACK : rollback_succeeded
     COMPENSATING --> MANUAL_INTERVENTION_REQUIRED : compensation_failed
-    MANUAL_INTERVENTION_REQUIRED --> COMPENSATING : resume_compensation
-    MANUAL_INTERVENTION_REQUIRED --> COMPENSATED : manual_recovery_completed
 
-    RECORDED --> [*]
+    INVALID --> [*]
     REJECTED --> [*]
     STALE --> [*]
+    RECORDED --> [*]
     ROLLED_BACK --> [*]
     COMPENSATED --> [*]
+    MANUAL_INTERVENTION_REQUIRED --> [*]
 ```
 
 | Evento | Transicion | Motivo o guard |
 |--------|------------|----------------|
 | `propose_operation` | inicial -> `PROPOSED` | Se crea un ChangeSet con base revisions y alcance declarados. |
 | `validate_operation` | `PROPOSED` -> `VALIDATED` | Schemas, boundaries, precondiciones y concurrencia pasan. |
-| `reject_invalid_proposal` | `PROPOSED` -> `FAILED` | La propuesta no puede validarse por error estructural o de dominio. |
+| `invalidate_operation` | `PROPOSED` o `STAGED` -> `INVALID` | Se detecta un error antes de aplicar efectos. |
 | `approve_operation` | `VALIDATED` -> `APPROVED` | Un actor autorizado aprueba el ChangeSet vigente. |
 | `reject_operation` | `VALIDATED` -> `REJECTED` | Un actor autorizado rechaza la propuesta con motivo registrado. |
 | `mark_operation_stale` | `VALIDATED` o `APPROVED` -> `STALE` | Cambia una base revision o una precondicion antes de aplicar. |
 | `stage_operation` | `APPROVED` -> `STAGED` | Se preparan snapshots y escrituras sin mutar el estado canonico. |
-| `fail_staging` | `STAGED` -> `FAILED` | No se puede completar staging o snapshot. |
 | `begin_apply` | `STAGED` -> `APPLYING` | Se inicia la mutacion autorizada e idempotente. |
 | `apply_succeeded` | `APPLYING` -> `APPLIED` | Todas las escrituras previstas terminan correctamente. |
-| `apply_failed` | `APPLYING` -> `FAILED` | La mutacion falla antes de completar el ChangeSet. |
-| `detect_partial_apply` | `APPLYING` -> `PARTIALLY_APPLIED` | Algunas escrituras terminaron y otras no. |
-| `rollback_apply` | `APPLYING` -> `ROLLED_BACK` | El rollback de staging o de la mutacion es verificable. |
-| `request_manual_intervention` | `APPLYING`, `APPLIED`, `PARTIALLY_APPLIED` o `FAILED` -> `MANUAL_INTERVENTION_REQUIRED` | Recovery automatico no es seguro o no es posible. |
-| `begin_compensation` | `PARTIALLY_APPLIED` -> `COMPENSATING` | Se inicia recovery despues de una aplicacion parcial. |
-| `verify_operation` | `APPLIED` -> `VERIFIED` | Postcondiciones, hashes y referencias quedan comprobados. |
-| `postcondition_failed` | `APPLIED` -> `FAILED` | La escritura termino pero el estado resultante no cumple. |
-| `rollback_applied_change` | `APPLIED` -> `ROLLED_BACK` | La compensacion reversible se completo y fue verificada. |
-| `begin_compensation` | `APPLIED` o `FAILED` -> `COMPENSATING` | Se inicia recovery para reparar una mutacion incompleta o invalida. |
-| `verification_failed` | `VERIFIED` -> `FAILED` | La verificacion posterior o el registro de evidencia falla. |
-| `record_operation` | `VERIFIED` -> `RECORDED` | Evento, manifest y proyecciones quedan registrados. |
+| `begin_compensation` | `APPLYING` -> `COMPENSATING` | La aplicacion produjo un efecto que requiere recovery. |
+| `request_manual_intervention` | `APPLYING` o `VERIFYING` -> `MANUAL_INTERVENTION_REQUIRED` | No existe recovery automatico seguro. |
+| `begin_verification` | `APPLIED` -> `VERIFYING` | Las escrituras terminaron y se inicia la comprobacion. |
+| `verification_succeeded` | `VERIFYING` -> `VERIFIED` | Postcondiciones, hashes y referencias quedan comprobados. |
+| `verification_failed` | `VERIFYING` -> `COMPENSATING` | La operacion tuvo efectos, pero la comprobacion no pasa. |
+| `begin_recording` | `VERIFIED` -> `RECORDING` | Se inicia la persistencia de eventos, manifest y proyecciones. |
+| `recording_succeeded` | `RECORDING` -> `RECORDED` | La auditoria y las proyecciones quedan registradas. |
+| `recording_failed` | `RECORDING` -> `MANUAL_INTERVENTION_REQUIRED` | No se puede garantizar el registro completo automaticamente. |
 | `compensation_succeeded` | `COMPENSATING` -> `COMPENSATED` | La compensacion finaliza y su resultado es verificable. |
+| `rollback_succeeded` | `COMPENSATING` -> `ROLLED_BACK` | El rollback finaliza y el estado anterior queda verificado. |
 | `compensation_failed` | `COMPENSATING` -> `MANUAL_INTERVENTION_REQUIRED` | La compensacion no puede garantizar consistencia automatica. |
-| `resume_compensation` | `MANUAL_INTERVENTION_REQUIRED` -> `COMPENSATING` | Un operador aporta la accion requerida y autoriza continuar el recovery. |
-| `manual_recovery_completed` | `MANUAL_INTERVENTION_REQUIRED` -> `COMPENSATED` | La intervencion manual corrige el estado y deja evidencia verificable. |
 
-Estados adicionales requeridos por recovery:
+Semantica obligatoria:
 
-```text
-REJECTED
-STALE
-COMPENSATING
-COMPENSATED
-PARTIALLY_APPLIED
-MANUAL_INTERVENTION_REQUIRED
-```
+- `INVALID`: error detectado antes de aplicar efectos.
+- `APPLYING`: la operacion ya comenzo a mutar.
+- `VERIFYING`: las escrituras terminaron, pero aun no estan aprobadas como validas.
+- `VERIFIED`: las postcondiciones y hashes pasaron.
+- `RECORDING`: se estan persistiendo eventos, manifest y proyecciones.
+- `COMPENSATING`: hubo efectos y se esta ejecutando recovery.
+- `MANUAL_INTERVENTION_REQUIRED`: no existe recovery automatico seguro.
 
 El manifest de operacion debe registrar:
 
@@ -303,6 +299,8 @@ El manifest de operacion debe registrar:
 state: PROPOSED
 previous_state: null
 transition_reason: created
+actor: system
+evidence: []
 attempt: 1
 started_at: 2026-07-22T00:00:00Z
 updated_at: 2026-07-22T00:00:00Z
@@ -322,6 +320,10 @@ La operacion debe:
 8. verificar;
 9. registrar eventos;
 10. regenerar proyecciones.
+
+Cada transicion debe estar declarada en el schema y registrar actor, motivo,
+timestamp, evidence y `previous_state`. Todos los estados requieren tests
+positivos y negativos.
 
 La matriz de fallas del Corte -1.2 debe cubrir crash despues de `APPLIED`, evento no registrado, postcondition fallida, verificacion fallida, compensacion parcial, comando externo exitoso con write local fallido, ChangeSet obsoleto despues de aprobacion, rollback imposible y reintento idempotente.
 
@@ -407,7 +409,7 @@ El bundle debe ser self-contained. No se asume `npm install` en el workspace usu
 
 Debe incluir parser YAML, JSON Schema validator, parser de argumentos, hashing, globbing, locks y renderers.
 
-Esto no elimina la dependencia del runtime de ejecucion. Corte -1.2 debe decidir entre Node.js 20+ obligatorio, binarios nativos o instalacion administrada.
+Esto no elimina la dependencia del runtime de ejecucion. El producto next-generation usa un bundle JavaScript self-contained con Node.js 20+ obligatorio.
 
 ## 14. Template pack historico
 
@@ -459,11 +461,11 @@ rollback: ...
 
 ## Criterio de salida del Corte -1.1
 
-El runtime puede comenzar cuando:
+El Corte -1.1 puede considerarse cerrado cuando se cumplan los siguientes contratos.
 
 - no existan fuentes duplicadas;
 - todos los estados operativos tengan schema;
-- la identidad sea segura en worktrees;
+- la identidad UUIDv7 sea segura en worktrees;
 - la atomicidad multiarchivo este definida;
 - el launcher funcione instalado desde `bin/`;
 - las dependencias esten empaquetadas;
@@ -471,3 +473,5 @@ El runtime puede comenzar cuando:
 - el template pack pueda resolverse de forma reproducible;
 - `check` sea query-only;
 - el vocabulario `propose/apply/verify` sea el unico contrato de mutacion.
+
+El inicio del runtime productivo continua bloqueado hasta cerrar tambien el Corte -1.2.

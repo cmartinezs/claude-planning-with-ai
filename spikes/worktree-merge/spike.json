@@ -1,0 +1,29 @@
+{
+  "id": "worktree-merge",
+  "status": "PLANNED",
+  "hypothesis": "Append-by-file aggregates and regenerable indexes avoid data loss across worktree merges.",
+  "scope": "create/create, edit/edit, delete/edit, supersede/edit and indexes.",
+  "non_goals": ["Mutable parent moves"],
+  "timebox": "2 days",
+  "prototype_location": "spikes/worktree-merge/",
+  "reusable_or_disposable": "reusable",
+  "inputs": ["worktree fixtures", "aggregate fixtures"],
+  "fault_model": ["silent overwrite", "data loss", "stale index"],
+  "decision_record": null,
+  "critical": true,
+  "waivable": false,
+  "pass_criteria": [
+    { "id": "no-data-loss", "severity": "critical", "waivable": false },
+    { "id": "no-silent-overwrite", "severity": "critical", "waivable": false },
+    { "id": "regenerable-indexes", "severity": "critical", "waivable": false }
+  ],
+  "fail_criteria": [
+    { "id": "merge-data-loss", "severity": "critical", "waivable": false }
+  ],
+  "evidence": [],
+  "fixtures": [],
+  "tests": [],
+  "adr": null,
+  "decision": null,
+  "result": null
+}

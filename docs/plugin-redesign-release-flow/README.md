@@ -1,10 +1,10 @@
-# Propuesta de rediseno next-generation: codename ARC Flow
+# Propuesta de rediseno next-generation
 
 Fecha: 2026-07-22
 
 ## Objetivo
 
-Reordenar el plugin bajo una identidad nueva y reconocible. `ARC Flow` (`ARC`: Agentic Release Coordination) queda como codename de trabajo, no como nombre definitivo. La unidad publica de entrega es la release, sin convertirla en una coleccion de comandos sueltos ni en una base de datos Markdown. El modelo v4 debe ser:
+Reordenar el plugin bajo una identidad nueva y reconocible. El producto next-generation `1.0.0` es una implementacion nueva, no una version compatible del plugin 3.x. La unidad publica de entrega es la release, sin convertirla en una coleccion de comandos sueltos ni en una base de datos Markdown. `v4` es solo etiqueta historica de la iniciativa.
 
 ```text
 project context -> release -> release item -> scope work package -> task
@@ -14,9 +14,9 @@ El Release Item representa una unidad entregable tipada: user story, capability,
 
 El flujo publico debe ser mas claro, con menos comandos visibles, una identidad estable, estado canonico estructurado, Markdown como proyeccion humana y trabajo mecanico delegado a un runtime determinista.
 
-La superficie publica deja de usar prefijos genericos `claude-*` o `plan-*`. La tercera revision corrige el enfoque: la API debe disenarse como `plugin name + skill name`, por ejemplo `/<product-name>:init`; un prefijo por acronimo queda solo como fallback si el spike demuestra que el namespace del plugin no es usable.
+La superficie publica deja de usar prefijos genericos `claude-*` o `plan-*`. La API usa exclusivamente la composicion `plugin name + skill name`, por ejemplo `/<plugin-name>:init`.
 
-Mientras la decision de producto siga abierta, este paquete usa "next-generation redesign" como etiqueta publica de trabajo. `v4` queda como nombre historico interno de la iniciativa, pero no se debe fijar `4.0.0`, manifest, binario, namespace, marketplace, sitio ni documentacion publica final hasta cerrar el naming gate y decidir entre continuidad del plugin actual o producto nuevo `1.0.0`.
+El producto next-generation es un producto nuevo `1.0.0`. `v4` queda unicamente como etiqueta historica de la iniciativa y no representa una version publicable.
 
 ## Orden de lectura
 
@@ -48,6 +48,6 @@ La propuesta reduce el flujo publico diario a skills canonicas `init`, `config`,
 
 La segunda revision experta aprueba avanzar al Corte -1, pero exige cerrar antes el [Corte -1.1](08-corte-1-1-contratos-runtime.md): fuente unica de scopes, guias YAML ejecutables, Release Items tipados, IDs distribuidos, eventos por archivo, revisiones por agregado, atomicidad multiarchivo, launcher raiz y bundle self-contained.
 
-La tercera revision aprueba el dominio y los spikes, pero no aprueba todavia el naming definitivo ni el runtime productivo. El [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md) debe resolver naming gate, namespace real de plugins, runtime Node/no Node, paths canonicos, merge protocol, limite del ChangeSet, DSL, catalogos, hashing, retencion y trust model.
+La quinta revision cierra las decisiones de producto: producto nuevo `1.0.0`, Node.js 20+, UUIDv7, display IDs deterministas e inmutables y relaciones padre-hijo inmutables. El [Corte -1.2](09-corte-1-2-spikes-producto-runtime.md) queda para ejecutar spikes y reunir evidencia, no para reabrir estas alternativas.
 
 La cuarta revision aprueba ejecutar el Corte -1.2, pero aclara que documentar spikes no equivale a resolverlos. Antes del vertical slice productivo deben quedar cerrados los contratos de [ejecucion y cierre](10-corte-1-2-contratos-ejecucion.md): permisos de skills, launcher interno versus CLI externa, limites de agregados, lifecycle de display IDs, DSL formal, hashing RFC 8785, separacion Execution Context/Deployment Environment, state machine de operaciones y resultados verificables de cada spike.

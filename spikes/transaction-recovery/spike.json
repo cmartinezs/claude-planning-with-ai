@@ -1,0 +1,29 @@
+{
+  "id": "transaction-recovery",
+  "status": "PLANNED",
+  "hypothesis": "ChangeSet operations recover deterministically after partial failure or external side effects.",
+  "scope": "staging, apply, verify, recording, compensation and manual intervention.",
+  "non_goals": ["Distributed event sourcing"],
+  "timebox": "3 days",
+  "prototype_location": "spikes/transaction-recovery/",
+  "reusable_or_disposable": "reusable",
+  "inputs": ["fault injection fixtures", "operation manifests"],
+  "fault_model": ["partial apply", "recording failure", "external command failure"],
+  "decision_record": null,
+  "critical": true,
+  "waivable": false,
+  "pass_criteria": [
+    { "id": "idempotent-retry", "severity": "critical", "waivable": false },
+    { "id": "verified-recovery", "severity": "critical", "waivable": false },
+    { "id": "no-corruption", "severity": "critical", "waivable": false }
+  ],
+  "fail_criteria": [
+    { "id": "recovery-corruption", "severity": "critical", "waivable": false }
+  ],
+  "evidence": [],
+  "fixtures": [],
+  "tests": [],
+  "adr": null,
+  "decision": null,
+  "result": null
+}

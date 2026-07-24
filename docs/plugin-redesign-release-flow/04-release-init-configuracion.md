@@ -26,6 +26,7 @@ Archivos base:
   decisions/
   releases/
   vendor/
+    template-packs/
 ```
 
 `config.yml` y `plugin.lock.yml` son legibles por scripts. Los README/reportes son proyecciones humanas generadas. Los templates canonicos se resuelven desde la instalacion del plugin, no desde una copia completa dentro del repo de trabajo.
@@ -140,11 +141,11 @@ concerns:
 
 ```yaml
 plugin:
-  version: <product-version>
-  schema_version: <schema-version>
+  version: 1.0.0
+  schema_version: 1
   template_pack:
     id: default
-    version: <template-pack-version>
+    version: 1.0.0
     fingerprint: sha256:...
     vendor_snapshot: .planning/vendor/template-packs/sha256-...
 ```

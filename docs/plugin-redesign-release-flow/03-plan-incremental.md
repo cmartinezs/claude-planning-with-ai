@@ -2,7 +2,7 @@
 
 ## Regla de trabajo
 
-Esto es v4 y parte en limpio. No hay compatibilidad hacia atras, aliases legacy ni storage paralelo por defecto. La ruta sigue siendo incremental para controlar riesgo de implementacion, pero cada corte debe construir el modelo v4 final, no una transicion desde v3.
+Esto es el producto next-generation `1.0.0` y parte en limpio. No hay compatibilidad hacia atras, aliases legacy ni storage paralelo por defecto. `v4` es solo una etiqueta historica de la iniciativa.
 
 La recomendacion del review cambia el orden: no comenzar por una skill publica. Primero debe cerrarse el contrato del dominio, del naming y del runtime. La segunda revision agrega un Corte -1.1 obligatorio para resolver contradicciones residuales. La tercera revision agrega un Corte -1.2 de spikes tecnicos antes del runtime productivo. La cuarta revision aprueba ejecutar ese Corte -1.2, pero prohibe saltar al vertical slice mientras algun spike no tenga resultado aceptado.
 
@@ -14,13 +14,13 @@ Entregables:
 
 - Modelo formal de `Release`, `Release Item`, `Scope Work Package`, `Task`, `Scope`, `Decision`, `Gate`, `Blocker`, `Waiver`, `Deployment Event` y `Finalization`.
 - JSON Schema o equivalente para `config`, `plugin.lock`, `scope`, `release`, `release-item`, `work-package`, `task`, `change-set`, `operation`, `event` y `guide metadata`.
-- Contrato de identidad estable: IDs primarios distribuidos, `display_id` humano (`R0001`, `RI0001`, `WP0001`, `T0001`), slugs decorativos y referencias por ID primario.
+- Contrato de identidad estable: UUIDv7 como ID primario, `display_id` determinista e inmutable, slugs decorativos y referencias por ID primario.
 - Contrato de storage: YAML/JSON canonico, Markdown como proyeccion, eventos JSON inmutables bajo `.planning/events/YYYY/MM/<event-id>.json`.
 - Protocolo de mutacion: `inspect -> propose -> validate -> approve -> stage -> apply -> verify -> record`.
 - Modelo de concurrencia: `baseRevisions` por agregado, optimistic locking, operation locks, idempotency keys y comportamiento en worktrees.
 - Politicas configurables: release sequence, lanes, autonomy, approvals, gates, skip, cancelacion, deployment y finalizacion.
 - Contrato seguro de comandos y custom generators: estructura de comando, cwd, timeouts, allowlist, path boundaries y permisos.
-- Naming publico pendiente: `ARC Flow` y `arcflow` son codename hasta cerrar naming gate; la API debe considerar namespace real de plugin y skills canonicas cortas.
+- Naming publico: el producto se expone exclusivamente mediante el namespace real del plugin y skills canonicas cortas.
 - Fixtures de arquitectura:
   - monorepo software;
   - repositorio simple;
@@ -34,7 +34,7 @@ Entregables:
 Validacion:
 
 ```text
-<product-cli> check architecture --fixtures all --format json
+node spikes/verify-corte-1.2.mjs
 bash scripts/verify-plugin.sh
 ```
 
@@ -48,7 +48,7 @@ Cambios:
 - Reemplazar reglas ejecutables en Markdown por `task-guide.yml` y `test-guide.yml`; los `.md` quedan como proyeccion.
 - Reemplazar `story.yml` como entidad general por `release-item.yml` con `kind: user_story | capability | defect | enabler | spike | compliance | migration | operational`.
 - Separar Delivery Scope, Cross-cutting Concern y Gate Profile.
-- Cambiar IDs primarios a ULID/UUIDv7 u otro formato distribuido; conservar `display_id` como etiqueta humana.
+- Adoptar UUIDv7 como ID primario; conservar `display_id` determinista e inmutable como etiqueta humana.
 - Cambiar `baseRevision` global por `baseRevisions` por agregado.
 - Reemplazar `events.ndjson` como storage primario por eventos individuales inmutables bajo `.planning/events/YYYY/MM/<event-id>.json`.
 - Definir `.planning/operations/<operation-id>/` con `operation.yml`, `change-set.json` y `result.json`; `before/`, `staged/` y logs viven bajo `.planning/.runtime/`.
@@ -64,7 +64,7 @@ Cambios:
 Validacion:
 
 ```text
-<product-cli> check architecture --contract corte-1.1 --format json
+node spikes/verify-corte-1.2.mjs
 <product-cli> changeset validate <fixture-operation-id> --format json
 bash scripts/verify-plugin.sh
 ```
@@ -76,8 +76,8 @@ Objetivo: cerrar con evidencia los bloqueadores que no se pueden resolver solo c
 Cambios:
 
 - Ejecutar naming gate antes de aprobar marca, paquete, binario o comandos definitivos.
-- Probar namespace real de plugins Claude Code y confirmar si las skills deben vivir como `skills/init/` o requieren fallback prefijado.
-- Decidir runtime: Node.js 20+ obligatorio, binarios nativos o instalacion administrada.
+- Validar discovery, autocomplete y ayuda del namespace real de plugins Claude Code sin cambiar la convencion `/<plugin-name>:<skill-name>`.
+- Adoptar runtime self-contained JavaScript con Node.js 20+ obligatorio.
 - Cambiar paths canonicos para que no dependan solo de `display_id` o slug.
 - Definir merge protocol append-by-file: hijos referencian al padre e indices se regeneran como proyeccion.
 - Acotar ChangeSet al control plane `.planning/**`; work product se registra como evidencia o se muta solo mediante operaciones explicitas limitadas.
@@ -88,10 +88,10 @@ Cambios:
 - Separar `.planning/events/`, `.planning/operations/`, `.planning/.runtime/` y `.planning/vendor/` con politica Git/retencion.
 - Exigir `propose` para reportes/renders que escriban proyecciones.
 - Declarar trust model: guardrails cooperativos y trazabilidad, no sandbox contra agente malicioso con permisos del usuario.
-- Decidir continuidad del plugin actual como `<product-version>` versus producto nuevo `1.0.0`.
+- Adoptar producto nuevo `1.0.0`; el plugin actual 3.x queda en maintenance only.
 - Formalizar contrato de permisos de skills: `allowed-tools`, `disable-model-invocation`, aprobaciones por stage, stop conditions y prohibicion de autoapproval.
 - Definir limites de agregados: `ProjectContext`, `Scope`, `Release`, `ReleaseItem`, `WorkPackage` y `Task` como agregados relacionados, con consistencia fuerte local y consistencia transversal recomputable.
-- Definir lifecycle de `display_id`: estados, aliases, resolucion de colisiones, no reutilizacion y estrategia inicial derivada del ID primario si los counters secuenciales no demuestran merge seguro.
+- Definir `display_id` determinista e inmutable derivado de UUIDv7, sin estado provisional ni aliases en 1.0.
 - Adoptar RFC 8785 JSON Canonicalization Scheme para hashes canonicos y especificar tree hash para fingerprints de directorios.
 - Separar `Execution Context` de `Deployment Environment`.
 - Cerrar state machine formal de operaciones con transiciones, estados de recovery y fault matrix.
@@ -99,7 +99,7 @@ Cambios:
 Validacion:
 
 ```text
-<product-cli> check architecture --contract corte-1.2 --format json
+node spikes/verify-corte-1.2.mjs
 bash scripts/verify-plugin.sh
 ```
 
@@ -126,6 +126,7 @@ stateDiagram-v2
     INCONCLUSIVE --> IN_PROGRESS : reopen_spike
     FAILED --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
     INCONCLUSIVE --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    DECISION_ACCEPTED_WITH_LIMITATIONS --> IN_PROGRESS : reopen_accepted_limitation
     PASSED --> [*]
     DECISION_ACCEPTED_WITH_LIMITATIONS --> [*]
 ```
@@ -138,16 +139,21 @@ stateDiagram-v2
 | `fail_spike` | `IN_PROGRESS` -> `FAILED` | La hipotesis falla o un criterio obligatorio no se cumple. |
 | `classify_spike_inconclusive` | `IN_PROGRESS` -> `INCONCLUSIVE` | La evidencia no permite una decision confiable. |
 | `reopen_spike` | `FAILED` o `INCONCLUSIVE` -> `IN_PROGRESS` | Se autoriza un nuevo intento con alcance o mitigacion revisados. |
-| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Existe ADR con riesgo, limitacion, owner y condicion de reapertura. |
+| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Solo si todos los criterios fallidos son `critical: false` o `waivable: true`; requiere ADR. |
+| `reopen_accepted_limitation` | `DECISION_ACCEPTED_WITH_LIMITATIONS` -> `IN_PROGRESS` | Se cumple la condicion de reapertura registrada en el ADR. |
 
 El roadmap no puede avanzar a Corte 0 si existe un spike en `PLANNED`, `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE`.
+
+Cada spike declara `critical: true|false` y `waivable: true|false`. Cada criterio declara `severity` y `waivable`. `DECISION_ACCEPTED_WITH_LIMITATIONS` no puede cerrar un spike cuando falla un criterio `critical` con `waivable: false`.
+
+Los criterios de integridad, ausencia de perdida de datos, reproducibilidad de hashes, aislamiento de paths e idempotencia son siempre `critical` y no waivable.
 
 Spikes obligatorios:
 
 1. Host integration: manifest, namespace, discovery, autocomplete/help, plugin root, plugin data, `bin/` en PATH del Bash tool, reload y update.
-2. Runtime distribution: Node.js 20+ obligatorio versus binarios nativos versus instalacion administrada, con evidencia Windows/WSL2/Linux/macOS segun soporte declarado.
-3. Canonical core: ULID o UUIDv7, canonical JSON RFC 8785, hashing, path normalization y evaluador DSL.
-4. Worktree merge: create/create, edit/edit, delete/edit, move/edit, colision de display IDs e indices regenerables.
+2. Runtime Node 20+: Node.js 20+ obligatorio, con evidencia Windows/WSL2/Linux/macOS.
+3. Canonical core: UUIDv7, display ID determinista, canonical JSON RFC 8785, hashing, path normalization y evaluador DSL.
+4. Worktree merge: create/create, edit/edit, delete/edit, supersede/edit e indices regenerables.
 5. Transaction recovery: fallas despues de staging, primer write, canonical state, antes del evento, despues de comando externo, rollback, compensacion e idempotencia.
 6. Integrated prototype: `init -> release -> item -> work package -> task -> propose -> apply -> check -> report`.
 
@@ -157,7 +163,21 @@ Objetivo: hacer que `/<product-name>:init` configure lo necesario para que el pl
 
 Cambios:
 
-- Crear `.planning/config.yml`, `.planning/plugin.lock.yml`, `.planning/events/`, `.planning/operations/`, `.planning/.runtime/`, `.planning/scopes/`, `.planning/decisions/`, `.planning/releases/` y `.planning/vendor/template-packs/` cuando el lock lo requiera.
+- Crear exactamente:
+  - `.planning/config.yml`
+  - `.planning/plugin.lock.yml`
+  - `.planning/events/`
+  - `.planning/operations/`
+  - `.planning/.runtime/`
+  - `.planning/scopes/`
+  - `.planning/concerns/`
+  - `.planning/gates/`
+  - `.planning/gate-profiles/`
+  - `.planning/execution-contexts/`
+  - `.planning/environments/`
+  - `.planning/decisions/`
+  - `.planning/releases/`
+  - `.planning/vendor/template-packs/`
 - Detectar y confirmar si el proyecto usa git.
 - Si usa git, configurar branch base, estrategia de ramas, lanes y si se permitira automatizacion `git`/`gh`.
 - Detectar carpetas, paquetes, workspaces o repositorios candidatos a scope.
@@ -365,7 +385,7 @@ Objetivo: dejar una superficie limpia y publicar el cambio como major.
 
 Cambios:
 
-- Confirmar contra `CHANGELOG.md`, manifests y naming gate si el release sera continuidad del plugin actual con `<product-version>` o producto nuevo `1.0.0`.
+- Confirmar contra `CHANGELOG.md`, manifests y naming gate que el producto next-generation se publica como producto nuevo `1.0.0`.
 - Ejecutar la eliminacion legacy definida en [Eliminacion legacy](06-eliminacion-legacy.md).
 - Actualizar manifests y metadata: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, README badge y `.page/package*.json`.
 - Rehacer documentacion publica: README, `docs/commands.yml`, reference, user guide, developer guide, tutoriales, workflows y glossary.
@@ -403,14 +423,13 @@ init
 
 Sin ejecucion autonoma, Git/gh mutante, recovery, backlog externo ni deployment en el primer vertical slice.
 
-## Preguntas abiertas
+## Decisiones cerradas
 
-1. Launcher: binario local `<product-cli>`, script npm empaquetado o wrapper instalado por plugin.
-2. Persistencia de counters: archivo dedicado por agregado o derivacion segura desde YAML/journal con lock.
-3. Version semantica: una release puede o no coincidir con version del plugin/producto; `release_id` y `version` deben mantenerse separados.
-4. Politica inicial por defecto: `strict_sequence` para simplicidad, con soporte posterior para lanes/hotfix.
-5. Compatibilidad cross-platform: nivel minimo de soporte para Windows nativo vs WSL2.
-6. Formato de ID primario: ULID, UUIDv7 u otro identificador distribuido.
+1. Producto nuevo `1.0.0`; el plugin actual 3.x queda en maintenance only.
+2. Runtime self-contained JavaScript con Node.js 20+ obligatorio.
+3. UUIDv7 es el unico ID primario.
+4. Display IDs deterministas e inmutables derivados del UUIDv7.
+5. Las relaciones padre-hijo son inmutables; trasladar trabajo crea un reemplazo.
 
 ## Criterio de exito
 

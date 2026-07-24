@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este documento define la estructura total nueva del repositorio del plugin next-generation. `v4` se mantiene como etiqueta historica de la iniciativa hasta decidir si se publica como continuidad del plugin actual o como producto nuevo `1.0.0`. La estructura cubre skills, runtime, template pack, schemas, metadata, documentacion publica, sitio web y outputs generados.
+Este documento define la estructura total nueva del repositorio del plugin next-generation `1.0.0`. `v4` es solo una etiqueta historica de la iniciativa. La estructura cubre skills, runtime, hooks, spikes, template pack, schemas, metadata, documentacion publica, sitio web y outputs generados.
 
 Regla base:
 
@@ -27,6 +27,9 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |
 +-- bin/
 |   +-- <product-cli>
+|
++-- hooks/
+|   +-- hooks.json
 |
 +-- .page/
 |   +-- components/
@@ -57,7 +60,17 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |   +-- claude-planning-v4-second-expert-review/
 |   +-- claude-planning-v4-third-expert-review/
 |   +-- claude-planning-v4-fourth-expert-review/
+|   +-- claude-planning-v4-fifth-expert-review/
 |   +-- design-history/
+|
++-- spikes/
+|   +-- host-integration/
+|   +-- runtime-node20/
+|   +-- canonical-core/
+|   +-- worktree-merge/
+|   +-- transaction-recovery/
+|   +-- integrated-prototype/
+|   +-- verify-corte-1.2.mjs
 |
 +-- runtime/
 |   +-- src/
@@ -118,6 +131,7 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |   +-- update-version/
 |
 +-- scripts/
+|   +-- protect-planning-state.mjs
 |   +-- verify-plugin.sh
 |
 +-- skills/
@@ -146,6 +160,7 @@ La separacion nueva es deliberada:
 | Ruta | Tipo | Responsabilidad |
 |------|------|-----------------|
 | `bin/` | Launcher interno estable del plugin | Entrada minima visible por el Bash tool cuando el plugin esta habilitado; delega al bundle del runtime. |
+| `hooks/` | Enforcement del plugin | `PreToolUse` bloquea escrituras directas a `.planning/**`. |
 | `runtime/` | Codigo del producto plugin | Codigo fuente, bundle self-contained, librerias, schemas, fixtures y ejecucion deterministica. |
 | `template-pack/` | Artefactos renderizables | Templates, docs de template pack y migraciones de template pack. No contiene scripts de dominio. |
 | `scripts/` | Tooling del repo | Verificacion, mantenimiento y tareas de publicacion del repositorio del plugin. No se distribuye como runtime publico. |
@@ -167,7 +182,7 @@ Reglas:
 
 - La version debe coincidir con `CHANGELOG.md`, README badge, site package y update-version despues de decidir producto y naming.
 - La descripcion debe mencionar el nombre aprobado por naming gate, las skills canonicas `init`, `config`, `release`, `item`, `task`, `check`, release items tipados, work packages, ChangeSets y estado canonico.
-- `ARC Flow` puede aparecer solo como codename interno hasta cerrar naming gate.
+- El nombre publico final se resuelve exclusivamente por el namespace del plugin.
 - No debe prometer compatibilidad con comandos v3.
 
 ## Skills
@@ -207,7 +222,7 @@ Contrato de cada `SKILL.md`:
 - argumentos publicos;
 - precondiciones;
 - llamada al launcher `<product-cli> <domain> <stage>`;
-- frontmatter `disable-model-invocation` y `allowed-tools` cuando aplique;
+- frontmatter `disable-model-invocation` y `allowed-tools` restringido por comando cuando aplique;
 - comandos permitidos por stage;
 - aprobaciones host/runtime separadas;
 - donde entra juicio del agente;

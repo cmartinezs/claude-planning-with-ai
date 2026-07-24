@@ -2,12 +2,38 @@
 
 ## Objetivo
 
-La tercera revision experta aprueba el dominio `release -> release item -> scope work package -> task`, pero no aprueba todavia el naming definitivo ni el runtime productivo. La cuarta revision aprueba ejecutar este corte y aclara que los spikes documentados no son evidencia de resolucion. Este corte amplifica el Corte -1.1 con decisiones que solo pueden cerrarse mediante prototipos, fixtures, pruebas y ADRs.
+La quinta revision mantiene el dominio `release -> release item -> scope work package -> task` y cierra producto nuevo `1.0.0`, Node.js 20+, UUIDv7, display IDs inmutables y parent inmutable. Los spikes documentados no son evidencia de resolucion; este corte se cierra solo con prototipos, fixtures, pruebas y ADRs.
 
 Regla:
 
 ```text
 No iniciar el vertical slice productivo hasta cerrar los spikes de este corte.
+```
+
+La validacion inicial no depende del CLI que los spikes deben construir:
+
+```text
+spikes/
+  host-integration/
+  runtime-node20/
+  canonical-core/
+  worktree-merge/
+  transaction-recovery/
+  integrated-prototype/
+  verify-corte-1.2.mjs
+```
+
+Ejecutar durante el corte:
+
+```text
+node spikes/verify-corte-1.2.mjs
+npm run verify:corte-1.2
+```
+
+Despues del prototipo integrado, agregar como regresion:
+
+```text
+<product-cli> check architecture --contract corte-1.2
 ```
 
 ## 1. Naming gate
@@ -69,21 +95,19 @@ skills/decision/
 skills/update/
 ```
 
-Un prefijo por acronimo, por ejemplo `/<acronym>-init`, solo es fallback si el spike demuestra que el namespace del plugin no queda visible o no es usable.
+Las skills usan exclusivamente `/<plugin-name>:<skill-name>`; no existe una segunda convencion de namespace.
 
 ## 3. Runtime prerequisite
 
 Un bundle JavaScript self-contained elimina `npm install`, pero no elimina Node.js.
 
-Decision requerida:
+Decision cerrada:
 
 ```text
-Opcion A: bundle JavaScript + Node.js 20+ obligatorio
-Opcion B: binarios nativos por plataforma
-Opcion C: instalacion administrada del runtime
+bundle JavaScript self-contained + Node.js 20+ obligatorio
 ```
 
-Si se elige Node obligatorio, el launcher debe hacer preflight:
+El launcher debe hacer preflight:
 
 - `node` disponible;
 - version minima;
@@ -410,6 +434,7 @@ stateDiagram-v2
     INCONCLUSIVE --> IN_PROGRESS : reopen_spike
     FAILED --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
     INCONCLUSIVE --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    DECISION_ACCEPTED_WITH_LIMITATIONS --> IN_PROGRESS : reopen_accepted_limitation
     PASSED --> [*]
     DECISION_ACCEPTED_WITH_LIMITATIONS --> [*]
 ```
@@ -422,9 +447,23 @@ stateDiagram-v2
 | `fail_spike` | `IN_PROGRESS` -> `FAILED` | La hipotesis falla o un criterio obligatorio no se cumple. |
 | `classify_spike_inconclusive` | `IN_PROGRESS` -> `INCONCLUSIVE` | La evidencia no permite una decision confiable. |
 | `reopen_spike` | `FAILED` o `INCONCLUSIVE` -> `IN_PROGRESS` | Se autoriza un nuevo intento con alcance o mitigacion revisados. |
-| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Existe ADR con riesgo, limitacion, owner y condicion de reapertura. |
+| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Solo si todos los criterios fallidos son `critical: false` o `waivable: true`; requiere ADR. |
+| `reopen_accepted_limitation` | `DECISION_ACCEPTED_WITH_LIMITATIONS` -> `IN_PROGRESS` | Se cumple la condicion de reapertura registrada en el ADR. |
 
 El Corte -1.2 no cierra si algun spike queda `PLANNED`, `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE`.
+
+Cada spike declara:
+
+```yaml
+critical: true
+waivable: false
+pass_criteria:
+  - id: no-data-loss
+    severity: critical
+    waivable: false
+```
+
+`DECISION_ACCEPTED_WITH_LIMITATIONS` no puede utilizarse cuando falla un criterio `critical` con `waivable: false`. Los criterios de integridad, ausencia de perdida de datos, reproducibilidad de hashes, aislamiento de paths e idempotencia son siempre critical y no waivable.
 
 Cada spike debe usar esta estructura:
 
@@ -446,27 +485,27 @@ Result
 
 ## 14. Spikes obligatorios
 
-### Spike 1A: Host integration
+### Spike 1: Host integration
 
 Validar manifest, namespace, discovery, autocomplete, help, `bin/` en PATH del Bash tool, plugin root, plugin data, reload y update.
 
-### Spike 1B: Runtime distribution
+### Spike 2: Runtime Node 20+
 
-Comparar Node.js 20+ obligatorio, binarios nativos e instalacion administrada. Debe cubrir Node ausente, version incompatible, binario colisionado, Windows, WSL2, Linux y macOS si se declara soporte.
+Adoptar Node.js 20+ obligatorio con bundle JavaScript self-contained. Debe cubrir Node ausente, version incompatible, binario colisionado, Windows, WSL2, Linux y macOS.
 
-### Spike 2: Canonical core
+### Spike 3: Canonical core
 
-Implementar ULID o UUIDv7, canonical JSON RFC 8785, hashing, path normalization y evaluador DSL suficiente para atomizar sin Markdown ni LLM.
+Implementar UUIDv7, display ID determinista, canonical JSON RFC 8785, hashing, path normalization y evaluador DSL suficiente para atomizar sin Markdown ni LLM.
 
-### Spike 3: Worktree merge
+### Spike 4: Worktree merge
 
-Probar create/create, edit/edit, delete/edit, move/edit, colision de display IDs e indices regenerables.
+Probar create/create, edit/edit, delete/edit, supersede/edit e indices regenerables. No probar `move/edit`: las relaciones padre-hijo son inmutables.
 
-### Spike 4: Transaction recovery
+### Spike 5: Transaction recovery
 
 Fallar despues de staging, primer write, canonical state, antes del evento y despues de comando externo. Validar rollback, compensacion, retry, idempotencia, limpieza y estados `PARTIALLY_APPLIED` o `MANUAL_INTERVENTION_REQUIRED` cuando correspondan.
 
-### Spike 5: Integrated prototype
+### Spike 6: Integrated prototype
 
 Ejecutar el flujo:
 
@@ -477,16 +516,40 @@ init
 -> work package
 -> task
 -> propose
+-> validate
+-> approve
 -> apply
+-> verify
 -> check
 -> report
 ```
 
 El spike anterior de guia ejecutable queda integrado al Canonical Core o como prueba adicional del prototipo integrado.
 
+## Criterios critical no waivable
+
+| Spike | Criterios obligatorios |
+|-------|------------------------|
+| Canonical Core | hash reproducible, path normalization, unicidad de identidad y DSL determinista |
+| Worktree Merge | ausencia de perdida de datos, ausencia de sobrescritura silenciosa e indices regenerables |
+| Transaction Recovery | idempotencia, consistencia, recovery verificable y ausencia de corrupcion |
+| Integrated Prototype | integridad del estado, ChangeSet obligatorio y audit trail |
+
+Estos criterios se declaran `severity: critical` y `waivable: false` en el
+manifest de cada spike. Un fallo critical bloquea el cierre del Corte -1.2.
+
 ## Criterio de salida
 
 El Corte -1.2 se cierra solo si todos los spikes producen:
+
+```text
+S1 PASSED
+S2 PASSED
+S3 PASSED
+S4 PASSED
+S5 PASSED
+S6 PASSED
+```
 
 - decisiones explicitas;
 - contratos verificables;

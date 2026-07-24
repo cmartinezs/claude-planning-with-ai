@@ -378,6 +378,21 @@ else
   warn "rg not installed; skipped public command reference scan"
 fi
 
+if command -v node >/dev/null 2>&1; then
+  if node "$ROOT/hooks/tests/protect-planning-state.test.mjs"; then
+    pass "planning-state protection hook tests"
+  else
+    fail "planning-state protection hook tests failed"
+  fi
+  if node "$ROOT/spikes/verify-corte-1.2.mjs" --structure-only; then
+    pass "Corte -1.2 spike structure"
+  else
+    fail "Corte -1.2 spike structure is invalid"
+  fi
+else
+  warn "node not installed; skipped next-generation hook and spike checks"
+fi
+
 if [[ "$failures" -gt 0 ]]; then
   printf '\nPlugin verification failed: %d failure(s), %d warning(s)\n' "$failures" "$warnings"
   exit 1

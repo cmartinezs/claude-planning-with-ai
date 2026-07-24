@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-La cuarta revision aprueba ejecutar el Corte -1.2, pero no aprueba naming, version, runtime productivo ni publicacion. Este documento convierte los problemas residuales en contratos verificables que deben quedar cerrados por los spikes.
+La quinta revision cierra el producto nuevo `1.0.0`, Node.js 20+, UUIDv7, display IDs deterministas e inmutables, parent inmutable, permisos restringidos y la validacion externa del Corte -1.2. Este documento convierte los contratos en evidencia verificable que debe quedar cerrada por los spikes.
 
 Regla:
 
@@ -50,6 +50,7 @@ stateDiagram-v2
     INCONCLUSIVE --> IN_PROGRESS : reopen_spike
     FAILED --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
     INCONCLUSIVE --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    DECISION_ACCEPTED_WITH_LIMITATIONS --> IN_PROGRESS : reopen_accepted_limitation
     PASSED --> [*]
     DECISION_ACCEPTED_WITH_LIMITATIONS --> [*]
 ```
@@ -62,30 +63,24 @@ stateDiagram-v2
 | `fail_spike` | `IN_PROGRESS` -> `FAILED` | La hipotesis falla o un criterio obligatorio no se cumple. |
 | `classify_spike_inconclusive` | `IN_PROGRESS` -> `INCONCLUSIVE` | La evidencia no permite una decision confiable. |
 | `reopen_spike` | `FAILED` o `INCONCLUSIVE` -> `IN_PROGRESS` | Se autoriza un nuevo intento con alcance o mitigacion revisados. |
-| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Existe ADR con riesgo, limitacion, owner y condicion de reapertura. |
+| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Solo si todos los criterios fallidos son `critical: false` o `waivable: true`; requiere ADR. |
+| `reopen_accepted_limitation` | `DECISION_ACCEPTED_WITH_LIMITATIONS` -> `IN_PROGRESS` | Se cumple la condicion de reapertura registrada en el ADR. |
 
-`DECISION_ACCEPTED_WITH_LIMITATIONS` exige ADR con alcance de la limitacion, riesgo aceptado, mitigacion, owner y condicion de reapertura.
+`DECISION_ACCEPTED_WITH_LIMITATIONS` exige ADR con alcance de la limitacion, riesgo aceptado, mitigacion, owner y condicion de reapertura. No puede utilizarse si falla un criterio `critical` con `waivable: false`.
 
 ## 2. Producto, naming y versionado
 
-La documentacion debe mantener abierta la decision hasta cerrar naming gate:
+La decision de producto esta cerrada:
 
 ```yaml
 plugin:
-  version: <product-version>
-  schema_version: <schema-version>
+  version: 1.0.0
+  schema_version: 1
   template_pack:
-    version: <template-pack-version>
+    version: 1.0.0
 ```
 
-Opciones:
-
-| Opcion | Version inicial | Impacto |
-|--------|-----------------|---------|
-| Continuidad del plugin actual | `<product-version>` | Mantiene repo, marketplace y upgrade path, pero requiere ruptura major clara. |
-| Producto nuevo | `1.0.0` | Requiere namespace, manifest, marketplace, instalacion, sitio y migracion separados. |
-
-No modificar definitivamente manifests, binarios, package names, marketplace, sitio ni documentacion publica final hasta decidir producto y nombre.
+El plugin actual 3.x queda en maintenance only. El producto next-generation se implementa como producto nuevo `1.0.0`, con namespace, manifest, marketplace, instalacion y sitio propios.
 
 Naming gate minimo:
 
@@ -114,15 +109,7 @@ Separar tres capas:
 
 No describir el launcher interno como interfaz externa. El launcher en `bin/` puede estar disponible en el PATH del Bash tool del plugin sin estar instalado globalmente para usuario, CI u otros agentes.
 
-El spike de runtime debe decidir entre:
-
-```text
-bundle JavaScript + Node.js 20+ obligatorio
-binario nativo
-instalacion administrada
-```
-
-Si se elige Node obligatorio, el preflight debe validar presencia, version minima, permisos, plugin root, PATH, mensaje de instalacion y salida JSON estructurada para skills.
+El runtime definitivo es un bundle JavaScript self-contained con Node.js 20+ obligatorio. El preflight debe validar presencia, version minima, permisos, plugin root, PATH, mensaje de instalacion y salida JSON estructurada para skills.
 
 ## 4. Contrato de ejecucion de skills
 
@@ -133,9 +120,50 @@ Cada `SKILL.md` v4 debe declarar frontmatter compatible con Claude Code:
 description: ...
 argument-hint: ...
 disable-model-invocation: true
-allowed-tools: Bash(<product-cli> ...)
 ---
 ```
+
+Contrato de preaprobacion:
+
+```yaml
+# check/SKILL.md
+allowed-tools: Bash(<product-cli> check *)
+
+# report/SKILL.md, solo stages query-only
+allowed-tools: Bash(<product-cli> report status *) Bash(<product-cli> report standup *) Bash(<product-cli> report history *)
+```
+
+Las skills mutantes `init`, `config`, `release`, `item`, `task`, `decision` y
+`update` no declaran `allowed-tools` general. Ninguna skill preaprueba
+`approve`, `apply` o deployment.
+
+## 4.1. Proteccion de `.planning/**`
+
+El plugin distribuye `hooks/hooks.json` con un hook `PreToolUse` para `Write`,
+`Edit` y `Bash`, implementado por `scripts/protect-planning-state.mjs`.
+
+Reglas:
+
+- `Write` y `Edit` se deniegan cuando el target esta dentro de
+  `<workspace>/.planning/**`, incluso mediante path absoluto, `../` o symlink.
+- `Bash` se deniega cuando el comando puede escribir en `.planning/**` mediante
+  redirect, `tee`, `cp`, `mv`, `rm`, shells anidados, `python`, `node` u otro
+  script mutante.
+- Solo el launcher aprobado `<product-cli>` puede mutar `.planning/**`.
+- Read, Glob, Grep, Bash query-only y comandos query-only del launcher quedan
+  permitidos.
+
+Mensaje exacto:
+
+```text
+Direct writes to .planning/** are prohibited.
+Use <product-cli> to produce and apply a ChangeSet.
+```
+
+Los tests obligatorios viven en
+`hooks/tests/protect-planning-state.test.mjs` y cubren `write-direct-file`,
+`edit-direct-file`, `bash-redirect`, `bash-tee`, `bash-cp`, `bash-mv`,
+`bash-rm`, `symlink-escape`, `launcher-allowed` y `read-allowed`.
 
 Campos obligatorios en el cuerpo:
 
@@ -221,6 +249,18 @@ Operaciones multiagregado declaran:
 
 Los hijos referencian al padre. Los padres no mantienen listas canonicas de hijos; los indices son proyecciones regenerables.
 
+Relaciones inmutables en 1.0:
+
+```text
+ReleaseItem.release_id        immutable
+WorkPackage.release_item_id   immutable
+Task.work_package_id          immutable
+```
+
+No existe `move/edit`. Para trasladar trabajo se crea un nuevo agregado bajo
+el nuevo padre, se registra provenance y se marca el anterior como
+`SUPERSEDED` o `CANCELLED` con `replacement_id`.
+
 ## 6. Lifecycle de display IDs
 
 Los IDs primarios son la identidad real. `display_id` es una entrada humana resoluble.
@@ -228,53 +268,38 @@ Los IDs primarios son la identidad real. `display_id` es una entrada humana reso
 Modelo:
 
 ```yaml
-id: 019...
-display_id: RI-7H3K9
-display_id_status: COMMITTED
-aliases:
-  - RI0038
+id: 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
+display_id: RI-4F8Q2B7X
+display_id_status: ACTIVE
 ```
 
 Estados:
 
 ```text
-UNASSIGNED
-PROVISIONAL
-COMMITTED
-ALIASED
+ACTIVE
 RETIRED
 ```
 
 ```mermaid
 stateDiagram-v2
-    [*] --> UNASSIGNED : create_entity
-    UNASSIGNED --> PROVISIONAL : assign_provisional_display_id
-    PROVISIONAL --> COMMITTED : commit_display_id
-    PROVISIONAL --> RETIRED : retire_provisional_display_id
-    COMMITTED --> ALIASED : alias_display_id
-    COMMITTED --> RETIRED : retire_display_id
-    ALIASED --> RETIRED : retire_aliased_display_id
+    [*] --> ACTIVE : create_display_id
+    ACTIVE --> RETIRED : retire_display_id
     RETIRED --> [*]
 ```
 
 | Evento | Transicion | Motivo o guard |
 |--------|------------|----------------|
-| `create_entity` | inicial -> `UNASSIGNED` | Se crea el agregado sin etiqueta humana asignada. |
-| `assign_provisional_display_id` | `UNASSIGNED` -> `PROVISIONAL` | Se genera una etiqueta candidata antes de confirmar su unicidad. |
-| `commit_display_id` | `PROVISIONAL` -> `COMMITTED` | La colision se descarta y la etiqueta queda persistida para el agregado. |
-| `retire_provisional_display_id` | `PROVISIONAL` -> `RETIRED` | Se abandona el agregado antes de confirmar su etiqueta. |
-| `alias_display_id` | `COMMITTED` -> `ALIASED` | Cambia la etiqueta visible; la anterior se conserva como alias. |
-| `retire_display_id` | `COMMITTED` -> `RETIRED` | El agregado se retira y su etiqueta no puede reutilizarse. |
-| `retire_aliased_display_id` | `ALIASED` -> `RETIRED` | Se retira un agregado que conserva historial de aliases. |
+| `create_display_id` | inicial -> `ACTIVE` | El display ID se deriva del UUIDv7 y se persiste al crear el agregado. |
+| `retire_display_id` | `ACTIVE` -> `RETIRED` | El agregado se retira y su display ID no puede reutilizarse. |
 
 Reglas:
 
 - referencias internas siempre usan `id`;
-- `display_id` puede cambiar y conservar aliases;
+- `display_id` es inmutable desde la creacion;
 - no se exige continuidad;
 - no se reutilizan IDs retirados o cancelados;
-- counters secuenciales quedan fuera del primer runtime si no pasan fixtures de merge;
-- estrategia inicial recomendada: ID humano derivado del primary ID, por ejemplo `RI-7H3K9`.
+- no existen counters secuenciales ni aliases en 1.0;
+- estrategia definitiva: prefijo de agregado y Base32 Crockford de un short-hash del UUIDv7, con ampliacion de longitud ante colision.
 
 El resolver de argumentos debe detectar ambiguedad y pedir seleccion humana, no elegir por heuristica silenciosa.
 
@@ -423,72 +448,94 @@ Transiciones permitidas:
 
 El campo `state` no se puede editar arbitrariamente. Cada cambio debe ser consecuencia de un evento de transicion autorizado, con motivo, actor, precondiciones y evidencia registrados.
 
+Estados definitivos:
+
+```text
+PROPOSED
+INVALID
+VALIDATED
+APPROVED
+REJECTED
+STALE
+STAGED
+APPLYING
+APPLIED
+VERIFYING
+VERIFIED
+RECORDING
+RECORDED
+COMPENSATING
+COMPENSATED
+ROLLED_BACK
+MANUAL_INTERVENTION_REQUIRED
+```
+
 ```mermaid
 stateDiagram-v2
     [*] --> PROPOSED : propose_operation
     PROPOSED --> VALIDATED : validate_operation
-    PROPOSED --> FAILED : reject_invalid_proposal
+    PROPOSED --> INVALID : invalidate_operation
     VALIDATED --> APPROVED : approve_operation
     VALIDATED --> REJECTED : reject_operation
     VALIDATED --> STALE : mark_operation_stale
     APPROVED --> STAGED : stage_operation
     APPROVED --> STALE : mark_operation_stale
     STAGED --> APPLYING : begin_apply
-    STAGED --> FAILED : fail_staging
+    STAGED --> INVALID : invalidate_operation
     APPLYING --> APPLIED : apply_succeeded
-    APPLYING --> FAILED : apply_failed
-    APPLYING --> ROLLED_BACK : rollback_apply
-    APPLYING --> PARTIALLY_APPLIED : detect_partial_apply
+    APPLYING --> COMPENSATING : begin_compensation
     APPLYING --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
-    PARTIALLY_APPLIED --> COMPENSATING : begin_compensation
-    PARTIALLY_APPLIED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
-    APPLIED --> VERIFIED : verify_operation
-    APPLIED --> FAILED : postcondition_failed
-    APPLIED --> ROLLED_BACK : rollback_applied_change
-    APPLIED --> COMPENSATING : begin_compensation
-    APPLIED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
-    VERIFIED --> RECORDED : record_operation
-    VERIFIED --> FAILED : verification_failed
-    FAILED --> COMPENSATING : begin_compensation
-    FAILED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+    APPLIED --> VERIFYING : begin_verification
+    VERIFYING --> VERIFIED : verification_succeeded
+    VERIFYING --> COMPENSATING : verification_failed
+    VERIFYING --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+    VERIFIED --> RECORDING : begin_recording
+    RECORDING --> RECORDED : recording_succeeded
+    RECORDING --> MANUAL_INTERVENTION_REQUIRED : recording_failed
     COMPENSATING --> COMPENSATED : compensation_succeeded
+    COMPENSATING --> ROLLED_BACK : rollback_succeeded
     COMPENSATING --> MANUAL_INTERVENTION_REQUIRED : compensation_failed
-    MANUAL_INTERVENTION_REQUIRED --> COMPENSATING : resume_compensation
-    MANUAL_INTERVENTION_REQUIRED --> COMPENSATED : manual_recovery_completed
+    INVALID --> [*]
     RECORDED --> [*]
     REJECTED --> [*]
     STALE --> [*]
     ROLLED_BACK --> [*]
     COMPENSATED --> [*]
+    MANUAL_INTERVENTION_REQUIRED --> [*]
 ```
 
 | Evento | Transicion | Motivo o guard |
 |--------|------------|----------------|
 | `propose_operation` | inicial -> `PROPOSED` | Se crea un ChangeSet con base revisions y alcance declarados. |
 | `validate_operation` | `PROPOSED` -> `VALIDATED` | Schemas, boundaries, precondiciones y concurrencia pasan. |
-| `reject_invalid_proposal` | `PROPOSED` -> `FAILED` | La propuesta no puede validarse por error estructural o de dominio. |
+| `invalidate_operation` | `PROPOSED` o `STAGED` -> `INVALID` | Se detecta un error antes de aplicar efectos. |
 | `approve_operation` | `VALIDATED` -> `APPROVED` | Un actor autorizado aprueba el ChangeSet vigente. |
 | `reject_operation` | `VALIDATED` -> `REJECTED` | Un actor autorizado rechaza la propuesta con motivo registrado. |
 | `mark_operation_stale` | `VALIDATED` o `APPROVED` -> `STALE` | Cambia una base revision o una precondicion antes de aplicar. |
 | `stage_operation` | `APPROVED` -> `STAGED` | Se preparan snapshots y escrituras sin mutar el estado canonico. |
-| `fail_staging` | `STAGED` -> `FAILED` | No se puede completar staging o snapshot. |
 | `begin_apply` | `STAGED` -> `APPLYING` | Se inicia la mutacion autorizada e idempotente. |
 | `apply_succeeded` | `APPLYING` -> `APPLIED` | Todas las escrituras previstas terminan correctamente. |
-| `apply_failed` | `APPLYING` -> `FAILED` | La mutacion falla antes de completar el ChangeSet. |
-| `detect_partial_apply` | `APPLYING` -> `PARTIALLY_APPLIED` | Algunas escrituras terminaron y otras no. |
-| `rollback_apply` | `APPLYING` -> `ROLLED_BACK` | El rollback de staging o de la mutacion es verificable. |
-| `request_manual_intervention` | `APPLYING`, `APPLIED`, `PARTIALLY_APPLIED` o `FAILED` -> `MANUAL_INTERVENTION_REQUIRED` | Recovery automatico no es seguro o no es posible. |
-| `begin_compensation` | `PARTIALLY_APPLIED` -> `COMPENSATING` | Se inicia recovery despues de una aplicacion parcial. |
-| `verify_operation` | `APPLIED` -> `VERIFIED` | Postcondiciones, hashes y referencias quedan comprobados. |
-| `postcondition_failed` | `APPLIED` -> `FAILED` | La escritura termino pero el estado resultante no cumple. |
-| `rollback_applied_change` | `APPLIED` -> `ROLLED_BACK` | La compensacion reversible se completo y fue verificada. |
-| `begin_compensation` | `APPLIED` o `FAILED` -> `COMPENSATING` | Se inicia recovery para reparar una mutacion incompleta o invalida. |
-| `verification_failed` | `VERIFIED` -> `FAILED` | La verificacion posterior o el registro de evidencia falla. |
-| `record_operation` | `VERIFIED` -> `RECORDED` | Evento, manifest y proyecciones quedan registrados. |
+| `begin_compensation` | `APPLYING` -> `COMPENSATING` | La aplicacion produjo un efecto que requiere recovery. |
+| `request_manual_intervention` | `APPLYING` o `VERIFYING` -> `MANUAL_INTERVENTION_REQUIRED` | No existe recovery automatico seguro. |
+| `begin_verification` | `APPLIED` -> `VERIFYING` | Las escrituras terminaron y se inicia la comprobacion. |
+| `verification_succeeded` | `VERIFYING` -> `VERIFIED` | Postcondiciones, hashes y referencias quedan comprobados. |
+| `verification_failed` | `VERIFYING` -> `COMPENSATING` | La operacion tuvo efectos, pero la comprobacion no pasa. |
+| `begin_recording` | `VERIFIED` -> `RECORDING` | Se inicia la persistencia de eventos, manifest y proyecciones. |
+| `recording_succeeded` | `RECORDING` -> `RECORDED` | La auditoria y las proyecciones quedan registradas. |
+| `recording_failed` | `RECORDING` -> `MANUAL_INTERVENTION_REQUIRED` | No se puede garantizar el registro completo automaticamente. |
 | `compensation_succeeded` | `COMPENSATING` -> `COMPENSATED` | La compensacion finaliza y su resultado es verificable. |
+| `rollback_succeeded` | `COMPENSATING` -> `ROLLED_BACK` | El rollback finaliza y el estado anterior queda verificado. |
 | `compensation_failed` | `COMPENSATING` -> `MANUAL_INTERVENTION_REQUIRED` | La compensacion no puede garantizar consistencia automatica. |
-| `resume_compensation` | `MANUAL_INTERVENTION_REQUIRED` -> `COMPENSATING` | Un operador aporta la accion requerida y autoriza continuar el recovery. |
-| `manual_recovery_completed` | `MANUAL_INTERVENTION_REQUIRED` -> `COMPENSATED` | La intervencion manual corrige el estado y deja evidencia verificable. |
+
+Semantica obligatoria:
+
+- `INVALID`: error detectado antes de aplicar efectos.
+- `APPLYING`: la operacion ya comenzo a mutar.
+- `VERIFYING`: las escrituras terminaron, pero aun no estan aprobadas como validas.
+- `VERIFIED`: las postcondiciones y hashes pasaron.
+- `RECORDING`: se estan persistiendo eventos, manifest y proyecciones.
+- `COMPENSATING`: hubo efectos y se esta ejecutando recovery.
+- `MANUAL_INTERVENTION_REQUIRED`: no existe recovery automatico seguro.
 
 Manifest minimo:
 
@@ -496,6 +543,8 @@ Manifest minimo:
 state: PROPOSED
 previous_state: null
 transition_reason: created
+actor: system
+evidence: []
 attempt: 1
 started_at: 2026-07-22T00:00:00Z
 updated_at: 2026-07-22T00:00:00Z

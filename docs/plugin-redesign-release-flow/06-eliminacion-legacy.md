@@ -34,7 +34,7 @@ backlog
 
 Todo lo demas debe borrarse o quedar fuera del plugin v4.
 
-`release` queda como router publico del lifecycle de release. No existe `release init`; el bootstrap completo es `init` y la configuracion posterior vive en `config`. La forma visible final es `/<product-name>:<skill-name>` salvo que el spike de namespace obligue a un fallback prefijado.
+`release` queda como router publico del lifecycle de release. No existe `release init`; el bootstrap completo es `init` y la configuracion posterior vive en `config`. La forma visible final es `/<plugin-name>:<skill-name>` y no existe una segunda convencion de namespace.
 
 ## Alcance completo
 
@@ -269,7 +269,7 @@ Reglas:
 
 - `plugin.json` debe describir v4 como release/release-item/work-package/task, no lifecycle planning v3.
 - `marketplace.json` no debe listar comandos removidos ni texto antiguo.
-- todo version marker debe apuntar a `<product-version>` si se publica como continuidad del plugin actual, o a `1.0.0` si el naming gate decide producto nuevo.
+- todo version marker del producto next-generation debe apuntar a `1.0.0`; el plugin actual 3.x queda en maintenance only.
 - `CHANGELOG.md` debe declarar ruptura, comandos removidos, storage nuevo y ausencia de aliases.
 - `template-pack/update-version/` debe explicar que v4 es corte limpio. Si existe herramienta auxiliar de export desde v3, debe documentarse como opcional.
 - `config.yml` debe modelar `project`, `policies`, `git`, `commands`, `scope_catalog`, `guide_outputs`, `custom_generators`, validacion y autonomia; no debe duplicar `scope.yml` ni conservar `terminology.planning_item` o estados INITIAL/EXPANSION/DEEPENING.
