@@ -269,7 +269,7 @@ Reglas:
 
 - `plugin.json` debe describir v4 como release/release-item/work-package/task, no lifecycle planning v3.
 - `marketplace.json` no debe listar comandos removidos ni texto antiguo.
-- todo version marker debe apuntar a v4.0.0 cuando se publique el major.
+- todo version marker debe apuntar a `<product-version>` si se publica como continuidad del plugin actual, o a `1.0.0` si el naming gate decide producto nuevo.
 - `CHANGELOG.md` debe declarar ruptura, comandos removidos, storage nuevo y ausencia de aliases.
 - `template-pack/update-version/` debe explicar que v4 es corte limpio. Si existe herramienta auxiliar de export desde v3, debe documentarse como opcional.
 - `config.yml` debe modelar `project`, `policies`, `git`, `commands`, `scope_catalog`, `guide_outputs`, `custom_generators`, validacion y autonomia; no debe duplicar `scope.yml` ni conservar `terminology.planning_item` o estados INITIAL/EXPANSION/DEEPENING.
@@ -374,12 +374,13 @@ Revision inicial:
 ```text
 launcher                 -> crear como entrada estable <product-cli> <domain> <stage>
 release.mjs              -> reescribir como use cases v4 de release aggregate
-planning-init.mjs        -> reescribir para estructura v4 base y plugin lock
-planning-config.mjs      -> crear para scopes, policies, commands, guides y generators
-planning-story.mjs       -> reescribir para release items y work packages
-planning-task.mjs        -> adaptar a release/release-item/work-package/task
-planning-check.mjs       -> adaptar y ampliar con guide checks
-planning-report.mjs      -> adaptar a release/release-item/work-package/task
+planning-init.mjs        -> reemplazar por workspace-init.mjs
+planning-config.mjs      -> reemplazar por config.mjs
+planning-story.mjs       -> reemplazar por item.mjs
+planning-task.mjs        -> reemplazar por task.mjs
+planning-check.mjs       -> reemplazar por check.mjs
+planning-report.mjs      -> reemplazar por report.mjs
+planning-decision.mjs    -> reemplazar por decision.mjs
 doc-generate.mjs         -> plegar bajo report o borrar wrapper directo
 planning-atomize.mjs     -> integrar a item atomize
 planning-mutate.mjs      -> reemplazar por ChangeSet/stores/librerias v4

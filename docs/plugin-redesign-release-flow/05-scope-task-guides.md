@@ -26,6 +26,17 @@ in
 matches
 ```
 
+Contrato de evaluacion:
+
+- `dsl_version: 1` obligatorio en cada guia ejecutable.
+- Tipos permitidos: `string`, `number`, `boolean`, `null`, `array`, `object`, `date`, `datetime`.
+- Field paths usan notacion por punto, por ejemplo `item.kind`, `item.tags` o `work_package.contracts.api`.
+- No hay coercion implicita de tipos.
+- Campos inexistentes producen error estructurado salvo que el operador sea `exists`.
+- Strings son case-sensitive por defecto y se evalua sobre Unicode normalizado segun la politica de hashing.
+- `all` y `any` hacen short-circuit y emiten trace de decision.
+- `matches` debe declarar motor regex, timeout, tamano maximo de input/patron y proteccion ReDoS.
+
 Nombres:
 
 ```text
@@ -88,7 +99,7 @@ guides:
       source_fingerprints:
         - path: docs/frontend-guidelines.md
           fingerprint: sha256:...
-      generator_version: 4.0.0
+      generator_version: <product-version>
       model: gpt-5
       prompt_version: scope-task-guide-v1
       generated_at: 2026-07-22T00:00:00Z
@@ -103,7 +114,7 @@ guides:
       sources:
         - docs/testing.md
       source_fingerprints: []
-      generator_version: 4.0.0
+      generator_version: <product-version>
       model: null
       prompt_version: null
       generated_at: 2026-07-22T00:00:00Z
@@ -120,6 +131,29 @@ approved
 stale
 rejected
 ```
+
+```mermaid
+stateDiagram-v2
+    [*] --> generated : generate_guide
+    generated --> reviewed : submit_guide_for_review
+    generated --> rejected : reject_guide
+    reviewed --> approved : approve_guide
+    reviewed --> rejected : reject_guide
+    approved --> stale : detect_guide_drift
+    stale --> generated : regenerate_guide
+    rejected --> generated : revise_guide
+    approved --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `generate_guide` | inicial -> `generated` | Se genera una guia con fuentes, revision y provenance registradas. |
+| `submit_guide_for_review` | `generated` -> `reviewed` | La guia supera validaciones estructurales y queda lista para revision humana. |
+| `approve_guide` | `reviewed` -> `approved` | Un aprobador autorizado confirma contenido, fuentes y policy. |
+| `reject_guide` | `generated` o `reviewed` -> `rejected` | La guia tiene defectos, fuentes insuficientes o incumple la policy. |
+| `detect_guide_drift` | `approved` -> `stale` | Cambia una fuente o fingerprint y la revision aprobada deja de ser vigente. |
+| `regenerate_guide` | `stale` -> `generated` | Se produce una nueva revision a partir de fuentes actuales. |
+| `revise_guide` | `rejected` -> `generated` | Se corrigen las observaciones y se genera una nueva revision. |
 
 Una guia `generated`, `stale` o `rejected` no habilita atomizacion automatica en modo estricto. Debe existir aprobacion humana o una waiver explicita.
 
@@ -145,12 +179,13 @@ Estructura ejecutable recomendada:
 
 ```yaml
 schema_version: 1
+dsl_version: 1
 scope_id: web
 revision: sha256:...
 work_package_types:
   - id: ui-feature
     applies_when:
-      any:
+      all:
         - field: item.kind
           op: in
           value:
@@ -280,6 +315,7 @@ Estructura ejecutable recomendada:
 
 ```yaml
 schema_version: 1
+dsl_version: 1
 scope_id: web
 revision: sha256:...
 gates_by_work_package_type:
@@ -300,9 +336,12 @@ gates_by_task_type:
 test_data:
   - need: authenticated-user
     strategy: fixture
-environments:
+execution_contexts:
   - local
   - ci
+deployment_environments:
+  - beta
+  - production
 open_gaps: []
 ```
 
@@ -328,7 +367,7 @@ Estructura narrativa recomendada:
 | Task Type | Required gates | Commands | Evidence |
 |-----------|----------------|----------|----------|
 
-## Test Data And Environments
+## Test Data, Execution Contexts And Deployment Environments
 
 | Need | Strategy | Setup | Teardown |
 |------|----------|-------|----------|

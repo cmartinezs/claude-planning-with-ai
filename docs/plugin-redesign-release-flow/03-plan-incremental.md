@@ -4,7 +4,7 @@
 
 Esto es v4 y parte en limpio. No hay compatibilidad hacia atras, aliases legacy ni storage paralelo por defecto. La ruta sigue siendo incremental para controlar riesgo de implementacion, pero cada corte debe construir el modelo v4 final, no una transicion desde v3.
 
-La recomendacion del review cambia el orden: no comenzar por una skill publica. Primero debe cerrarse el contrato del dominio, del naming y del runtime. La segunda revision agrega un Corte -1.1 obligatorio para resolver contradicciones residuales. La tercera revision agrega un Corte -1.2 de spikes tecnicos antes del runtime productivo.
+La recomendacion del review cambia el orden: no comenzar por una skill publica. Primero debe cerrarse el contrato del dominio, del naming y del runtime. La segunda revision agrega un Corte -1.1 obligatorio para resolver contradicciones residuales. La tercera revision agrega un Corte -1.2 de spikes tecnicos antes del runtime productivo. La cuarta revision aprueba ejecutar ese Corte -1.2, pero prohibe saltar al vertical slice mientras algun spike no tenga resultado aceptado.
 
 ## Corte -1: contrato del dominio y del runtime
 
@@ -56,7 +56,7 @@ Cambios:
 - Vincular aprobaciones al hash del ChangeSet.
 - Hacer `/<product-name>:check` query-only; debe recomendar operaciones, no generar artefactos.
 - Reemplazar `--dry-run`/`--write` como contrato mental por `propose/validate/approve/apply/verify`.
-- Mover el launcher publico a `bin/<product-cli>`.
+- Mover el launcher interno estable del plugin a `bin/<product-cli>`.
 - Crear bundle self-contained en `runtime/dist/<product-cli>.mjs`.
 - Definir estrategia historica de template packs con `.planning/vendor/template-packs/<fingerprint>/`.
 - Agregar schemas faltantes: actor, approval, gate, blocker, risk, waiver, decision, deployment event, finalization, revision ref, command spec, provenance, resolution, release item y operation.
@@ -88,7 +88,13 @@ Cambios:
 - Separar `.planning/events/`, `.planning/operations/`, `.planning/.runtime/` y `.planning/vendor/` con politica Git/retencion.
 - Exigir `propose` para reportes/renders que escriban proyecciones.
 - Declarar trust model: guardrails cooperativos y trazabilidad, no sandbox contra agente malicioso con permisos del usuario.
-- Decidir continuidad v4 del plugin actual versus producto nuevo 1.0.0.
+- Decidir continuidad del plugin actual como `<product-version>` versus producto nuevo `1.0.0`.
+- Formalizar contrato de permisos de skills: `allowed-tools`, `disable-model-invocation`, aprobaciones por stage, stop conditions y prohibicion de autoapproval.
+- Definir limites de agregados: `ProjectContext`, `Scope`, `Release`, `ReleaseItem`, `WorkPackage` y `Task` como agregados relacionados, con consistencia fuerte local y consistencia transversal recomputable.
+- Definir lifecycle de `display_id`: estados, aliases, resolucion de colisiones, no reutilizacion y estrategia inicial derivada del ID primario si los counters secuenciales no demuestran merge seguro.
+- Adoptar RFC 8785 JSON Canonicalization Scheme para hashes canonicos y especificar tree hash para fingerprints de directorios.
+- Separar `Execution Context` de `Deployment Environment`.
+- Cerrar state machine formal de operaciones con transiciones, estados de recovery y fault matrix.
 
 Validacion:
 
@@ -97,13 +103,53 @@ Validacion:
 bash scripts/verify-plugin.sh
 ```
 
+Estados permitidos para cada spike:
+
+```text
+PLANNED
+IN_PROGRESS
+PASSED
+FAILED
+INCONCLUSIVE
+DECISION_ACCEPTED_WITH_LIMITATIONS
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> PLANNED : plan_spike
+    PLANNED --> IN_PROGRESS : start_spike
+    IN_PROGRESS --> PASSED : pass_spike
+    IN_PROGRESS --> FAILED : fail_spike
+    IN_PROGRESS --> INCONCLUSIVE : classify_spike_inconclusive
+    IN_PROGRESS --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    FAILED --> IN_PROGRESS : reopen_spike
+    INCONCLUSIVE --> IN_PROGRESS : reopen_spike
+    FAILED --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    INCONCLUSIVE --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    PASSED --> [*]
+    DECISION_ACCEPTED_WITH_LIMITATIONS --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `plan_spike` | inicial -> `PLANNED` | La hipotesis, alcance, timebox y criterios quedan definidos. |
+| `start_spike` | `PLANNED` -> `IN_PROGRESS` | Se inicia el prototipo dentro del timebox aprobado. |
+| `pass_spike` | `IN_PROGRESS` -> `PASSED` | La evidencia cumple los criterios de aprobacion. |
+| `fail_spike` | `IN_PROGRESS` -> `FAILED` | La hipotesis falla o un criterio obligatorio no se cumple. |
+| `classify_spike_inconclusive` | `IN_PROGRESS` -> `INCONCLUSIVE` | La evidencia no permite una decision confiable. |
+| `reopen_spike` | `FAILED` o `INCONCLUSIVE` -> `IN_PROGRESS` | Se autoriza un nuevo intento con alcance o mitigacion revisados. |
+| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Existe ADR con riesgo, limitacion, owner y condicion de reapertura. |
+
+El roadmap no puede avanzar a Corte 0 si existe un spike en `PLANNED`, `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE`.
+
 Spikes obligatorios:
 
-1. Plugin real: manifest, skill namespaced, launcher, runtime, plugin root, PATH, Node ausente, binario colisionado y actualizacion.
-2. Dos worktrees: crear items/work packages/eventos en paralelo, merge real, display IDs reconciliados e indices regenerables.
-3. Crash recovery: fallas despues de staging, write parcial, canonical state, antes del evento y despues de comando externo.
-4. Canonical hashes: YAML equivalente produce el mismo hash pese a orden, indentacion, line endings, comentarios y estilos de string.
-5. Guia ejecutable: atomizar Work Package sin lenguaje natural, LLM ni Markdown.
+1. Host integration: manifest, namespace, discovery, autocomplete/help, plugin root, plugin data, `bin/` en PATH del Bash tool, reload y update.
+2. Runtime distribution: Node.js 20+ obligatorio versus binarios nativos versus instalacion administrada, con evidencia Windows/WSL2/Linux/macOS segun soporte declarado.
+3. Canonical core: ULID o UUIDv7, canonical JSON RFC 8785, hashing, path normalization y evaluador DSL.
+4. Worktree merge: create/create, edit/edit, delete/edit, move/edit, colision de display IDs e indices regenerables.
+5. Transaction recovery: fallas despues de staging, primer write, canonical state, antes del evento, despues de comando externo, rollback, compensacion e idempotencia.
+6. Integrated prototype: `init -> release -> item -> work package -> task -> propose -> apply -> check -> report`.
 
 ## Corte 0: bootstrap y configuracion del proyecto
 
@@ -167,12 +213,38 @@ Cambios:
 - Modelar `finalization` como metadata y no como estado bloqueante del flujo principal.
 - Separar lifecycle de `completion` y `readiness`; el runtime calcula esos campos sin transicionar automaticamente la release.
 - Modelar deployment events por separado dentro del agregado de release.
-- Definir environments iniciales: `beta`, `demo`, `production` y custom environments configurables.
+- Definir `Execution Contexts` iniciales como `local`, `ci`, `container` o `preview`, y `Deployment Environments` iniciales como `beta`, `demo`, `staging`, `production` y custom targets configurables.
 - Agregar policies configurables:
   - `strict_sequence`;
   - `dependency_graph`;
   - lanes como `main`, `hotfix` o `mobile`.
 - Dejar `release_train` y `parallel` fuera del primer vertical slice.
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT : create_release
+    DRAFT --> PLANNED : plan_release
+    DRAFT --> CANCELLED : cancel_release
+    PLANNED --> ACTIVE : activate_release
+    PLANNED --> CANCELLED : cancel_release
+    ACTIVE --> VERIFYING : start_release_verification
+    ACTIVE --> CANCELLED : cancel_release
+    VERIFYING --> RELEASED : release_release
+    VERIFYING --> ACTIVE : reopen_release
+    VERIFYING --> CANCELLED : cancel_release
+    RELEASED --> [*]
+    CANCELLED --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `create_release` | inicial -> `DRAFT` | Se crea la release con identidad y alcance iniciales. |
+| `plan_release` | `DRAFT` -> `PLANNED` | El alcance, dependencias y work packages requeridos son validos. |
+| `activate_release` | `PLANNED` -> `ACTIVE` | Existe aprobacion para ejecutar el trabajo planificado. |
+| `start_release_verification` | `ACTIVE` -> `VERIFYING` | El trabajo requerido fue entregado y se inicia la verificacion. |
+| `release_release` | `VERIFYING` -> `RELEASED` | Readiness, gates y evidencia de release cumplen la policy. |
+| `reopen_release` | `VERIFYING` -> `ACTIVE` | La verificacion detecta fallas corregibles y permite remediacion. |
+| `cancel_release` | `DRAFT`, `PLANNED`, `ACTIVE` o `VERIFYING` -> `CANCELLED` | Cancelacion explicita con motivo y actor registrados. |
 - Registrar `scope_refs` con indice de `guide_revision` para reproducibilidad, sin reemplazar los `guide_refs` obligatorios de cada Work Package.
 - Regenerar `TRACEABILITY.md`, `RELEASE-NOTES.md` y reportes desde YAML canonico.
 - Validar unicidad, formato y resolucion no ambigua de display IDs; no exigir continuidad sin saltos.
@@ -293,7 +365,7 @@ Objetivo: dejar una superficie limpia y publicar el cambio como major.
 
 Cambios:
 
-- Confirmar contra `CHANGELOG.md` que el siguiente major es v4.0.0.
+- Confirmar contra `CHANGELOG.md`, manifests y naming gate si el release sera continuidad del plugin actual con `<product-version>` o producto nuevo `1.0.0`.
 - Ejecutar la eliminacion legacy definida en [Eliminacion legacy](06-eliminacion-legacy.md).
 - Actualizar manifests y metadata: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, README badge y `.page/package*.json`.
 - Rehacer documentacion publica: README, `docs/commands.yml`, reference, user guide, developer guide, tutoriales, workflows y glossary.
@@ -315,16 +387,16 @@ El primer cambio implementable debe ser pequeno, pero previo a comandos publicos
 4. Agregar checks de arquitectura en `scripts/verify-plugin.sh`.
 5. Documentar el launcher estable y los contratos en developer guide.
 
-Despues de Corte -1 y Corte -1.1, implementar el vertical slice:
+Despues de cerrar Corte -1, Corte -1.1 y Corte -1.2, implementar el primer vertical slice:
 
 ```text
-arc-init
-  -> config estructurada
+init
+  -> config
   -> scope catalog
-  -> release create
-  -> release item create
-  -> work package create
-  -> task create
+  -> release
+  -> release item
+  -> work package
+  -> task
   -> check
   -> report
 ```

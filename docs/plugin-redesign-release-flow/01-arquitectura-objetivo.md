@@ -7,7 +7,7 @@
 3. Work package por scope: el trabajo tecnico se divide por unidades estables de ownership y validacion, no por "historias hermanas".
 4. Scopes globales: los scopes pertenecen al proyecto y las releases referencian revisiones concretas de sus guias.
 5. Estado estructurado: YAML o JSON es fuente de verdad; Markdown es proyeccion humana generada.
-6. Identidad estable y distribuida: IDs primarios ULID/UUIDv7, `display_id` humano como `R0001` o `T0042`, y slugs decorativos.
+6. Identidad estable y distribuida: IDs primarios ULID/UUIDv7, `display_id` humano resoluble como alias de entrada y slugs decorativos.
 7. Marca reconocible pendiente: v4 deja atras `claude-*` y `plan-*`, pero `ARC Flow` queda como codename hasta cerrar naming gate y namespace real de plugin.
 8. Menos comandos publicos: un comando por intencion principal; las variaciones son subcomandos o stages internos.
 9. Skills delgadas: la skill coordina intencion, aprobacion y juicio del agente; no implementa mecanica repetible.
@@ -40,6 +40,46 @@ Version corta:
 ```text
 release -> release item -> scope work package -> task
 ```
+
+## Limites de agregados
+
+El termino "Release Aggregate" no debe implicar atomicidad global sobre todo el arbol. El modelo operativo tiene agregados relacionados:
+
+```text
+ProjectContext Aggregate
+Scope Aggregate
+Release Aggregate
+ReleaseItem Aggregate
+WorkPackage Aggregate
+Task Aggregate
+```
+
+Invariantes locales se validan transaccionalmente dentro de un agregado:
+
+- schema valido;
+- transicion permitida;
+- scope valido;
+- estado local;
+- campos condicionales;
+- gates propios.
+
+Invariantes transversales se calculan o validan mediante queries y policies:
+
+- readiness de Release;
+- completion agregada;
+- dependencias satisfechas;
+- grafo sin ciclos;
+- work packages obligatorios completados;
+- gates transversales aprobados.
+
+Modelo de consistencia:
+
+```text
+strong consistency within aggregate
+eventual/recomputed consistency across aggregates
+```
+
+Operaciones multiagregado declaran agregados leidos, agregados mutados, revisiones, orden de escritura, compensacion, postcondiciones y riesgo de conflicto.
 
 ### Release
 
@@ -189,9 +229,13 @@ Estructura objetivo:
   gate-profiles/
     frontend-default.yml
     security-default.yml
-  environments/
+  execution-contexts/
     local.yml
+    ci.yml
+    preview.yml
+  environments/
     beta.yml
+    staging.yml
     demo.yml
     production.yml
 
@@ -237,7 +281,7 @@ Estado canonico:
 - `config.yml`;
 - `plugin.lock.yml`;
 - `scope.yml`;
-- concern, gate, gate profile y environment YAML;
+- concern, gate, gate profile, execution context y deployment environment YAML;
 - `release.yml`;
 - `release-item.yml`;
 - `work-package.yml`;
@@ -263,11 +307,11 @@ Proyecciones humanas generadas:
 
 ```yaml
 plugin:
-  version: 4.0.0
-  schema_version: 4
+  version: <product-version>
+  schema_version: <schema-version>
   template_pack:
     id: default
-    version: 4.0.0
+    version: <template-pack-version>
     fingerprint: sha256:...
 ```
 
@@ -289,20 +333,63 @@ Recomendado:
 
 ```yaml
 id: 01J4F0Z9M...
-display_id: T0042
+display_id: T-7H3K9
+display_id_status: COMMITTED
+aliases: []
 slug: validate-schema
 ```
 
 `display_id` mejora lectura, pero no es la referencia primaria:
 
 ```text
-R0001-release-flow-redesign
-RI0004-configure-project-scopes
-WP0012-api-contract
-T0041-validate-schema
+R-7H3K9-release-flow-redesign
+RI-4F8Q2-configure-project-scopes
+WP-9M2AB-api-contract
+T-3Q6NZ-validate-schema
 ```
 
 Cambiar un titulo o mover un work package dentro de un Release Item no debe romper dependencias ni trazabilidad.
+
+Lifecycle de `display_id`:
+
+```text
+UNASSIGNED
+PROVISIONAL
+COMMITTED
+ALIASED
+RETIRED
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> UNASSIGNED : create_entity
+    UNASSIGNED --> PROVISIONAL : assign_provisional_display_id
+    PROVISIONAL --> COMMITTED : commit_display_id
+    PROVISIONAL --> RETIRED : retire_provisional_display_id
+    COMMITTED --> ALIASED : alias_display_id
+    COMMITTED --> RETIRED : retire_display_id
+    ALIASED --> RETIRED : retire_aliased_display_id
+    RETIRED --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `create_entity` | inicial -> `UNASSIGNED` | Se crea el agregado sin etiqueta humana asignada. |
+| `assign_provisional_display_id` | `UNASSIGNED` -> `PROVISIONAL` | Se genera una etiqueta candidata antes de confirmar su unicidad. |
+| `commit_display_id` | `PROVISIONAL` -> `COMMITTED` | La colision se descarta y la etiqueta queda persistida para el agregado. |
+| `retire_provisional_display_id` | `PROVISIONAL` -> `RETIRED` | Se abandona el agregado antes de confirmar su etiqueta. |
+| `alias_display_id` | `COMMITTED` -> `ALIASED` | Cambia la etiqueta visible; la anterior se conserva como alias. |
+| `retire_display_id` | `COMMITTED` -> `RETIRED` | El agregado se retira y su etiqueta no puede reutilizarse. |
+| `retire_aliased_display_id` | `ALIASED` -> `RETIRED` | Se retira un agregado que conserva historial de aliases. |
+
+Reglas:
+
+- no exigir continuidad;
+- no reutilizar IDs retirados o cancelados;
+- mantener aliases cuando una etiqueta humana cambie;
+- resolver `display_id` solo como entrada humana;
+- usar siempre `id` en referencias internas;
+- considerar una etiqueta humana derivada del ID primario para el primer runtime, por ejemplo `RI-7H3K9`, hasta demostrar counters secuenciales seguros en merges de worktrees.
 
 ## Estados y dimensiones separadas
 
@@ -320,6 +407,32 @@ VERIFYING
 RELEASED
 CANCELLED
 ```
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT : create_release
+    DRAFT --> PLANNED : plan_release
+    DRAFT --> CANCELLED : cancel_release
+    PLANNED --> ACTIVE : activate_release
+    PLANNED --> CANCELLED : cancel_release
+    ACTIVE --> VERIFYING : start_release_verification
+    ACTIVE --> CANCELLED : cancel_release
+    VERIFYING --> RELEASED : release_release
+    VERIFYING --> ACTIVE : reopen_release
+    VERIFYING --> CANCELLED : cancel_release
+    RELEASED --> [*]
+    CANCELLED --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `create_release` | inicial -> `DRAFT` | Se crea la release con identidad y alcance iniciales. |
+| `plan_release` | `DRAFT` -> `PLANNED` | El alcance, dependencias y work packages requeridos son validos. |
+| `activate_release` | `PLANNED` -> `ACTIVE` | Existe aprobacion para ejecutar el trabajo planificado. |
+| `start_release_verification` | `ACTIVE` -> `VERIFYING` | El trabajo requerido fue entregado y se inicia la verificacion. |
+| `release_release` | `VERIFYING` -> `RELEASED` | Readiness, gates y evidencia de release cumplen la policy. |
+| `reopen_release` | `VERIFYING` -> `ACTIVE` | La verificacion detecta fallas corregibles y permite remediacion. |
+| `cancel_release` | `DRAFT`, `PLANNED`, `ACTIVE` o `VERIFYING` -> `CANCELLED` | Cancelacion explicita con motivo y actor registrados. |
 
 Finalizacion es metadata:
 
@@ -354,6 +467,32 @@ VERIFYING
 DONE
 CANCELLED
 ```
+
+```mermaid
+stateDiagram-v2
+    [*] --> TODO : create_work_item
+    TODO --> READY : prepare_work_item
+    TODO --> CANCELLED : cancel_work_item
+    READY --> IN_PROGRESS : start_work_item
+    READY --> CANCELLED : cancel_work_item
+    IN_PROGRESS --> VERIFYING : submit_work_item
+    IN_PROGRESS --> CANCELLED : cancel_work_item
+    VERIFYING --> DONE : complete_work_item
+    VERIFYING --> IN_PROGRESS : reopen_work_item
+    VERIFYING --> CANCELLED : cancel_work_item
+    DONE --> [*]
+    CANCELLED --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `create_work_item` | inicial -> `TODO` | Se crea el elemento con alcance y padre validos. |
+| `prepare_work_item` | `TODO` -> `READY` | Dependencias, guia aplicable y precondiciones estan satisfechas. |
+| `start_work_item` | `READY` -> `IN_PROGRESS` | Un actor autorizado inicia la ejecucion. |
+| `submit_work_item` | `IN_PROGRESS` -> `VERIFYING` | Se entrega evidencia y se solicita verificacion. |
+| `complete_work_item` | `VERIFYING` -> `DONE` | Los criterios de aceptacion y gates pasan. |
+| `reopen_work_item` | `VERIFYING` -> `IN_PROGRESS` | La verificacion encuentra trabajo pendiente o evidencia insuficiente. |
+| `cancel_work_item` | `TODO`, `READY` o `IN_PROGRESS` -> `CANCELLED` | Cancelacion explicita con resolucion y riesgo registrados. |
 
 `SKIPPED` existe como resolucion, no como estado principal:
 
@@ -439,7 +578,7 @@ Contrato minimo:
 {
   "schemaVersion": 1,
   "operationId": "OP-01J...",
-  "operation": "story.atomize",
+  "operation": "item.atomize",
   "target": {
     "releaseId": "01J...",
     "releaseItemId": "01J...",
@@ -503,7 +642,7 @@ El runtime debe protegerse contra command injection, path traversal, symlink esc
 
 ## Launcher estable
 
-La interfaz interna recomendada no expone rutas como `.planning/scripts/release.mjs` ni rutas de instalacion del plugin. Las skills llaman un launcher estable. Mientras no cierre el naming gate, se documenta como placeholder:
+La interfaz interna recomendada no expone rutas como `.planning/scripts/release.mjs` ni rutas de instalacion del plugin. Las skills llaman un launcher interno estable del plugin. Mientras no cierre el naming gate, se documenta como placeholder:
 
 ```text
 <product-cli> <domain> <stage> [args] [--format json|markdown]
@@ -519,6 +658,16 @@ El launcher resuelve:
 - runtime;
 - boundaries de paths;
 - compatibilidad de schema.
+
+Capas de invocacion:
+
+| Capa | Forma | Alcance |
+|------|-------|---------|
+| API conversacional | `/<plugin-name>:init` | Skill namespaced dentro de Claude Code. |
+| Launcher interno estable del plugin | `<product-cli>` | Ejecutable disponible para las skills y el Bash tool cuando el plugin esta habilitado. |
+| CLI externa opcional | `<product-cli>` instalado por npm/Homebrew/binario/installer | Solo existe si se distribuye fuera de Claude Code. |
+
+No describir el launcher interno como interfaz externa hasta que exista una distribucion adicional decidida y probada.
 
 ## Responsabilidades deterministas
 

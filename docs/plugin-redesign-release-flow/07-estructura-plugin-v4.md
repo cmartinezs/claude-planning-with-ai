@@ -1,8 +1,8 @@
-# Estructura completa del plugin v4
+# Estructura completa del plugin next-generation
 
 ## Objetivo
 
-Este documento define la estructura total nueva del repositorio del plugin v4: skills, runtime, template pack, schemas, metadata, documentacion publica, sitio web y outputs generados. Complementa la arquitectura de dominio; aqui la pregunta es donde vive cada cosa y que responsabilidades tiene.
+Este documento define la estructura total nueva del repositorio del plugin next-generation. `v4` se mantiene como etiqueta historica de la iniciativa hasta decidir si se publica como continuidad del plugin actual o como producto nuevo `1.0.0`. La estructura cubre skills, runtime, template pack, schemas, metadata, documentacion publica, sitio web y outputs generados.
 
 Regla base:
 
@@ -56,19 +56,20 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |   +-- claude-planning-v4-expert-review/
 |   +-- claude-planning-v4-second-expert-review/
 |   +-- claude-planning-v4-third-expert-review/
+|   +-- claude-planning-v4-fourth-expert-review/
 |   +-- design-history/
 |
 +-- runtime/
 |   +-- src/
 |   |   +-- commands/
-|   |   |   +-- planning-init.mjs
-|   |   |   +-- planning-config.mjs
+|   |   |   +-- workspace-init.mjs
+|   |   |   +-- config.mjs
 |   |   |   +-- release.mjs
-|   |   |   +-- planning-story.mjs
-|   |   |   +-- planning-task.mjs
-|   |   |   +-- planning-check.mjs
-|   |   |   +-- planning-report.mjs
-|   |   |   +-- planning-decision.mjs
+|   |   |   +-- item.mjs
+|   |   |   +-- task.mjs
+|   |   |   +-- check.mjs
+|   |   |   +-- report.mjs
+|   |   |   +-- decision.mjs
 |   |   |   +-- update-version.mjs
 |   |   |   +-- changeset.mjs
 |   |   +-- lib/
@@ -144,7 +145,7 @@ La separacion nueva es deliberada:
 
 | Ruta | Tipo | Responsabilidad |
 |------|------|-----------------|
-| `bin/` | Launcher publico | Entrada minima visible por el plugin; delega al bundle del runtime. |
+| `bin/` | Launcher interno estable del plugin | Entrada minima visible por el Bash tool cuando el plugin esta habilitado; delega al bundle del runtime. |
 | `runtime/` | Codigo del producto plugin | Codigo fuente, bundle self-contained, librerias, schemas, fixtures y ejecucion deterministica. |
 | `template-pack/` | Artefactos renderizables | Templates, docs de template pack y migraciones de template pack. No contiene scripts de dominio. |
 | `scripts/` | Tooling del repo | Verificacion, mantenimiento y tareas de publicacion del repositorio del plugin. No se distribuye como runtime publico. |
@@ -164,7 +165,7 @@ Por tanto, `scripts/` dentro de `planning-template/` era una herencia v3, no una
 
 Reglas:
 
-- La version debe coincidir con `CHANGELOG.md`, README badge, site package y update-version.
+- La version debe coincidir con `CHANGELOG.md`, README badge, site package y update-version despues de decidir producto y naming.
 - La descripcion debe mencionar el nombre aprobado por naming gate, las skills canonicas `init`, `config`, `release`, `item`, `task`, `check`, release items tipados, work packages, ChangeSets y estado canonico.
 - `ARC Flow` puede aparecer solo como codename interno hasta cerrar naming gate.
 - No debe prometer compatibilidad con comandos v3.
@@ -206,9 +207,14 @@ Contrato de cada `SKILL.md`:
 - argumentos publicos;
 - precondiciones;
 - llamada al launcher `<product-cli> <domain> <stage>`;
+- frontmatter `disable-model-invocation` y `allowed-tools` cuando aplique;
+- comandos permitidos por stage;
+- aprobaciones host/runtime separadas;
 - donde entra juicio del agente;
 - cuando pedir aprobacion humana;
-- criterios de stop.
+- stop conditions;
+- manejo de error;
+- salida esperada.
 
 No debe contener parseo Markdown, asignacion de IDs, logica de transiciones, pasos Git repetidos, tablas grandes duplicadas ni reglas ya definidas por schemas/runtime/templates.
 
@@ -216,7 +222,7 @@ No debe contener parseo Markdown, asignacion de IDs, logica de transiciones, pas
 
 `runtime/` contiene el codigo ejecutable distribuido con el plugin. No vive dentro del template pack porque no es plantilla: es runtime.
 
-La entrada visible es un launcher raiz minimo:
+La entrada interna estable del plugin es un launcher raiz minimo:
 
 ```text
 bin/<product-cli>
@@ -240,14 +246,14 @@ Scripts de dominio:
 
 | Script | Responsabilidad |
 |--------|-----------------|
-| `planning-init.mjs` | Bootstrap del workspace, config inicial, plugin lock y estructura base. |
-| `planning-config.mjs` | Scopes, fuentes, policies, comandos, autonomia, guias y generadores. |
+| `workspace-init.mjs` | Bootstrap del workspace, config inicial, plugin lock y estructura base. |
+| `config.mjs` | Scopes, fuentes, policies, comandos, autonomia, guias y generadores. |
 | `release.mjs` | Release aggregate, lifecycle, readiness, deployment events y finalization. |
-| `planning-story.mjs` | Release Items tipados, criterios funcionales cuando apliquen, work packages y atomizacion. |
-| `planning-task.mjs` | Inspect, start, verify, correction y closeout de tasks. |
-| `planning-check.mjs` | Schemas, invariantes, guide freshness, gates, readiness y evidencia. |
-| `planning-report.mjs` | Status, standup, history, traceability, release notes, docs y exports. |
-| `planning-decision.mjs` | Decision records, aceptacion/rechazo, waivers y enlaces. |
+| `item.mjs` | Release Items tipados, criterios funcionales cuando apliquen, work packages y atomizacion. |
+| `task.mjs` | Inspect, start, verify, correction y closeout de tasks. |
+| `check.mjs` | Schemas, invariantes, guide freshness, gates, readiness y evidencia. |
+| `report.mjs` | Status, standup, history, traceability, release notes, docs y exports. |
+| `decision.mjs` | Decision records, aceptacion/rechazo, waivers y enlaces. |
 | `update-version.mjs` | Migraciones futuras v4+ y actualizacion del template pack. |
 
 `runtime/src/lib/` contiene librerias compartidas:
@@ -289,6 +295,8 @@ Reglas:
 | `plugin-lock.schema.json` | Version del plugin, schema y template pack fingerprint. |
 | `scope.schema.json` | Scope catalog, kind, ownership, paths, guide revisions y provenance. |
 | `guide-metadata.schema.json` | Estado de guia, source fingerprints, generator y aprobacion. |
+| `execution-context.schema.json` | Runners, commands, setup, teardown y evidencia de ejecucion. |
+| `environment.schema.json` | Targets desplegables, promotion, rollback, approvals, secrets refs y smoke verification. |
 | `release.schema.json` | Release aggregate, lifecycle, lane, release items, gates, deployment events y finalization. |
 | `release-item.schema.json` | Release Item tipado: user story, capability, defect, enabler, spike, compliance, migration u operational. |
 | `work-package.schema.json` | Trabajo tecnico por scope y gates propios. |
@@ -399,6 +407,7 @@ Reglas:
 | `docs/claude-planning-v4-expert-review/` | Review externo de la propuesta v4. |
 | `docs/claude-planning-v4-second-expert-review/` | Segunda revision experta, fuente del Corte -1.1. |
 | `docs/claude-planning-v4-third-expert-review/` | Tercera revision experta, fuente del Corte -1.2 y spikes. |
+| `docs/claude-planning-v4-fourth-expert-review/` | Cuarta revision experta, fuente de contratos de cierre del Corte -1.2. |
 | `docs/design-history/` | Material archivado; no debe ser fuente publica principal. |
 
 Reglas:
@@ -490,8 +499,10 @@ El plugin v4 crea esta estructura en el proyecto del usuario:
     <gate-id>.yml
   gate-profiles/
     <gate-profile-id>.yml
+  execution-contexts/
+    <execution-context-id>.yml
   environments/
-    <environment-id>.yml
+    <deployment-environment-id>.yml
 
   decisions/
     DEC-0001-slug/
@@ -534,9 +545,9 @@ El runtime vive en el plugin; el workspace guarda estado, lock, eventos, scopes,
 
 ## Publicacion y versionado
 
-Antes de publicar v4:
+Antes de publicar:
 
-- `.claude-plugin/plugin.json` y `marketplace.json` describen solo v4.
+- `.claude-plugin/plugin.json` y `marketplace.json` describen solo el producto aprobado, no el flujo v3.
 - `README.md`, `docs/commands.yml`, `docs/reference.md`, `docs/user-guide.md` y site estan alineados.
 - `bin/`, `runtime/`, `runtime/src/schemas/`, `runtime/dist/<product-cli>.mjs`, `template-pack/template-pack.yml` y `template-pack/templates/` tienen versiones compatibles.
 - `CHANGELOG.md` declara ruptura, comandos removidos, storage nuevo y ausencia de aliases.

@@ -21,6 +21,7 @@ Archivos base:
   concerns/
   gates/
   gate-profiles/
+  execution-contexts/
   environments/
   decisions/
   releases/
@@ -37,7 +38,7 @@ project:
   type: software
 
 plugin:
-  schema_version: 4
+  schema_version: <schema-version>
   launcher: <product-cli>
 
 policies:
@@ -83,6 +84,8 @@ runtime:
   retain_before_snapshots: false
   event_retention: permanent
 ```
+
+`execution-contexts/` describe donde se ejecutan validaciones (`local`, `ci`, `container`, `preview`). `environments/` describe targets desplegables (`beta`, `demo`, `staging`, `production`). No mezclar `ci` con un ambiente desplegable.
 
 `config.yml` no duplica la definicion completa de scopes. Cada scope vive en `.planning/scopes/<scope-id>/scope.yml`.
 
@@ -137,11 +140,11 @@ concerns:
 
 ```yaml
 plugin:
-  version: 4.0.0
-  schema_version: 4
+  version: <product-version>
+  schema_version: <schema-version>
   template_pack:
     id: default
-    version: 4.0.0
+    version: <template-pack-version>
     fingerprint: sha256:...
     vendor_snapshot: .planning/vendor/template-packs/sha256-...
 ```

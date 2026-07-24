@@ -15,8 +15,8 @@ La regla de naming v4 es:
 - el nombre del plugin/producto aporta el namespace publico;
 - las skills canonicas usan nombres cortos sin prefijo: `init`, `config`, `release`, `item`, `task`, `check`, `report`, `decision`, `update`;
 - la forma visible esperada se disena como `/<product-name>:<skill-name>`, por ejemplo `/<product-name>:init`;
-- si el spike demuestra que el host no expone namespace usable, se permite un fallback prefijado por acronimo, por ejemplo `/arc-init`, pero no se aprueba antes de verificarlo;
-- launcher de runtime provisional `arcflow`, sujeto al mismo naming gate;
+- si el spike demuestra que el host no expone namespace usable, se permite un fallback prefijado por acronimo, por ejemplo `/<acronym>-init`, pero no se aprueba antes de verificarlo;
+- launcher interno estable provisional `<product-cli>`, sujeto al mismo naming gate;
 - dominios internos sin prefijo conversacional (`workspace`, `config`, `release`, `item`, `task`, `check`, `report`, `decision`, `changeset`);
 - no usar `claude-*` ni `plan-*` como marca publica nueva;
 - conservar menciones `plan-*` solo en tablas de reemplazo legacy.
@@ -84,7 +84,7 @@ Reglas:
 
 - no crear aliases legacy;
 - no mantener `.releases/`, `.planning/active/` ni `.planning/finished/` como storage;
-- no aceptar `NNN-slug` como identificador raiz si el contrato exige ID primario distribuido o `display_id` `R0001`;
+- no aceptar `NNN-slug` como identificador raiz si el contrato exige ID primario distribuido o `display_id` humano resoluble;
 - no duplicar skills por etapa cuando una etapa puede ser stage interno;
 - no usar IDs que mezclen slug, scope, titulo u orden de item;
 - si una capacidad v3 no entra en project context, release, release item, work package, task, check, report o decision, se elimina o queda como comando avanzado solo con una razon fuerte.
@@ -97,9 +97,41 @@ Cada `SKILL.md` debe tener como maximo:
 - argumentos publicos;
 - precondiciones;
 - llamada al launcher determinista;
+- herramientas permitidas;
+- comandos permitidos;
 - punto exacto donde entra juicio del agente;
 - criterios de stop;
+- manejo de error;
+- salida esperada;
 - reglas de aprobacion humana.
+
+Frontmatter esperado para flujos con efectos secundarios:
+
+```yaml
+---
+description: ...
+argument-hint: ...
+disable-model-invocation: true
+allowed-tools: Bash(<product-cli> ...)
+---
+```
+
+Politica de permisos:
+
+| Stage u operacion | Preaprobacion sugerida |
+|-------------------|------------------------|
+| `check`, `status`, `inspect`, `propose`, `validate` | permitida |
+| `approve` | no permitida por defecto |
+| `apply` | no permitida por defecto |
+| Git mutante | segun policy |
+| deployment | aprobacion explicita |
+
+Las aprobaciones runtime no reemplazan permisos del host, y los permisos del host no reemplazan aprobaciones de ChangeSet. La policy base debe ser:
+
+```yaml
+approvals:
+  allow_agent_self_approval: false
+```
 
 La skill no debe contener:
 
@@ -108,7 +140,10 @@ La skill no debe contener:
 - logica de estados;
 - pasos Git repetidos;
 - tablas duplicadas;
-- reglas que ya viven en schemas, runtime, templates o docs canonicos.
+- reglas que ya viven en schemas, runtime, templates o docs canonicos;
+- aprobacion de su propio ChangeSet;
+- escritura directa de `.planning/`;
+- `apply` sin approval/policy.
 
 ## Contrato del runtime
 

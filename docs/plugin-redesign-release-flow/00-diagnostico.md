@@ -67,8 +67,8 @@ El almacenamiento canonico debe incluir `config.yml`, `plugin.lock.yml`, `scope.
 
 Ya existe una direccion correcta:
 
-- `planning-template/scripts/planning-task.mjs` centraliza etapas de task como `inspect`, `readiness`, `git-setup`, `start`, `publish`, `correction`, `closeout`.
-- `planning-template/scripts/planning-check.mjs` centraliza `health`, `validate` y `task-validate`.
+- `planning-template/scripts/planning-task.mjs` centraliza etapas de task como `inspect`, `readiness`, `git-setup`, `start`, `publish`, `correction`, `closeout`; en v4 esta capacidad debe renombrarse y moverse a `runtime/src/commands/task.mjs`.
+- `planning-template/scripts/planning-check.mjs` centraliza `health`, `validate` y `task-validate`; en v4 esta capacidad debe renombrarse y moverse a `runtime/src/commands/check.mjs`.
 - `planning-template/scripts/doc-generate.mjs` centraliza documentacion de task, story y planning.
 - `planning-template/scripts/release.mjs` ya centraliza release CRUD, aunque con el modelo viejo de release -> plannings.
 - `planning-template/scripts/planning-from-release.mjs` ya apunta al bridge desde documentos de release.

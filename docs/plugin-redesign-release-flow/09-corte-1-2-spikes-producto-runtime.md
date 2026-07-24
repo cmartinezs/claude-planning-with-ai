@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-La tercera revision experta aprueba el dominio `release -> release item -> scope work package -> task`, pero no aprueba todavia el naming definitivo ni el runtime productivo. Este corte amplifica el Corte -1.1 con decisiones que solo pueden cerrarse mediante spikes tecnicos.
+La tercera revision experta aprueba el dominio `release -> release item -> scope work package -> task`, pero no aprueba todavia el naming definitivo ni el runtime productivo. La cuarta revision aprueba ejecutar este corte y aclara que los spikes documentados no son evidencia de resolucion. Este corte amplifica el Corte -1.1 con decisiones que solo pueden cerrarse mediante prototipos, fixtures, pruebas y ADRs.
 
 Regla:
 
@@ -69,7 +69,7 @@ skills/decision/
 skills/update/
 ```
 
-Un prefijo por acronimo, por ejemplo `/arc-init`, solo es fallback si el spike demuestra que el namespace del plugin no queda visible o no es usable.
+Un prefijo por acronimo, por ejemplo `/<acronym>-init`, solo es fallback si el spike demuestra que el namespace del plugin no queda visible o no es usable.
 
 ## 3. Runtime prerequisite
 
@@ -195,7 +195,8 @@ Las guias deben usar una DSL cerrada para:
 - gate selection;
 - evidence requirements;
 - command selection;
-- environment selection.
+- execution context selection;
+- deployment environment selection.
 
 Operadores permitidos iniciales:
 
@@ -248,9 +249,13 @@ Agregar storage canonico para conceptos transversales:
   gate-profiles/
     security-default.yml
     frontend-default.yml
-  environments/
+  execution-contexts/
     local.yml
+    ci.yml
+    preview.yml
+  environments/
     beta.yml
+    staging.yml
     demo.yml
     production.yml
 ```
@@ -283,7 +288,7 @@ Definir pipeline unico:
 YAML 1.2 seguro
 -> objeto validado
 -> eliminar campos no semanticos
--> canonical JSON
+-> canonical JSON RFC 8785
 -> UTF-8
 -> SHA-256
 ```
@@ -306,9 +311,12 @@ template_fingerprint
 operation_hash
 change_set_hash
 render_hash
+tree_hash
 ```
 
 `revision` no puede incluir su propio campo `revision` en el hash.
+
+El fingerprint de directorios debe declarar paths normalizados, orden lexicografico, politica de symlinks, exclusiones, interaccion con Git ignore y hash de contenido, como tree hash o manifest Merkle.
 
 ## 10. Eventos, operaciones y retencion
 
@@ -377,35 +385,114 @@ Refuerzos:
 - permisos de filesystem cuando sea posible;
 - auditoria de llamadas.
 
-## 13. Spikes obligatorios
+## 13. Estado y template de spikes
 
-### Spike 1: plugin real
+Estados permitidos:
 
-Validar manifest, skill namespaced, launcher, runtime, plugin root, PATH, Node ausente, binario colisionado, actualizacion, Windows/WSL2/Linux.
+```text
+PLANNED
+IN_PROGRESS
+PASSED
+FAILED
+INCONCLUSIVE
+DECISION_ACCEPTED_WITH_LIMITATIONS
+```
 
-### Spike 2: dos worktrees
+```mermaid
+stateDiagram-v2
+    [*] --> PLANNED : plan_spike
+    PLANNED --> IN_PROGRESS : start_spike
+    IN_PROGRESS --> PASSED : pass_spike
+    IN_PROGRESS --> FAILED : fail_spike
+    IN_PROGRESS --> INCONCLUSIVE : classify_spike_inconclusive
+    IN_PROGRESS --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    FAILED --> IN_PROGRESS : reopen_spike
+    INCONCLUSIVE --> IN_PROGRESS : reopen_spike
+    FAILED --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    INCONCLUSIVE --> DECISION_ACCEPTED_WITH_LIMITATIONS : accept_spike_with_limitations
+    PASSED --> [*]
+    DECISION_ACCEPTED_WITH_LIMITATIONS --> [*]
+```
 
-Crear simultaneamente Release Items, Work Packages, eventos y cambios sobre una misma release; fusionar branches y regenerar indices.
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `plan_spike` | inicial -> `PLANNED` | La hipotesis, alcance, timebox y criterios quedan definidos. |
+| `start_spike` | `PLANNED` -> `IN_PROGRESS` | Se inicia el prototipo dentro del timebox aprobado. |
+| `pass_spike` | `IN_PROGRESS` -> `PASSED` | La evidencia cumple los criterios de aprobacion. |
+| `fail_spike` | `IN_PROGRESS` -> `FAILED` | La hipotesis falla o un criterio obligatorio no se cumple. |
+| `classify_spike_inconclusive` | `IN_PROGRESS` -> `INCONCLUSIVE` | La evidencia no permite una decision confiable. |
+| `reopen_spike` | `FAILED` o `INCONCLUSIVE` -> `IN_PROGRESS` | Se autoriza un nuevo intento con alcance o mitigacion revisados. |
+| `accept_spike_with_limitations` | `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE` -> `DECISION_ACCEPTED_WITH_LIMITATIONS` | Existe ADR con riesgo, limitacion, owner y condicion de reapertura. |
 
-### Spike 3: crash recovery
+El Corte -1.2 no cierra si algun spike queda `PLANNED`, `IN_PROGRESS`, `FAILED` o `INCONCLUSIVE`.
 
-Fallar despues de staging, primer write, canonical state, antes del evento y despues de comando externo. Validar rollback, compensacion, retry, idempotencia y limpieza.
+Cada spike debe usar esta estructura:
 
-### Spike 4: canonical hashes
+```text
+Hypothesis
+Scope
+Non-goals
+Timebox
+Prototype location
+Reusable or disposable
+Inputs
+Fault model
+Pass criteria
+Fail criteria
+Evidence
+Decision record
+Result
+```
 
-Dos YAML equivalentes deben producir el mismo hash pese a orden, indentacion, line endings, comentarios y estilos de string.
+## 14. Spikes obligatorios
 
-### Spike 5: guia ejecutable
+### Spike 1A: Host integration
 
-Atomizar un Work Package sin interpretar lenguaje natural, invocar LLM ni leer Markdown.
+Validar manifest, namespace, discovery, autocomplete, help, `bin/` en PATH del Bash tool, plugin root, plugin data, reload y update.
+
+### Spike 1B: Runtime distribution
+
+Comparar Node.js 20+ obligatorio, binarios nativos e instalacion administrada. Debe cubrir Node ausente, version incompatible, binario colisionado, Windows, WSL2, Linux y macOS si se declara soporte.
+
+### Spike 2: Canonical core
+
+Implementar ULID o UUIDv7, canonical JSON RFC 8785, hashing, path normalization y evaluador DSL suficiente para atomizar sin Markdown ni LLM.
+
+### Spike 3: Worktree merge
+
+Probar create/create, edit/edit, delete/edit, move/edit, colision de display IDs e indices regenerables.
+
+### Spike 4: Transaction recovery
+
+Fallar despues de staging, primer write, canonical state, antes del evento y despues de comando externo. Validar rollback, compensacion, retry, idempotencia, limpieza y estados `PARTIALLY_APPLIED` o `MANUAL_INTERVENTION_REQUIRED` cuando correspondan.
+
+### Spike 5: Integrated prototype
+
+Ejecutar el flujo:
+
+```text
+init
+-> release
+-> item
+-> work package
+-> task
+-> propose
+-> apply
+-> check
+-> report
+```
+
+El spike anterior de guia ejecutable queda integrado al Canonical Core o como prueba adicional del prototipo integrado.
 
 ## Criterio de salida
 
-El Corte -1.2 se cierra solo si los cinco spikes producen:
+El Corte -1.2 se cierra solo si todos los spikes producen:
 
 - decisiones explicitas;
 - contratos verificables;
 - fixtures;
 - pruebas automatizadas;
+- evidencia de ejecucion;
+- ADRs;
 - documentacion actualizada;
 - decision final de nombre/producto/versionado.

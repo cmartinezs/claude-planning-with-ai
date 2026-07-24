@@ -124,7 +124,7 @@ Los IDs secuenciales no son claves primarias. La identidad primaria debe ser dis
 
 ```yaml
 id: 01J4F0Z9M...
-display_id: T0042
+display_id: T-7H3K9
 slug: validate-schema
 ```
 
@@ -205,6 +205,111 @@ FAILED
 ROLLED_BACK
 ```
 
+State machine inicial:
+
+El campo `state` no se puede editar arbitrariamente. Cada cambio debe ser consecuencia de un evento de transicion autorizado, con motivo, actor, precondiciones y evidencia registrados.
+
+```mermaid
+stateDiagram-v2
+    [*] --> PROPOSED : propose_operation
+
+    PROPOSED --> VALIDATED : validate_operation
+    PROPOSED --> FAILED : reject_invalid_proposal
+
+    VALIDATED --> APPROVED : approve_operation
+    VALIDATED --> REJECTED : reject_operation
+    VALIDATED --> STALE : mark_operation_stale
+
+    APPROVED --> STAGED : stage_operation
+    APPROVED --> STALE : mark_operation_stale
+
+    STAGED --> APPLYING : begin_apply
+    STAGED --> FAILED : fail_staging
+
+    APPLYING --> APPLIED : apply_succeeded
+    APPLYING --> FAILED : apply_failed
+    APPLYING --> ROLLED_BACK : rollback_apply
+    APPLYING --> PARTIALLY_APPLIED : detect_partial_apply
+    APPLYING --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+    PARTIALLY_APPLIED --> COMPENSATING : begin_compensation
+    PARTIALLY_APPLIED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+
+    APPLIED --> VERIFIED : verify_operation
+    APPLIED --> FAILED : postcondition_failed
+    APPLIED --> ROLLED_BACK : rollback_applied_change
+    APPLIED --> COMPENSATING : begin_compensation
+    APPLIED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+
+    VERIFIED --> RECORDED : record_operation
+    VERIFIED --> FAILED : verification_failed
+
+    FAILED --> COMPENSATING : begin_compensation
+    FAILED --> MANUAL_INTERVENTION_REQUIRED : request_manual_intervention
+
+    COMPENSATING --> COMPENSATED : compensation_succeeded
+    COMPENSATING --> MANUAL_INTERVENTION_REQUIRED : compensation_failed
+    MANUAL_INTERVENTION_REQUIRED --> COMPENSATING : resume_compensation
+    MANUAL_INTERVENTION_REQUIRED --> COMPENSATED : manual_recovery_completed
+
+    RECORDED --> [*]
+    REJECTED --> [*]
+    STALE --> [*]
+    ROLLED_BACK --> [*]
+    COMPENSATED --> [*]
+```
+
+| Evento | Transicion | Motivo o guard |
+|--------|------------|----------------|
+| `propose_operation` | inicial -> `PROPOSED` | Se crea un ChangeSet con base revisions y alcance declarados. |
+| `validate_operation` | `PROPOSED` -> `VALIDATED` | Schemas, boundaries, precondiciones y concurrencia pasan. |
+| `reject_invalid_proposal` | `PROPOSED` -> `FAILED` | La propuesta no puede validarse por error estructural o de dominio. |
+| `approve_operation` | `VALIDATED` -> `APPROVED` | Un actor autorizado aprueba el ChangeSet vigente. |
+| `reject_operation` | `VALIDATED` -> `REJECTED` | Un actor autorizado rechaza la propuesta con motivo registrado. |
+| `mark_operation_stale` | `VALIDATED` o `APPROVED` -> `STALE` | Cambia una base revision o una precondicion antes de aplicar. |
+| `stage_operation` | `APPROVED` -> `STAGED` | Se preparan snapshots y escrituras sin mutar el estado canonico. |
+| `fail_staging` | `STAGED` -> `FAILED` | No se puede completar staging o snapshot. |
+| `begin_apply` | `STAGED` -> `APPLYING` | Se inicia la mutacion autorizada e idempotente. |
+| `apply_succeeded` | `APPLYING` -> `APPLIED` | Todas las escrituras previstas terminan correctamente. |
+| `apply_failed` | `APPLYING` -> `FAILED` | La mutacion falla antes de completar el ChangeSet. |
+| `detect_partial_apply` | `APPLYING` -> `PARTIALLY_APPLIED` | Algunas escrituras terminaron y otras no. |
+| `rollback_apply` | `APPLYING` -> `ROLLED_BACK` | El rollback de staging o de la mutacion es verificable. |
+| `request_manual_intervention` | `APPLYING`, `APPLIED`, `PARTIALLY_APPLIED` o `FAILED` -> `MANUAL_INTERVENTION_REQUIRED` | Recovery automatico no es seguro o no es posible. |
+| `begin_compensation` | `PARTIALLY_APPLIED` -> `COMPENSATING` | Se inicia recovery despues de una aplicacion parcial. |
+| `verify_operation` | `APPLIED` -> `VERIFIED` | Postcondiciones, hashes y referencias quedan comprobados. |
+| `postcondition_failed` | `APPLIED` -> `FAILED` | La escritura termino pero el estado resultante no cumple. |
+| `rollback_applied_change` | `APPLIED` -> `ROLLED_BACK` | La compensacion reversible se completo y fue verificada. |
+| `begin_compensation` | `APPLIED` o `FAILED` -> `COMPENSATING` | Se inicia recovery para reparar una mutacion incompleta o invalida. |
+| `verification_failed` | `VERIFIED` -> `FAILED` | La verificacion posterior o el registro de evidencia falla. |
+| `record_operation` | `VERIFIED` -> `RECORDED` | Evento, manifest y proyecciones quedan registrados. |
+| `compensation_succeeded` | `COMPENSATING` -> `COMPENSATED` | La compensacion finaliza y su resultado es verificable. |
+| `compensation_failed` | `COMPENSATING` -> `MANUAL_INTERVENTION_REQUIRED` | La compensacion no puede garantizar consistencia automatica. |
+| `resume_compensation` | `MANUAL_INTERVENTION_REQUIRED` -> `COMPENSATING` | Un operador aporta la accion requerida y autoriza continuar el recovery. |
+| `manual_recovery_completed` | `MANUAL_INTERVENTION_REQUIRED` -> `COMPENSATED` | La intervencion manual corrige el estado y deja evidencia verificable. |
+
+Estados adicionales requeridos por recovery:
+
+```text
+REJECTED
+STALE
+COMPENSATING
+COMPENSATED
+PARTIALLY_APPLIED
+MANUAL_INTERVENTION_REQUIRED
+```
+
+El manifest de operacion debe registrar:
+
+```yaml
+state: PROPOSED
+previous_state: null
+transition_reason: created
+attempt: 1
+started_at: 2026-07-22T00:00:00Z
+updated_at: 2026-07-22T00:00:00Z
+recovery_required: false
+manual_action: null
+```
+
 La operacion debe:
 
 1. cargar revisiones por agregado;
@@ -217,6 +322,8 @@ La operacion debe:
 8. verificar;
 9. registrar eventos;
 10. regenerar proyecciones.
+
+La matriz de fallas del Corte -1.2 debe cubrir crash despues de `APPLIED`, evento no registrado, postcondition fallida, verificacion fallida, compensacion parcial, comando externo exitoso con write local fallido, ChangeSet obsoleto despues de aprobacion, rollback imposible y reintento idempotente.
 
 ## 9. Comandos externos como saga
 
@@ -275,9 +382,9 @@ CLI conceptual:
 
 Los comandos publicos pueden ocultar parte de esta mecanica, pero el runtime conserva el contrato `propose/validate/approve/apply/verify`.
 
-## 13. Launcher y bundle
+## 13. Launcher interno y bundle
 
-El ejecutable publico vive en la raiz. El nombre exacto queda pendiente del naming gate:
+El launcher interno estable del plugin vive en la raiz. El nombre exacto queda pendiente del naming gate:
 
 ```text
 bin/
@@ -339,7 +446,8 @@ operation.schema.json
 `deployment-event.schema.json` debe cubrir al menos:
 
 ```yaml
-environment: beta | demo | production | custom
+deployment_environment: beta | demo | staging | production | custom
+execution_context: ci | local | preview | custom
 artifact_version: ...
 commit_sha: ...
 started_at: ...
