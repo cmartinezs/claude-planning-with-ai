@@ -9,21 +9,20 @@
   "reusable_or_disposable": "reusable",
   "inputs": ["runtime bundle", "platform fixtures"],
   "fault_model": ["Node absent", "Node 18", "PATH collision", "spaces and Unicode"],
-  "decision_record": null,
+  "adr": null,
   "critical": true,
   "waivable": false,
   "pass_criteria": [
-    { "id": "node-20-minimum", "severity": "critical", "waivable": false },
-    { "id": "json-output", "severity": "critical", "waivable": false },
-    { "id": "platform-matrix", "severity": "critical", "waivable": false }
+    { "id": "node-20-minimum", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] },
+    { "id": "json-output", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] },
+    { "id": "platform-matrix", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] }
   ],
   "fail_criteria": [
-    { "id": "incompatible-node-accepted", "severity": "critical", "waivable": false }
+    { "id": "incompatible-node-accepted", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] }
   ],
   "evidence": [],
   "fixtures": [],
   "tests": [],
-  "adr": null,
   "decision": null,
   "result": null
 }

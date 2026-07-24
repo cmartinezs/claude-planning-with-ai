@@ -9,21 +9,20 @@
   "reusable_or_disposable": "reusable",
   "inputs": ["plugin manifest", "Claude Code host"],
   "fault_model": ["namespace hidden", "hooks not loaded"],
-  "decision_record": null,
+  "adr": null,
   "critical": true,
   "waivable": false,
   "pass_criteria": [
-    { "id": "manifest", "severity": "critical", "waivable": false },
-    { "id": "hooks-active", "severity": "critical", "waivable": false },
-    { "id": "namespace-discovery", "severity": "critical", "waivable": false }
+    { "id": "manifest", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] },
+    { "id": "hooks-active", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] },
+    { "id": "namespace-discovery", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] }
   ],
   "fail_criteria": [
-    { "id": "namespace-hidden", "severity": "critical", "waivable": false }
+    { "id": "namespace-hidden", "severity": "critical", "waivable": false, "status": "PENDING", "evidence_refs": [] }
   ],
   "evidence": [],
   "fixtures": [],
   "tests": [],
-  "adr": null,
   "decision": null,
   "result": null
 }

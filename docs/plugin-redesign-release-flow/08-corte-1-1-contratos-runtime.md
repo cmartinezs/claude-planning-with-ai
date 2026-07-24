@@ -123,7 +123,7 @@ Los scopes pueden solaparse solo cuando `overlap_policy` lo permite y la depende
 Los IDs secuenciales no son claves primarias. La identidad primaria debe ser distribuida:
 
 ```yaml
-id: 01J4F0Z9M...
+id: 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
 display_id: T-7H3K9
 slug: validate-schema
 ```
@@ -145,9 +145,9 @@ Un `baseRevision` global invalida operaciones por cambios no relacionados. El Ch
     "projectConfig": "sha256:...",
     "scope:web": "sha256:...",
     "guide:web:task": "sha256:...",
-    "release:01J...": "sha256:...",
-    "releaseItem:01J...": "sha256:...",
-    "workPackage:01J...": "sha256:..."
+    "release:0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2": "sha256:...",
+    "releaseItem:0190f1c8-6041-7d11-8bb2-2a45f8154ef3": "sha256:...",
+    "workPackage:0190f1c8-7131-7e01-8bb2-2a45f8154ef4": "sha256:..."
   }
 }
 ```
@@ -164,8 +164,8 @@ Storage primario:
 .planning/events/
   2026/
     07/
-      01J4E-release-created.json
-      01J4F-task-started.json
+      0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2-release-created.json
+      0190f1c8-7131-7e01-8bb2-2a45f8154ef4-task-started.json
 ```
 
 Cada evento declara `event_id`, `type`, aggregate, timestamp UTC, actor, operation_id, idempotency_key, payload, input_hash y output_hash. El orden se deriva de UUIDv7/timestamp/causal references, no del orden de lineas.
@@ -376,10 +376,10 @@ CLI conceptual:
 
 ```text
 <product-cli> workspace init propose
-<product-cli> changeset validate OP-...
-<product-cli> changeset approve OP-...
-<product-cli> changeset apply OP-...
-<product-cli> changeset verify OP-...
+<product-cli> changeset validate 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
+<product-cli> changeset approve 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
+<product-cli> changeset apply 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
+<product-cli> changeset verify 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
 ```
 
 Los comandos publicos pueden ocultar parte de esta mecanica, pero el runtime conserva el contrato `propose/validate/approve/apply/verify`.

@@ -245,27 +245,27 @@ Estructura objetivo:
       README.md
 
   releases/
-    <release-id>/
+    <uuidv7>/
       release.yml
       README.md
 
       items/
-        <release-item-id>/
+        <uuidv7>/
           release-item.yml
           README.md
 
           work-packages/
-            <work-package-id>/
+            <uuidv7>/
               work-package.yml
               tasks/
-                <task-id>/
+                <uuidv7>/
                   task.yml
                   README.md
 
-            <work-package-id>/
+            <uuidv7>/
               work-package.yml
               tasks/
-                <task-id>/
+                <uuidv7>/
                   task.yml
                   README.md
 
@@ -489,8 +489,8 @@ reason: ...
 approved_by: ...
 accepted_risk: ...
 replacement:
-  release_id: R0002
-  work_item_id: 01J...
+  release_id: 0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2
+  work_item_id: 0190f1c8-6041-7d11-8bb2-2a45f8154ef3
 ```
 
 Cada elemento declara:
@@ -577,17 +577,17 @@ Contrato minimo:
 ```json
 {
   "schemaVersion": 1,
-  "operationId": "OP-01J...",
+  "operationId": "0190f1c8-4e39-7a21-8bb2-2a45f8154ef1",
   "operation": "item.atomize",
   "target": {
-    "releaseId": "01J...",
-    "releaseItemId": "01J...",
-    "workPackageId": "01J..."
+    "releaseId": "0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2",
+    "releaseItemId": "0190f1c8-6041-7d11-8bb2-2a45f8154ef3",
+    "workPackageId": "0190f1c8-7131-7e01-8bb2-2a45f8154ef4"
   },
   "baseRevisions": {
-    "release:01J...": "sha256:...",
-    "releaseItem:01J...": "sha256:...",
-    "workPackage:01J...": "sha256:...",
+    "release:0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2": "sha256:...",
+    "releaseItem:0190f1c8-6041-7d11-8bb2-2a45f8154ef3": "sha256:...",
+    "workPackage:0190f1c8-7131-7e01-8bb2-2a45f8154ef4": "sha256:...",
     "guide:web:task": "sha256:..."
   },
   "idempotencyKey": "...",
@@ -712,18 +712,18 @@ Cuando el agente produzca Release Items, work packages o tasks, debe entregar un
 /<product-name>:config scopes
 /<product-name>:config policies
 /<product-name>:release new --title "Capability name" --target 2026-Q3-M1-W2 --date 2026-08-07
-/<product-name>:item add R0001 --kind user_story --title "Publish assessment"
-/<product-name>:item package add R0001 RI0001 --scope api --title "Command contract and persistence"
-/<product-name>:item package add R0001 RI0001 --scope web --title "Teacher publishing UI"
-/<product-name>:item atomize R0001 RI0001 WP0001
-/<product-name>:item atomize R0001 RI0001 WP0002
-/<product-name>:task inspect R0001 RI0001 WP0001 T0001
-/<product-name>:task start R0001 RI0001 WP0001 T0001
-/<product-name>:check readiness R0001
-/<product-name>:report status R0001
-/<product-name>:release mark R0001 VERIFYING
-/<product-name>:release mark R0001 RELEASED
-/<product-name>:release finalize R0001
+/<product-name>:item add REL-5F11 --kind user_story --title "Publish assessment"
+/<product-name>:item package add REL-5F11 ITEM-6041 --scope api --title "Command contract and persistence"
+/<product-name>:item package add REL-5F11 ITEM-6041 --scope web --title "Teacher publishing UI"
+/<product-name>:item atomize REL-5F11 ITEM-6041 WP-7131
+/<product-name>:item atomize REL-5F11 ITEM-6041 WP-7A21
+/<product-name>:task inspect REL-5F11 ITEM-6041 WP-7131 TASK-7A21
+/<product-name>:task start REL-5F11 ITEM-6041 WP-7131 TASK-7A21
+/<product-name>:check readiness REL-5F11
+/<product-name>:report status REL-5F11
+/<product-name>:release mark REL-5F11 VERIFYING
+/<product-name>:release mark REL-5F11 RELEASED
+/<product-name>:release finalize REL-5F11
 ```
 
 La forma exacta puede cambiar, pero el usuario debe sentir que navega release -> release item -> scope work package -> task, no una coleccion de utilidades ni una jerarquia de planificaciones paralelas.

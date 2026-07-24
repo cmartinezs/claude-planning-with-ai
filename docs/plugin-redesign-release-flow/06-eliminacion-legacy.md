@@ -302,7 +302,7 @@ Cambios esperados:
 
 - home debe explicar el flujo v4: init -> config -> release -> item -> scope work packages -> task -> ChangeSets -> check/report -> release/deployment -> finalize.
 - pagina de comandos debe mostrar solo comandos v4.
-- tutoriales deben usar `.planning/releases/`, `.planning/scopes/`, IDs primarios distribuidos con `display_id` `R0001`/`RI0001`/`WP0001`/`T0001`, task guides y test guides.
+- tutoriales deben usar `.planning/releases/`, `.planning/scopes/`, UUIDv7 como identidad primaria y display IDs solo en comandos, reportes y proyecciones, junto con task guides y test guides.
 - training/demo no debe ensenar `plan-new`, `plan-expand`, `active/finished`, `.releases/` ni planificaciones adicionales por scope.
 - localizaciones `en` y `es` deben actualizarse juntas.
 - `.page/scripts/verify.js` debe fallar si el site renderiza comandos legacy.
@@ -387,7 +387,7 @@ planning-mutate.mjs      -> reemplazar por ChangeSet/stores/librerias v4
 planning-archive.mjs     -> borrar o reimplementar como release finalization
 planning-done.mjs        -> borrar si queda cubierto por release/release-item/task stages
 planning-clone.mjs       -> borrar salvo que recover lo justifique
-planning-merge.mjs       -> borrar; usar release-item/work-package move/link si aplica
+planning-merge.mjs       -> borrar; crear un agregado reemplazante y cerrar el anterior con provenance y replacement_id
 planning-retry.mjs       -> mover a recover si se conserva
 planning-rollback.mjs    -> mover a recover si se conserva
 planning-story-skip.mjs  -> mover a release-item/task resolution con waiver si se conserva
@@ -442,7 +442,7 @@ rg -n "\.planning/scripts/.*\.mjs" README.md docs runtime template-pack skills .
 Antes de publicar v4:
 
 ```text
-bash scripts/verify-plugin.sh
+bash scripts/verify-next-generation.sh
 cd .page
 npm run build
 git diff --check

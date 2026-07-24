@@ -120,28 +120,22 @@ El launcher debe hacer preflight:
 
 Los IDs primarios distribuidos no bastan si el filesystem usa solo `display_id`.
 
-Prohibido como path canonico:
+Ejemplo de path canonico:
 
 ```text
-R0001-slug/
-RI0001-slug/
-WP0001-slug/
-T0001-slug/
+releases/0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2/
+items/0190f1c8-6041-7d11-8bb2-2a45f8154ef3/
+work-packages/0190f1c8-7131-7e01-8bb2-2a45f8154ef4/
+tasks/0190f1c8-7a21-7e01-8bb2-2a45f8154ef5/
 ```
 
 Opciones permitidas:
 
 ```text
-releases/<primary-id>/
-items/<primary-id>/
-work-packages/<primary-id>/
-tasks/<primary-id>/
-```
-
-o path hibrido:
-
-```text
-RI0004-7H3K9-publish-assessment/
+releases/<uuidv7>/
+items/<uuidv7>/
+work-packages/<uuidv7>/
+tasks/<uuidv7>/
 ```
 
 El `display_id` y el slug son para lectura humana y proyecciones. Las referencias internas usan `id`.
@@ -154,7 +148,7 @@ Preferir:
 
 ```yaml
 # release-item.yml
-release_id: 01J-RELEASE
+release_id: 0190f1c8-5f11-7cc1-8bb2-2a45f8154ef2
 ```
 
 En vez de:
@@ -162,8 +156,8 @@ En vez de:
 ```yaml
 # release.yml
 items:
-  - 01J-ITEM-A
-  - 01J-ITEM-B
+  - 0190f1c8-6041-7d11-8bb2-2a45f8154ef3
+  - 0190f1c8-6041-7d21-8bb2-2a45f8154ef6
 ```
 
 Los indices de hijos son proyecciones regenerables. Operaciones que modifican padres requieren single writer, lock de agregado, reconciliacion explicita o nueva propuesta despues del merge.
@@ -382,7 +376,7 @@ Debe existir mantenimiento para archive, purge y report sin romper locks ni evid
 
 ```text
 <product-cli> report render propose
-<product-cli> changeset apply OP-...
+<product-cli> changeset apply 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1
 ```
 
 Status, readiness, release notes y traceability pueden salir a stdout sin mutar.
@@ -503,7 +497,9 @@ Probar create/create, edit/edit, delete/edit, supersede/edit e indices regenerab
 
 ### Spike 5: Transaction recovery
 
-Fallar despues de staging, primer write, canonical state, antes del evento y despues de comando externo. Validar rollback, compensacion, retry, idempotencia, limpieza y estados `PARTIALLY_APPLIED` o `MANUAL_INTERVENTION_REQUIRED` cuando correspondan.
+Fallar despues de staging, primer write, canonical state, antes del evento y despues de comando externo. Validar rollback, compensacion, retry, idempotencia y limpieza.
+
+Cuando una operacion haya producido efectos parciales, debe transicionar a `COMPENSATING` o `MANUAL_INTERVENTION_REQUIRED`, segun exista o no una compensacion automatica segura.
 
 ### Spike 6: Integrated prototype
 

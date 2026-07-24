@@ -35,7 +35,7 @@ Validacion:
 
 ```text
 node spikes/verify-corte-1.2.mjs
-bash scripts/verify-plugin.sh
+bash scripts/verify-next-generation.sh
 ```
 
 ## Corte -1.1: cerrar contradicciones del contrato
@@ -66,7 +66,7 @@ Validacion:
 ```text
 node spikes/verify-corte-1.2.mjs
 <product-cli> changeset validate <fixture-operation-id> --format json
-bash scripts/verify-plugin.sh
+bash scripts/verify-next-generation.sh
 ```
 
 ## Corte -1.2: spikes de producto y runtime
@@ -100,7 +100,7 @@ Validacion:
 
 ```text
 node spikes/verify-corte-1.2.mjs
-bash scripts/verify-plugin.sh
+bash scripts/verify-next-generation.sh
 ```
 
 Estados permitidos para cada spike:
@@ -193,10 +193,10 @@ Validacion:
 
 ```text
 <product-cli> workspace init propose --format json
-<product-cli> changeset validate OP-... --format json
-<product-cli> changeset apply OP-... --format json
+<product-cli> changeset validate 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1 --format json
+<product-cli> changeset apply 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1 --format json
 <product-cli> check schema --format json
-bash scripts/verify-plugin.sh
+bash scripts/verify-next-generation.sh
 ```
 
 ## Corte 1: scope catalog y guias aprobables
@@ -217,8 +217,8 @@ Validacion:
 
 ```text
 <product-cli> config guide refresh propose --scope <scope-id> --format json
-<product-cli> changeset approve OP-... --format json
-<product-cli> changeset apply OP-... --format json
+<product-cli> changeset approve 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1 --format json
+<product-cli> changeset apply 0190f1c8-4e39-7a21-8bb2-2a45f8154ef1 --format json
 <product-cli> check guides --format json
 ```
 
@@ -273,8 +273,8 @@ Validacion:
 
 ```text
 <product-cli> release new propose --title <title> --format json
-<product-cli> release status R0001 --format json
-<product-cli> check release R0001 --format json
+<product-cli> release status REL-5F11 --format json
+<product-cli> check release REL-5F11 --format json
 ```
 
 ## Corte 3: release items y work packages
@@ -294,9 +294,9 @@ Cambios:
 Validacion:
 
 ```text
-<product-cli> item create propose R0001 --kind user_story --format json
-<product-cli> item package add propose R0001 RI0001 --scope <scope-id> --format json
-<product-cli> check item R0001 RI0001 --format json
+<product-cli> item create propose REL-5F11 --kind user_story --format json
+<product-cli> item package add propose REL-5F11 ITEM-6041 --scope <scope-id> --format json
+<product-cli> check item REL-5F11 ITEM-6041 --format json
 ```
 
 ## Corte 4: tasks y ejecucion atomica
@@ -305,7 +305,7 @@ Objetivo: adaptar `/<product-name>:task` al nuevo contexto `release -> release i
 
 Cambios:
 
-- Permitir argumentos por IDs primarios o display IDs resueltos: `R0001 RI0001 WP0001 T0001`.
+- Permitir argumentos por IDs primarios o display IDs resueltos: `REL-5F11 ITEM-6041 WP-7131 TASK-7A21`.
 - Rechazar `NNN-slug story-01 task-01` como forma v4.
 - Hacer que `task.yml` herede scope y gates desde `work-package.yml`.
 - Mantener `Test Execution Evidence`, smoke, logging y diseno frontend/backend cuando aplique al kind del scope.
@@ -316,9 +316,9 @@ Cambios:
 Validacion:
 
 ```text
-<product-cli> task inspect R0001 RI0001 WP0001 T0001 --format json
-<product-cli> task start propose R0001 RI0001 WP0001 T0001 --format json
-<product-cli> task closeout R0001 RI0001 WP0001 T0001 --format json
+<product-cli> task inspect REL-5F11 ITEM-6041 WP-7131 TASK-7A21 --format json
+<product-cli> task start propose REL-5F11 ITEM-6041 WP-7131 TASK-7A21 --format json
+<product-cli> task closeout REL-5F11 ITEM-6041 WP-7131 TASK-7A21 --format json
 ```
 
 ## Corte 5: check/report/docs

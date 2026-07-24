@@ -132,7 +132,9 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 |
 +-- scripts/
 |   +-- protect-planning-state.mjs
+|   +-- protect-planning-state-hook.sh
 |   +-- verify-plugin.sh
+|   +-- verify-next-generation.sh
 |
 +-- skills/
 |   +-- init/
@@ -464,7 +466,7 @@ Responsabilidades v4 del sitio:
 
 - Home: explicar el flujo `init -> config -> release -> item -> work package -> task -> ChangeSet -> check/report -> release/deployment -> finalize`.
 - Commands: mostrar solo comandos v4 y separar `update` como mantenimiento.
-- Tutorials: usar IDs display `R0001`, `RI0001`, `WP0001`, `T0001`, IDs primarios distribuidos y storage `.planning/scopes/` + `.planning/releases/`.
+- Tutorials: usar display IDs solo para lectura humana, UUIDv7 en paths y referencias internas, y storage `.planning/scopes/` + `.planning/releases/`.
 - Training: no ensenar `plan-new`, `plan-expand`, `active/finished`, `.releases/` ni historias hermanas por scope.
 - Locales: actualizar `en` y `es` juntos.
 - Verify: `.page/scripts/verify.js` debe fallar ante comandos legacy, storage v3 o copy antiguo.
@@ -525,18 +527,18 @@ El plugin v4 crea esta estructura en el proyecto del usuario:
       README.md
 
   releases/
-    <release-id>/
+    <uuidv7>/
       release.yml
       README.md
       items/
-        <release-item-id>/
+        <uuidv7>/
           release-item.yml
           README.md
           work-packages/
-            <work-package-id>/
+            <uuidv7>/
               work-package.yml
               tasks/
-                <task-id>/
+                <uuidv7>/
                   task.yml
                   README.md
       TRACEABILITY.md
@@ -567,7 +569,7 @@ Antes de publicar:
 - `bin/`, `runtime/`, `runtime/src/schemas/`, `runtime/dist/<product-cli>.mjs`, `template-pack/template-pack.yml` y `template-pack/templates/` tienen versiones compatibles.
 - `CHANGELOG.md` declara ruptura, comandos removidos, storage nuevo y ausencia de aliases.
 - `template-pack/update-version/<N>-<N+1>.md` explica el corte limpio y futuras migraciones v4+.
-- `scripts/verify-plugin.sh`, `.page/scripts/verify.js` y `npm run build` pasan.
+- `scripts/verify-next-generation.sh`, `.page/scripts/verify.js` y `npm run build` pasan.
 
 ## Criterio de consistencia
 

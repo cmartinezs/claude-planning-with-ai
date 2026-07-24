@@ -7,6 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "verify:corte-1.2": "node spikes/verify-corte-1.2.mjs"
+    "verify:corte-1.2": "node spikes/verify-corte-1.2.mjs",
+    "verify:next-generation": "bash scripts/verify-next-generation.sh"
   }
 }
