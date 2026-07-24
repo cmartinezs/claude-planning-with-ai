@@ -58,7 +58,7 @@ function inputPath(toolInput) {
 }
 
 function hasPlanningToken(command) {
-  return /(?:^|[\s"'=(:,;&|])(?:\.\.?[\\/])*\.planning(?:[\\/\s"'=:,;&|)]|$)/i.test(command)
+  return /(?:^|[\s"'=(:,;&|<>])(?:\.\.?[\\/])*\.planning(?:[\\/\s"'=:,;&|<>)]|$)/i.test(command)
     || /[\\/]\.planning(?:[\\/]|$)/i.test(command);
 }
 
@@ -90,10 +90,10 @@ export function isStandaloneApprovedLauncher(command, approvedLauncher) {
 }
 
 function containsWriteOperation(command) {
-  return /(?:^|\s)(?:>|>>|tee|cp|mv|rm|install|mkdir|touch)(?:\s|$)/i.test(command)
+  return /[<>]/.test(command)
+    || /(?:^|[\s;&|()])(?:tee|cp|mv|rm|install|mkdir|touch)(?=$|[\s;&|()])/i.test(command)
     || /(?:sed|perl)\s+-[^\n]*i(?:\s|$)/i.test(command)
-    || /(?:^|\s)(?:python|python3|node|deno|ruby|php|npm|npx)\b/i.test(command)
-    || /(?:^|\s)(?:bash|sh|zsh|fish)\b/i.test(command);
+    || /(?:^|[\s;&|()])(?:python|python3|node|deno|ruby|php|npm|npx|bash|sh|zsh|fish)\b/i.test(command);
 }
 
 export function evaluate(payload, context = defaultContext) {

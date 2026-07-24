@@ -133,7 +133,6 @@ El repo del plugin no debe confundirse con el `.planning/` que se crea dentro de
 +-- scripts/
 |   +-- protect-planning-state.mjs
 |   +-- protect-planning-state-hook.sh
-|   +-- verify-plugin.sh
 |   +-- verify-next-generation.sh
 |
 +-- skills/
@@ -395,7 +394,7 @@ Reglas:
 | `historic-template-pack/` | Workspace con lock a un template pack anterior y snapshot vendor. |
 | `cross-platform-paths/` | Paths, line endings y launcher en Windows/WSL2 o Git Bash segun soporte declarado. |
 
-`scripts/verify-plugin.sh` debe validar:
+`scripts/verify-next-generation.sh` debe validar:
 
 - comandos v4 presentes y comandos v3 ausentes;
 - schemas presentes;

@@ -391,7 +391,7 @@ Cambios:
 - Rehacer documentacion publica: README, `docs/commands.yml`, reference, user guide, developer guide, tutoriales, workflows y glossary.
 - Rehacer site/landing desde `.page` para mostrar solo el flujo v4 y validar con `npm run build`.
 - Rehacer `runtime/`, `runtime/src/schemas/` y `template-pack/`. `/<product-name>:init` no copia templates completos al repo de trabajo.
-- Actualizar `scripts/verify-plugin.sh` para validar ausencia legacy en skills, docs, template, site, manifests y version markers.
+- Actualizar `scripts/verify-next-generation.sh` para validar ausencia legacy en skills, docs, template, site, manifests y version markers.
 - Actualizar `CHANGELOG.md`.
 - Actualizar `template-pack/update-version/<N>-<N+1>.md`.
 - Documentar tabla de comandos removidos y reemplazos.
@@ -404,7 +404,7 @@ El primer cambio implementable debe ser pequeno, pero previo a comandos publicos
 1. Crear schemas minimos para `config`, `plugin.lock`, `scope`, `release`, `release-item`, `work-package`, `task`, `change-set`, `operation` y `event`.
 2. Crear librerias base de identidad, revision, paths, ChangeSet, atomic write y event journal.
 3. Agregar fixtures para monorepo, repo simple y scope no-code.
-4. Agregar checks de arquitectura en `scripts/verify-plugin.sh`.
+4. Agregar checks de arquitectura en `scripts/verify-next-generation.sh`.
 5. Documentar el launcher estable y los contratos en developer guide.
 
 Despues de cerrar Corte -1, Corte -1.1 y Corte -1.2, implementar el primer vertical slice:

@@ -28,6 +28,9 @@ assert.equal(denied(run("Bash", { command: "echo product-cli && rm -rf .planning
 assert.equal(denied(run("Bash", { command: "product-cli apply > .planning/result" })), true, "launcher-with-redirect");
 assert.equal(denied(run("Bash", { command: "product-cli apply | tee .planning/result" })), true, "launcher-with-pipe");
 assert.equal(denied(run("Bash", { command: "product-cli $(cat command.txt)" })), true, "launcher-with-command-substitution");
+assert.equal(denied(run("Bash", { command: "echo x>.planning/config.yml" })), true, "bash-redirect-no-space");
+assert.equal(denied(run("Bash", { command: "echo x>>.planning/config.yml" })), true, "bash-append-redirect-no-space");
+assert.equal(denied(run("Bash", { command: "printf x|tee .planning/config.yml" })), true, "bash-pipe-tee-no-space");
 
 const expectExit2 = (command, args, options) => {
   assert.throws(() => execFileSync(command, args, { ...options, stdio: "pipe" }), (error) => error.status === 2);
@@ -40,6 +43,14 @@ await writeFile(fakeNode, "#!/bin/sh\nprintf '18\\n'\n");
 await chmod(fakeNode, 0o755);
 expectExit2("/bin/bash", [wrapper], { env: { ...process.env, PATH: fakeNodeDir, CLAUDE_PLUGIN_ROOT: path.dirname(path.dirname(wrapper)) } });
 
+const validPluginRoot = path.dirname(path.dirname(wrapper));
+const envWithoutPluginRoot = { ...process.env };
+delete envWithoutPluginRoot.CLAUDE_PLUGIN_ROOT;
+expectExit2("/bin/bash", [wrapper], { env: envWithoutPluginRoot });
+
+const missingHookRoot = await mkdtemp(path.join(os.tmpdir(), "missing-planning-hook-"));
+expectExit2("/bin/bash", [wrapper], { env: { ...process.env, CLAUDE_PLUGIN_ROOT: missingHookRoot } });
+
 expectExit2("node", [hookScript], { input: "not-json", env: process.env });
 
-console.log("planning-state protection hook tests: 16 passed");
+console.log("planning-state protection hook tests: 21 passed");

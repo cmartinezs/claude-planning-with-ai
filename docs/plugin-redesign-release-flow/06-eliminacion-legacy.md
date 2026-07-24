@@ -346,7 +346,7 @@ Reglas:
 Actualizar:
 
 ```text
-scripts/verify-plugin.sh
+scripts/verify-next-generation.sh
 scripts/migrate-commands.sh
 .github/workflows/deploy-pages.yml
 .gitignore
@@ -354,7 +354,7 @@ scripts/migrate-commands.sh
 
 Reglas:
 
-- `verify-plugin.sh` debe validar manifest, docs, site source, template, scripts y ausencia legacy.
+- `verify-next-generation.sh` debe validar manifest, docs, site source, template, scripts y ausencia legacy del producto next-generation.
 - `migrate-commands.sh` debe borrarse si solo migra comandos v3, o reescribirse para tareas v4 reales.
 - workflow de Pages debe seguir construyendo desde `.page` y no depender de outputs legacy.
 - `.gitignore` debe seguir excluyendo outputs generados, no fuentes v4.
@@ -397,7 +397,7 @@ update-version.mjs       -> conservar para futuras migraciones v4+
 
 ## Checks obligatorios
 
-`scripts/verify-plugin.sh` debe fallar si encuentra:
+`scripts/verify-next-generation.sh` debe fallar si encuentra:
 
 - `skills/release-*`;
 - ausencia de `skills/config/` cuando `docs/commands.yml` lo declare;

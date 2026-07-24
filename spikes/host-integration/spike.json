@@ -1,6 +1,6 @@
 {
   "id": "host-integration",
-  "status": "PLANNED",
+  "status": "IN_PROGRESS",
   "hypothesis": "The plugin host exposes the canonical namespaced skills and bundled hooks.",
   "scope": "Manifest, discovery, namespace, help, PATH, reload, update and hooks.",
   "non_goals": ["Productive runtime implementation"],
