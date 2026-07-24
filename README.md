@@ -11,6 +11,10 @@
 
 **Structured lifecycle planning for software projects**
 
+> **Maintenance only:** v3 is frozen. This repository is preserved as the
+> historical v3 product; no new features will be added here. Next-generation
+> development continues in the sibling `shipping-mode` repository.
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Version](https://img.shields.io/badge/version-3.11.0-brightgreen?style=flat-square)](.claude-plugin/plugin.json)
 [![Platform](https://img.shields.io/badge/Claude%20Code-plugin-7C3AED?style=flat-square)](https://claude.ai/code)
